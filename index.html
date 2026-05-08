@@ -99,7 +99,7 @@
       alignment: rive.Alignment.Center,
       onLoad: () => {
         r.resizeDrawingSurfaceToCanvas();
-        tick();
+        r.playbackRate = 0.3;
       },
       onLoadError: (e) => console.error('Rive error:', e)
     });
@@ -110,25 +110,20 @@
       r.resizeDrawingSurfaceToCanvas();
     });
 
-    let targetSpeed = 0.3;
-    let currentSpeed = 0.3;
     let mouseTimeout;
 
-    function triggerSpeedUp() {
-      targetSpeed = 1.0;
+    document.addEventListener('mousemove', () => {
+      console.log('mouse, rate:', r.playbackRate);
+      r.playbackRate = 1.0;
       clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => { targetSpeed = 0.3; }, 150);
-    }
+      mouseTimeout = setTimeout(() => { r.playbackRate = 0.3; }, 300);
+    });
 
-    document.addEventListener('mousemove', triggerSpeedUp);
-    document.addEventListener('touchstart', triggerSpeedUp, { passive: true });
-
-    function tick() {
-      const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
-      currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
-      r.playbackRate = currentSpeed;
-      requestAnimationFrame(tick);
-    }
+    document.addEventListener('touchstart', () => {
+      r.playbackRate = 1.0;
+      clearTimeout(mouseTimeout);
+      mouseTimeout = setTimeout(() => { r.playbackRate = 0.3; }, 300);
+    }, { passive: true });
 
   </script>
 
