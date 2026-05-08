@@ -484,10 +484,11 @@
     let pullInput   = null;
 
     function sizeDoneCanvas() {
-      const w = doneCanvas.clientWidth;
-      const h = doneCanvas.clientHeight;
-      if (w > 0) { doneCanvas.width = w; doneCanvas.height = h; }
+      const w = doneCanvas.clientWidth || Math.round(window.innerWidth * 0.5);
+      doneCanvas.width  = w;
+      doneCanvas.height = Math.round(w * 9 / 16);
     }
+    sizeDoneCanvas();
 
     const doneRive = new rive.Rive({
       src: 'DoneItSlot.riv',
