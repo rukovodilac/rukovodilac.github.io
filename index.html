@@ -11,59 +11,86 @@
   <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: "Host Grotesk", sans-serif;
+      background: #000;
+    }
+
+    #rive-canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
     }
   </style>
 </head>
 <body>
-<!-- in <body> -->
-<canvas id="rive-canvas"></canvas>
 
-<!-- in <style> -->
-<style>
-  #rive-canvas {
-    width: 100%;
-    height: 100vh;
-    display: block;
-  }
-</style>
+  <canvas id="rive-canvas"></canvas>
 
-<!-- before </body> -->
-<script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
-<script>
-  const r = new rive.Rive({
-    src: 'web_head_full.riv',
-    canvas: document.getElementById('rive-canvas'),
-    artboard: 'Web_Head',
-    stateMachines: 'State Machine 1',
-    autoplay: true,
-    onLoad: () => {
+  <script src="https://unpkg.com/@rive-app/webgl2@2.23.10/rive.js"></script>
+  <script>
+    const canvas = document.getElementById('rive-canvas');
+    const isMobile = () => window.matchMedia('(pointer: coarse)').matches;
+
+    const r = new rive.Rive({
+      src: 'web_head_full.riv',
+      canvas: canvas,
+      artboard: 'Web_Head',
+      stateMachines: 'State Machine 1',
+      autoplay: true,
+      onLoad: () => {
+        resizeCanvas();
+        r.playbackRate = 0.05;
+      }
+    });
+
+    // --- Resize ---
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
       r.resizeDrawingSurfaceToCanvas();
-      r.playbackRate = 0.05;
     }
-  });
+    window.addEventListener('resize', resizeCanvas);
 
-  let targetSpeed = 0.05;
-  let currentSpeed = 0.05;
-  let mouseTimeout;
+    // --- Speed control ---
+    let targetSpeed = 0.05;
+    let currentSpeed = 0.05;
+    let mouseTimeout;
 
-  document.addEventListener('mousemove', () => {
-    targetSpeed = 1.0;
-    clearTimeout(mouseTimeout);
-    mouseTimeout = setTimeout(() => {
-      targetSpeed = 0.05; // start easing back after mouse stops
-    }, 150);
-  });
+    function triggerSpeedUp() {
+      targetSpeed = 1.0;
+      clearTimeout(mouseTimeout);
+      mouseTimeout = setTimeout(() => {
+        targetSpeed = 0.05;
+      }, 150);
+    }
 
-  function tick() {
-    const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
-    currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
-    r.playbackRate = currentSpeed;
-    requestAnimationFrame(tick);
-  }
+    // Desktop: mousemove
+    document.addEventListener('mousemove', () => {
+      if (!isMobile()) triggerSpeedUp();
+    });
 
-  tick();
-</script>
+    // Mobile: tap
+    document.addEventListener('touchstart', () => {
+      if (isMobile()) triggerSpeedUp();
+    });
+
+    // --- Lerp loop ---
+    function tick() {
+      const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
+      currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
+      r.playbackRate = currentSpeed;
+      requestAnimationFrame(tick);
+    }
+
+    tick();
+  </script>
+
 </body>
 </html>
