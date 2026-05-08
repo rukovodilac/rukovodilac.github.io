@@ -99,6 +99,8 @@
       alignment: rive.Alignment.Center,
       onLoad: () => {
         r.resizeDrawingSurfaceToCanvas();
+        console.log('State machines:', r.stateMachineNames);
+        console.log('Animations:', r.animationNames);
         const all = r.stateMachineInputs('State Machine 1');
         console.log('Inputs:', all?.map(i => i.name));
         all?.forEach(i => { inputs[i.name] = i; });
