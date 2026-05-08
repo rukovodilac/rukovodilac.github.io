@@ -48,7 +48,7 @@
       onLoad: () => {
         console.log('Rive loaded. Artboards:', r.artboardNames, '| State machines:', r.stateMachineNames);
         resizeCanvas();
-        r.playbackRate = 0.05;
+        r.playbackRate = 1.0;
       },
       onLoadError: (e) => {
         console.error('Rive load error:', e);
@@ -67,8 +67,8 @@
     window.addEventListener('resize', resizeCanvas);
 
     // --- Speed control ---
-    let targetSpeed = 0.05;
-    let currentSpeed = 0.05;
+    let targetSpeed = 1.0;
+    let currentSpeed = 1.0;
     let mouseTimeout;
 
     function triggerSpeedUp() {
