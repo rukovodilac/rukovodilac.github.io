@@ -224,6 +224,12 @@
       }
     }
 
+    .media-block {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
     .arrow-icon {
       display: inline-block;
       width: 0.85em;
@@ -356,7 +362,9 @@
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
           allowfullscreen
           frameborder="0"
+          scrolling="no"
         ></iframe>
+        <div class="media-block"></div>
       </div>
       <div class="work-tag work-tag--latest">
         <svg aria-hidden="true"><use href="#icon-latest"/></svg>
@@ -375,7 +383,9 @@
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
           allowfullscreen
           frameborder="0"
+          scrolling="no"
         ></iframe>
+        <div class="media-block"></div>
       </div>
       <div class="work-tag work-tag--latest">
         <svg aria-hidden="true"><use href="#icon-latest"/></svg>
@@ -394,7 +404,9 @@
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
           allowfullscreen
           frameborder="0"
+          scrolling="no"
         ></iframe>
+        <div class="media-block"></div>
       </div>
       <div class="work-tag work-tag--rerun">
         <svg aria-hidden="true"><use href="#icon-rerun"/></svg>
