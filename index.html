@@ -83,8 +83,8 @@
 </head>
 <body>
 
-  <canvas id="rive-canvas"></canvas>
   <canvas id="trail-canvas"></canvas>
+  <canvas id="rive-canvas"></canvas>
 
   <div id="overlay">
     <a href="/" id="logo">a–z</a>
@@ -134,13 +134,14 @@
       const dy = prevY === null ? 999 : y - prevY;
       if (dx * dx + dy * dy < 400) return;
       prevX = x; prevY = y;
-      const size = 12 + Math.random() * 88;
+      const vmin = Math.min(window.innerWidth, window.innerHeight);
+      const size = vmin * (0.015 + Math.random() * 0.08);
       squares.push({
         x: x - size / 2 + (Math.random() - 0.5) * 30,
         y: y - size / 2 + (Math.random() - 0.5) * 30,
         s: size,
         born: performance.now(),
-        life: 500 + Math.random() * 500
+        life: 900 + Math.random() * 600
       });
     }
 
@@ -153,7 +154,8 @@
         const sq = squares[i];
         const t = (now - sq.born) / sq.life;
         if (t >= 1) { squares.splice(i, 1); continue; }
-        tc.fillStyle = `rgba(255,255,255,${0.6 * (1 - t)})`;
+        const opacity = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
+        tc.fillStyle = `rgba(255,255,255,${opacity})`;
         tc.fillRect(sq.x, sq.y, sq.s, sq.s);
       }
       requestAnimationFrame(drawTrail);
