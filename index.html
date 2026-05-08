@@ -157,24 +157,26 @@
       position: absolute;
       bottom: clamp(16px, 2.5vw, 32px);
       left: clamp(14px, 2vw, 24px);
-      background: #F4E9D5;
-      padding: 5px 12px 7px;
       font-size: clamp(18px, 2.1vw, 34px);
-      font-weight: 500;
+      font-weight: 400;
       line-height: 1.2;
       color: #000;
       pointer-events: none;
       display: flex;
       flex-direction: column;
+      gap: 2px;
     }
 
-    /* Per-line underline draw animation */
+    /* Per-line highlight + underline draw animation */
     .work-title span {
       display: block;
+      width: fit-content;
+      background-color: #F4E9D5;
       background-image: linear-gradient(#000, #000);
       background-position: 0 100%;
       background-repeat: no-repeat;
       background-size: 0% 1.5px;
+      padding: 2px 12px 4px;
       transition: background-size 0.45s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
@@ -184,6 +186,13 @@
 
     @media (hover: hover) {
       .work-item:hover .work-title span {
+        background-size: 100% 1.5px;
+      }
+    }
+
+    /* Mobile: underline always visible */
+    @media (hover: none) {
+      .work-title span {
         background-size: 100% 1.5px;
       }
     }
@@ -251,6 +260,7 @@
   </section>
 
   <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
   <script>
     const canvas = document.getElementById('rive-canvas');
     canvas.width = window.innerWidth;
@@ -302,7 +312,15 @@
     window.addEventListener('mousemove', (e) => spawnSquare(e.clientX, e.clientY));
     window.addEventListener('touchmove', (e) => spawnSquare(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
 
-    function drawTrail(now) {
+    // Lenis smooth scroll
+    const lenis = new Lenis({
+      duration: 1.4,
+      easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)), // easeOutExpo
+      smoothWheel: true,
+    });
+
+    function tick(now) {
+      lenis.raf(now);
       tc.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
       for (let i = squares.length - 1; i >= 0; i--) {
         const sq = squares[i];
@@ -312,9 +330,9 @@
         tc.fillStyle = `rgba(255,255,255,${opacity})`;
         tc.fillRect(sq.x, sq.y, sq.s, sq.s);
       }
-      requestAnimationFrame(drawTrail);
+      requestAnimationFrame(tick);
     }
-    requestAnimationFrame(drawTrail);
+    requestAnimationFrame(tick);
   </script>
 
 </body>
