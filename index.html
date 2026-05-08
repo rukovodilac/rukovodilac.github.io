@@ -520,7 +520,8 @@
       src: 'DoneItSlot.riv',
       canvas: doneCanvas,
       artboard: 'Slot',
-      autoplay: false,
+      stateMachines: 'SlotStateMachine',
+      autoplay: true,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
@@ -530,8 +531,6 @@
         const anims = doneRive.animationNames || [];
         idleAnimName = anims.find(n => n.toLowerCase().includes('idle')) || anims[0];
         pullAnimName = anims.find(n => n !== idleAnimName) || anims[1];
-
-        if (idleAnimName) doneRive.play(idleAnimName);
 
         // ── ViewModel setup ──────────────────────────────────────────
         try {
@@ -589,13 +588,9 @@
 
     doneRive.on(rive.EventType.Stop, (event) => {
       const stopped = event.data || [];
+      console.log('[DoneItSlot] Stop:', stopped, '| isPulling was:', isPulling);
       if (stopped.some(n => n === pullAnimName)) {
         isPulling = false;
-        // idle is still playing underneath — do NOT restart it (that causes jitter)
-      }
-      // only restart idle if idle itself stopped (one-shot animation, no SM)
-      if (!isPulling && !spinTrigger && idleAnimName && stopped.some(n => n === idleAnimName)) {
-        doneRive.play(idleAnimName);
       }
     });
 
@@ -604,14 +599,23 @@
       do { idx = Math.floor(Math.random() * slotTitles.length); }
       while (slotTitles.length > 1 && idx === lastSlotIdx);
       lastSlotIdx = idx;
+      console.log('[DoneItSlot] changeSlotTitle → index', idx);
       setSlotText(slotTitles[idx]);
     }
 
     function fireSlot() {
       if (isPulling) return;
+      console.log('[DoneItSlot] fireSlot — trigger:', spinTrigger, '| pull:', pullAnimName);
       isPulling = true;
-      if (pullAnimName) doneRive.play(pullAnimName);
-      setTimeout(changeSlotTitle, Math.round(15 * 1000 / 60));
+      if (spinTrigger && typeof spinTrigger.trigger === 'function') {
+        spinTrigger.trigger();
+      } else if (pullAnimName) {
+        doneRive.play(pullAnimName);
+      }
+      setTimeout(() => {
+        console.log('[DoneItSlot] text timeout fired');
+        changeSlotTitle();
+      }, Math.round(15 * 1000 / 60));
     }
 
     doneCanvas.addEventListener('click', fireSlot);
