@@ -93,7 +93,7 @@
     let targetSpeed = 0.05;
     let currentSpeed = 0.05;
     let mouseTimeout;
-    let tickRunning = false;
+    let lastTime = null;
 
     const r = new rive.Rive({
       src: 'web_head_full.riv',
@@ -103,13 +103,11 @@
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
-        r.resizeDrawingSurfaceToCanvas();
-      },
-      onPlay: () => {
-        if (!tickRunning) {
-          tickRunning = true;
-          tick();
-        }
+        setTimeout(() => {
+          r.resizeDrawingSurfaceToCanvas();
+          r.stopRendering();
+          requestAnimationFrame(tick);
+        }, 0);
       },
       onLoadError: (e) => console.error('Rive error:', e)
     });
@@ -118,21 +116,27 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       r.resizeDrawingSurfaceToCanvas();
+      lastTime = null;
     });
 
     function triggerSpeedUp() {
       targetSpeed = 2.0;
       clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => { targetSpeed = 0.1; }, 200);
+      mouseTimeout = setTimeout(() => { targetSpeed = 0.05; }, 200);
     }
 
     canvas.addEventListener('mousemove', triggerSpeedUp);
     canvas.addEventListener('touchstart', triggerSpeedUp, { passive: true });
 
-    function tick() {
-      const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
-      currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
-      r.playbackRate = currentSpeed;
+    function tick(timestamp) {
+      if (lastTime !== null) {
+        const dt = (timestamp - lastTime) / 1000;
+        const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
+        currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
+        r.advance(dt * currentSpeed);
+        r.drawFrame();
+      }
+      lastTime = timestamp;
       requestAnimationFrame(tick);
     }
 
