@@ -90,8 +90,8 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    let targetSpeed = 0.1;
-    let currentSpeed = 0.1;
+    let targetSpeed = 0.05;
+    let currentSpeed = 0.05;
     let mouseTimeout;
     let tickRunning = false;
 
@@ -121,7 +121,7 @@
     });
 
     function triggerSpeedUp() {
-      targetSpeed = 1.0;
+      targetSpeed = 2.0;
       clearTimeout(mouseTimeout);
       mouseTimeout = setTimeout(() => { targetSpeed = 0.1; }, 200);
     }
