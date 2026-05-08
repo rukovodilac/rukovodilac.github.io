@@ -99,7 +99,7 @@
       alignment: rive.Alignment.Center,
       onLoad: () => {
         r.resizeDrawingSurfaceToCanvas();
-        r.playbackRate = 0.3;
+        r.playbackRate = 0.05;
       },
       onLoadError: (e) => console.error('Rive error:', e)
     });
@@ -113,16 +113,15 @@
     let mouseTimeout;
 
     document.addEventListener('mousemove', () => {
-      console.log('mouse, rate:', r.playbackRate);
-      r.playbackRate = 1.0;
+      r.playbackRate = 3.0;
       clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => { r.playbackRate = 0.3; }, 300);
+      mouseTimeout = setTimeout(() => { r.playbackRate = 0.05; }, 300);
     });
 
     document.addEventListener('touchstart', () => {
-      r.playbackRate = 1.0;
+      r.playbackRate = 3.0;
       clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => { r.playbackRate = 0.3; }, 300);
+      mouseTimeout = setTimeout(() => { r.playbackRate = 0.05; }, 300);
     }, { passive: true });
 
   </script>
