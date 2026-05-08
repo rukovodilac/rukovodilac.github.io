@@ -84,7 +84,7 @@
     </div>
   </div>
 
-  <script src="https://unpkg.com/@rive-app/canvas@2.23.10/rive.js"></script>
+  <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
   <script>
     const canvas = document.getElementById('rive-canvas');
     canvas.width = window.innerWidth;
@@ -100,6 +100,7 @@
       onLoad: () => {
         r.resizeDrawingSurfaceToCanvas();
         r.playbackRate = 0.05;
+        tick();
       },
       onLoadError: (e) => console.error('Rive error:', e)
     });
@@ -110,19 +111,25 @@
       r.resizeDrawingSurfaceToCanvas();
     });
 
+    let targetSpeed = 0.05;
+    let currentSpeed = 0.05;
     let mouseTimeout;
 
-    document.addEventListener('mousemove', () => {
-      r.playbackRate = 3.0;
+    function triggerSpeedUp() {
+      targetSpeed = 1.0;
       clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => { r.playbackRate = 0.05; }, 300);
-    });
+      mouseTimeout = setTimeout(() => { targetSpeed = 0.05; }, 150);
+    }
 
-    document.addEventListener('touchstart', () => {
-      r.playbackRate = 3.0;
-      clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => { r.playbackRate = 0.05; }, 300);
-    }, { passive: true });
+    document.addEventListener('mousemove', triggerSpeedUp);
+    document.addEventListener('touchstart', triggerSpeedUp, { passive: true });
+
+    function tick() {
+      const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
+      currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
+      r.playbackRate = currentSpeed;
+      requestAnimationFrame(tick);
+    }
 
   </script>
 
