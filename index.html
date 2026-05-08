@@ -493,6 +493,9 @@
     let isPulling    = false;
     let idleAnimName = null;
     let pullAnimName = null;
+    let slotVmInst   = null;   // ViewModel instance — available once you bind it in the Rive editor
+    let slotTextProp = null;   // vm.string('slotText')
+    let spinTrigger  = null;   // vm.trigger('trigSpin')
 
     function sizeDoneCanvas() {
       const w = doneCanvas.clientWidth || Math.round(window.innerWidth * 0.4);
@@ -501,11 +504,20 @@
     }
     sizeDoneCanvas();
 
+    function setSlotText(text) {
+      if (slotTextProp) {
+        slotTextProp.value = text;
+      } else {
+        try { doneRive.setTextRunValue(SLOT_TEXT, text); } catch(e) {}
+      }
+    }
+
     const doneRive = new rive.Rive({
       src: 'DoneItSlot.riv',
       canvas: doneCanvas,
       artboard: 'Slot',
-      autoplay: false,
+      stateMachines: 'SlotStateMachine',
+      autoplay: true,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
@@ -513,53 +525,48 @@
         doneRive.resizeDrawingSurfaceToCanvas();
 
         const anims = doneRive.animationNames || [];
-        console.log('[DoneItSlot] all animations:', anims);
-
         idleAnimName = anims.find(n => n.toLowerCase().includes('idle')) || anims[0];
         pullAnimName = anims.find(n => n !== idleAnimName) || anims[1];
         console.log('[DoneItSlot] idle =', idleAnimName, '| pull =', pullAnimName);
 
-        if (idleAnimName) doneRive.play(idleAnimName);
-
-        // Diagnostic: list what the artboard exposes
+        // ── ViewModel setup ──────────────────────────────────────────
+        // Works once you bind a SlotVm instance as the artboard's Data Context in the Rive editor:
+        //   Select artboard → right panel → Data / Data Context → + → SlotVm → re-export
         try {
-          const ab = doneRive.artboard;
-          console.log('[DoneItSlot] artboard object:', ab);
-          // Try direct artboard text run lookup (faster path, skips nested search)
-          if (ab && typeof ab.textRun === 'function') {
-            const run = ab.textRun(SLOT_TEXT);
-            console.log('[DoneItSlot] ab.textRun("slotText"):', run);
-            if (run) { run.text = slotTitles[0]; console.log('[DoneItSlot] set via ab.textRun OK'); }
+          slotVmInst = doneRive.viewModelInstance;
+
+          if (!slotVmInst) {
+            const vmDef = doneRive.viewModelByName('SlotVm');
+            if (vmDef) {
+              slotVmInst = doneRive.createViewModelInstanceFromViewModel(vmDef);
+              if (slotVmInst) doneRive.setDataContextFromViewModelInstance(slotVmInst);
+            }
+          }
+
+          if (slotVmInst) {
+            slotTextProp = slotVmInst.string('slotText');
+            spinTrigger  = slotVmInst.trigger('trigSpin');
+            console.log('[DoneItSlot] ViewModel OK — text prop:', slotTextProp, '| trigger:', spinTrigger);
+          } else {
+            console.warn('[DoneItSlot] ViewModel instance not found. Bind a SlotVm instance as the artboard Data Context in the Rive editor, then re-export.');
           }
         } catch(e) {
-          console.log('[DoneItSlot] artboard textRun probe failed:', e.message);
+          console.warn('[DoneItSlot] ViewModel setup error:', e.message || e);
         }
-        try {
-          doneRive.setTextRunValue(SLOT_TEXT, slotTitles[0]);
-          console.log('[DoneItSlot] setTextRunValue OK — initial text set');
-        } catch(e) {
-          console.error(
-            '[DoneItSlot] setTextRunValue still failing.\n' +
-            'MOST LIKELY CAUSE: the text element is inside a nested Rive component (symbol/artboard).\n' +
-            'In that case setTextRunValue only searches the top-level artboard and cannot reach it.\n' +
-            'FIX: In Rive editor, check if the text node is inside a component — if so, move it out to\n' +
-            'the Slot artboard directly (not inside a nested component), then rename the run and re-export.\n' +
-            'Error was:', e.message || e
-          );
-        }
+
+        setSlotText(slotTitles[0]);
       },
       onLoadError: (e) => console.error('DoneItSlot Rive error:', e)
     });
 
     doneRive.on(rive.EventType.Stop, (event) => {
       const stopped = event.data || [];
-      console.log('[DoneItSlot] Stop event:', stopped);
       if (stopped.some(n => n === pullAnimName)) {
         isPulling = false;
         // idle is still playing underneath — do NOT restart it (that causes jitter)
       }
-      // only restart idle if idle itself stopped (one-shot animation case)
-      if (!isPulling && idleAnimName && stopped.some(n => n === idleAnimName)) {
+      // only restart idle if idle itself stopped (one-shot animation, no SM)
+      if (!isPulling && !spinTrigger && idleAnimName && stopped.some(n => n === idleAnimName)) {
         doneRive.play(idleAnimName);
       }
     });
@@ -569,18 +576,17 @@
       do { idx = Math.floor(Math.random() * slotTitles.length); }
       while (slotTitles.length > 1 && idx === lastSlotIdx);
       lastSlotIdx = idx;
-      try {
-        doneRive.setTextRunValue(SLOT_TEXT, slotTitles[idx]);
-        console.log('[DoneItSlot] text changed to:', slotTitles[idx]);
-      } catch(e) {
-        console.warn('[DoneItSlot] changeSlotTitle failed:', e.message);
-      }
+      setSlotText(slotTitles[idx]);
     }
 
     function fireSlot() {
       if (isPulling) return;
       isPulling = true;
-      if (pullAnimName) doneRive.play(pullAnimName);
+      if (spinTrigger) {
+        spinTrigger.fire();
+      } else if (pullAnimName) {
+        doneRive.play(pullAnimName);
+      }
       setTimeout(changeSlotTitle, Math.round(15 * 1000 / 60));
     }
 
