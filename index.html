@@ -516,7 +516,8 @@
       src: 'DoneItSlot.riv',
       canvas: doneCanvas,
       artboard: 'Slot',
-      autoplay: false,
+      stateMachines: 'SlotStateMachine',
+      autoplay: true,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
@@ -526,9 +527,6 @@
         const anims = doneRive.animationNames || [];
         idleAnimName = anims.find(n => n.toLowerCase().includes('idle')) || anims[0];
         pullAnimName = anims.find(n => n !== idleAnimName) || anims[1];
-        console.log('[DoneItSlot] idle =', idleAnimName, '| pull =', pullAnimName);
-
-        if (idleAnimName) doneRive.play(idleAnimName);
 
         // ── ViewModel setup ──────────────────────────────────────────
         try {
@@ -593,7 +591,7 @@
       if (isPulling) return;
       isPulling = true;
       if (spinTrigger) {
-        spinTrigger.fire();
+        spinTrigger.trigger();
       } else if (pullAnimName) {
         doneRive.play(pullAnimName);
       }
