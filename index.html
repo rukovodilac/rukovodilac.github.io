@@ -495,7 +495,7 @@
       canvas: doneCanvas,
       stateMachines: SLOT_SM,
       autoplay: true,
-      fit: rive.Fit.Cover,
+      fit: rive.Fit.Contain,
       alignment: rive.Alignment.Center,
       onLoad: () => {
         sizeDoneCanvas();
@@ -503,8 +503,12 @@
 
         const inputs = doneRive.stateMachineInputs(SLOT_SM);
         if (inputs && inputs.length) {
-          pullInput = inputs.find(i => typeof i.fire === 'function') || null;
+          // prefer Trigger, fall back to first Boolean, then anything
+          pullInput = inputs.find(i => typeof i.fire === 'function')
+                   || inputs.find(i => typeof i.value === 'boolean')
+                   || inputs[0];
           console.log('[DoneItSlot] inputs:', inputs.map(i => `${i.name} (type ${i.type})`));
+          console.log('[DoneItSlot] using input:', pullInput?.name);
         } else {
           console.warn('[DoneItSlot] No inputs found for SM "' + SLOT_SM + '" — check name in Rive editor.');
         }
@@ -520,6 +524,7 @@
 
     doneRive.on(rive.EventType.StateChange, (event) => {
       const states = event.data || [];
+      console.log('[DoneItSlot] StateChange:', states);
       const enteringPull = states.some(s => s.toLowerCase().includes('pull'));
       if (enteringPull && !isPulling) {
         isPulling = true;
@@ -529,20 +534,25 @@
           while (slotTitles.length > 1 && idx === lastSlotIdx);
           lastSlotIdx = idx;
           try { doneRive.setTextRunValue(SLOT_TEXT, slotTitles[idx]); } catch(e) {}
-        }, Math.round(15 * 1000 / 60)); // 15 frames @ 60 fps ≈ 250 ms
+        }, Math.round(15 * 1000 / 60));
       } else if (!enteringPull) {
         isPulling = false;
       }
     });
 
-    doneCanvas.addEventListener('click', () => {
-      if (pullInput && !isPulling) pullInput.fire();
-    });
+    function fireSlot() {
+      if (isPulling) return;
+      if (!pullInput) { console.warn('[DoneItSlot] No input — check console after load.'); return; }
+      console.log('[DoneItSlot] Firing:', pullInput.name);
+      if (typeof pullInput.fire === 'function') {
+        pullInput.fire();
+      } else if (typeof pullInput.value === 'boolean') {
+        pullInput.value = true;
+      }
+    }
 
-    doneCanvas.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      if (pullInput && !isPulling) pullInput.fire();
-    }, { passive: false });
+    doneCanvas.addEventListener('click', fireSlot);
+    doneCanvas.addEventListener('touchend', (e) => { e.preventDefault(); fireSlot(); }, { passive: false });
 
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
