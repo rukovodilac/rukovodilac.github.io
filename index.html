@@ -461,8 +461,8 @@
     trailCanvas.height = heroH();
 
     // ── DoneItSlot Rive ──
-    const SLOT_SM   = 'SlotStateMachine';
-    const SLOT_TEXT = 'slotText'; // ViewModel string property name
+    // SLOT_TEXT: name of the text run — set this in the Rive editor (see below)
+    const SLOT_TEXT = 'slotText';
 
     const slotTitles = [
       'INTERACTIVE\nMOTION DESIGN',
@@ -489,9 +489,9 @@
     ];
 
     const doneCanvas = document.getElementById('done-it-canvas');
-    let lastSlotIdx = 0;
-    let isPulling   = false;
-    let slotVm      = null; // ViewModel instance (trigSpin + slotText live here)
+    let lastSlotIdx  = 0;
+    let isPulling    = false;
+    let pullAnimName = 'pull'; // updated in onLoad from actual animation names
 
     function sizeDoneCanvas() {
       const w = doneCanvas.clientWidth || Math.round(window.innerWidth * 0.4);
@@ -504,7 +504,7 @@
       src: 'DoneItSlot.riv',
       canvas: doneCanvas,
       artboard: 'Slot',
-      stateMachines: SLOT_SM,
+      animations: 'idle',   // drive animations directly — no ViewModel needed
       autoplay: true,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
@@ -512,49 +512,53 @@
         sizeDoneCanvas();
         doneRive.resizeDrawingSurfaceToCanvas();
 
-        // SlotVm is a ViewModel — access via viewModelInstance
-        try {
-          slotVm = doneRive.viewModelInstance;
-          console.log('[DoneItSlot] ViewModel:', slotVm ? 'found' : 'null');
-        } catch(e) {
-          console.warn('[DoneItSlot] viewModelInstance not available:', e.message);
-        }
+        const anims = doneRive.animationNames || [];
+        console.log('[DoneItSlot] animations:', anims);
 
-        setSlotText(slotTitles[0]);
+        // pick the pull animation: first name that isn't idle
+        const found = anims.find(n => !n.toLowerCase().includes('idle'));
+        if (found) pullAnimName = found;
+        console.log('[DoneItSlot] pull animation:', pullAnimName);
+
+        // set initial text — works once you name the text run in the Rive editor (see below)
+        try {
+          doneRive.setTextRunValue(SLOT_TEXT, slotTitles[0]);
+        } catch(e) {
+          console.warn(
+            '[DoneItSlot] Text run not accessible.\n' +
+            'Fix in Rive editor (one-time):\n' +
+            '  1. Click the text element on the Slot artboard\n' +
+            '  2. Right panel → "Text" section → find the "Runs" list\n' +
+            '  3. Click the run name field (may be blank) and type: slotText\n' +
+            '  4. Re-export and replace DoneItSlot.riv'
+          );
+        }
       },
       onLoadError: (e) => console.error('DoneItSlot Rive error:', e)
     });
 
-    function setSlotText(text) {
-      if (slotVm) {
-        try { slotVm.string(SLOT_TEXT).value = text; return; } catch(e) {}
+    // when pull animation finishes, loop back to idle
+    doneRive.on(rive.EventType.Stop, (event) => {
+      const stopped = event.data || [];
+      if (stopped.some(n => n === pullAnimName)) {
+        isPulling = false;
+        doneRive.play('idle');
       }
-      // Fallback: direct text run (works if text run is also named in editor)
-      try { doneRive.setTextRunValue(SLOT_TEXT, text); } catch(e) {}
-    }
+    });
 
     function changeSlotTitle() {
       let idx;
       do { idx = Math.floor(Math.random() * slotTitles.length); }
       while (slotTitles.length > 1 && idx === lastSlotIdx);
       lastSlotIdx = idx;
-      setSlotText(slotTitles[idx]);
+      try { doneRive.setTextRunValue(SLOT_TEXT, slotTitles[idx]); } catch(e) {}
     }
 
     function fireSlot() {
       if (isPulling) return;
       isPulling = true;
-
-      // Fire trigSpin via ViewModel
-      if (slotVm) {
-        try { slotVm.trigger('trigSpin').trigger(); }
-        catch(e) { console.warn('[DoneItSlot] trigSpin failed:', e.message); }
-      }
-
-      // Change text after 15 frames (250 ms at 60 fps)
+      doneRive.play(pullAnimName);
       setTimeout(changeSlotTitle, Math.round(15 * 1000 / 60));
-      // Unlock after estimated animation duration
-      setTimeout(() => { isPulling = false; }, 1500);
     }
 
     doneCanvas.addEventListener('click', fireSlot);
