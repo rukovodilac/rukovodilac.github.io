@@ -491,7 +491,8 @@
     const doneCanvas = document.getElementById('done-it-canvas');
     let lastSlotIdx  = 0;
     let isPulling    = false;
-    let pullAnimName = 'pull'; // updated in onLoad from actual animation names
+    let idleAnimName = null;
+    let pullAnimName = null;
 
     function sizeDoneCanvas() {
       const w = doneCanvas.clientWidth || Math.round(window.innerWidth * 0.4);
@@ -504,8 +505,7 @@
       src: 'DoneItSlot.riv',
       canvas: doneCanvas,
       artboard: 'Slot',
-      animations: 'idle',   // drive animations directly — no ViewModel needed
-      autoplay: true,
+      autoplay: false,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
@@ -513,36 +513,32 @@
         doneRive.resizeDrawingSurfaceToCanvas();
 
         const anims = doneRive.animationNames || [];
-        console.log('[DoneItSlot] animations:', anims);
+        console.log('[DoneItSlot] all animations:', anims);
 
-        // pick the pull animation: first name that isn't idle
-        const found = anims.find(n => !n.toLowerCase().includes('idle'));
-        if (found) pullAnimName = found;
-        console.log('[DoneItSlot] pull animation:', pullAnimName);
+        idleAnimName = anims.find(n => n.toLowerCase().includes('idle')) || anims[0];
+        pullAnimName = anims.find(n => n !== idleAnimName) || anims[1];
+        console.log('[DoneItSlot] idle =', idleAnimName, '| pull =', pullAnimName);
 
-        // set initial text — works once you name the text run in the Rive editor (see below)
+        if (idleAnimName) doneRive.play(idleAnimName);
+
         try {
           doneRive.setTextRunValue(SLOT_TEXT, slotTitles[0]);
+          console.log('[DoneItSlot] initial text set OK');
         } catch(e) {
-          console.warn(
-            '[DoneItSlot] Text run not accessible.\n' +
-            'Fix in Rive editor (one-time):\n' +
-            '  1. Click the text element on the Slot artboard\n' +
-            '  2. Right panel → "Text" section → find the "Runs" list\n' +
-            '  3. Click the run name field (may be blank) and type: slotText\n' +
-            '  4. Re-export and replace DoneItSlot.riv'
-          );
+          console.warn('[DoneItSlot] setTextRunValue failed — text run not yet named in Rive editor:', e.message || e);
         }
       },
       onLoadError: (e) => console.error('DoneItSlot Rive error:', e)
     });
 
-    // when pull animation finishes, loop back to idle
     doneRive.on(rive.EventType.Stop, (event) => {
       const stopped = event.data || [];
+      console.log('[DoneItSlot] Stop event:', stopped);
       if (stopped.some(n => n === pullAnimName)) {
         isPulling = false;
-        doneRive.play('idle');
+        if (idleAnimName) doneRive.play(idleAnimName);
+      } else if (!isPulling && idleAnimName && stopped.some(n => n === idleAnimName)) {
+        doneRive.play(idleAnimName);
       }
     });
 
@@ -551,13 +547,16 @@
       do { idx = Math.floor(Math.random() * slotTitles.length); }
       while (slotTitles.length > 1 && idx === lastSlotIdx);
       lastSlotIdx = idx;
-      try { doneRive.setTextRunValue(SLOT_TEXT, slotTitles[idx]); } catch(e) {}
+      try {
+        doneRive.setTextRunValue(SLOT_TEXT, slotTitles[idx]);
+        console.log('[DoneItSlot] text changed to:', slotTitles[idx]);
+      } catch(e) {}
     }
 
     function fireSlot() {
       if (isPulling) return;
       isPulling = true;
-      doneRive.play(pullAnimName);
+      if (pullAnimName) doneRive.play(pullAnimName);
       setTimeout(changeSlotTitle, Math.round(15 * 1000 / 60));
     }
 
