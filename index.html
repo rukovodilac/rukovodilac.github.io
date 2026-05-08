@@ -33,6 +33,9 @@
       #hero {
         height: min(100svh, calc(100vw * 1.5));
       }
+      #headline {
+        bottom: max(22%, 28px);
+      }
     }
 
     #rive-canvas {
@@ -61,7 +64,7 @@
 
     #logo {
       position: absolute;
-      top: max(6%, 20px);
+      top: clamp(20px, 3vw, 40px);
       left: clamp(20px, 3.5vw, 48px);
       font-size: clamp(48px, 6.5vw, 96px);
       font-weight: 500;
@@ -73,7 +76,7 @@
 
     #headline {
       position: absolute;
-      bottom: max(6%, 20px);
+      bottom: clamp(28px, 5vh, 72px);
       left: clamp(20px, 3.5vw, 48px);
       display: flex;
       flex-direction: column;
@@ -181,7 +184,7 @@
       background-image: linear-gradient(#000, #000);
       background-position: 0 100%;
       background-repeat: no-repeat;
-      background-size: 0% 2px;
+      background-size: 0% 1.5px;
       padding: 2px 12px 4px;
       transition: background-size 0.45s cubic-bezier(0.25, 1, 0.5, 1);
     }
@@ -192,14 +195,14 @@
 
     @media (hover: hover) {
       .work-item:hover .work-title span {
-        background-size: 100% 2px;
+        background-size: 100% 1.5px;
       }
     }
 
     /* Mobile: underline always visible */
     @media (hover: none) {
       .work-title span {
-        background-size: 100% 2px;
+        background-size: 100% 1.5px;
       }
     }
 
@@ -218,8 +221,8 @@
   <svg aria-hidden="true" focusable="false" style="display:none;position:absolute;width:0;height:0">
     <defs>
       <symbol id="arr" viewBox="0 0 20 9" overflow="visible">
-        <line x1="0" y1="4.5" x2="14.5" y2="4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-        <polyline points="10,0 16,4.5 10,9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <line x1="0" y1="4.5" x2="14.5" y2="4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        <polyline points="10,0 16,4.5 10,9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/>
       </symbol>
     </defs>
   </svg>
@@ -291,21 +294,8 @@
     }
 
     const canvas = document.getElementById('rive-canvas');
-    const trailCanvas = document.getElementById('trail-canvas');
-    const tc = trailCanvas.getContext('2d');
-
-    function resizeAll() {
-      const d = window.devicePixelRatio || 1;
-      const w = window.innerWidth;
-      const h = heroH();
-      canvas.width  = Math.round(w * d);
-      canvas.height = Math.round(h * d);
-      trailCanvas.width  = Math.round(w * d);
-      trailCanvas.height = Math.round(h * d);
-      tc.setTransform(d, 0, 0, d, 0, 0);
-    }
-
-    resizeAll();
+    canvas.width = window.innerWidth;
+    canvas.height = heroH();
 
     const r = new rive.Rive({
       src: 'web_head_full.riv',
@@ -318,9 +308,17 @@
       onLoadError: (e) => console.error('Rive error:', e)
     });
 
+    const trailCanvas = document.getElementById('trail-canvas');
+    const tc = trailCanvas.getContext('2d');
+    trailCanvas.width = window.innerWidth;
+    trailCanvas.height = heroH();
+
     window.addEventListener('resize', () => {
-      resizeAll();
+      canvas.width = window.innerWidth;
+      canvas.height = heroH();
       r.resizeDrawingSurfaceToCanvas();
+      trailCanvas.width = window.innerWidth;
+      trailCanvas.height = heroH();
     });
 
     const squares = [];
@@ -354,7 +352,7 @@
 
     function tick(now) {
       lenis.raf(now);
-      tc.clearRect(0, 0, window.innerWidth, heroH());
+      tc.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
       for (let i = squares.length - 1; i >= 0; i--) {
         const sq = squares[i];
         const t = (now - sq.born) / sq.life;
