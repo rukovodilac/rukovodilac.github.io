@@ -516,8 +516,7 @@
       src: 'DoneItSlot.riv',
       canvas: doneCanvas,
       artboard: 'Slot',
-      stateMachines: 'SlotStateMachine',
-      autoplay: true,
+      autoplay: false,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
@@ -529,29 +528,40 @@
         pullAnimName = anims.find(n => n !== idleAnimName) || anims[1];
         console.log('[DoneItSlot] idle =', idleAnimName, '| pull =', pullAnimName);
 
+        if (idleAnimName) doneRive.play(idleAnimName);
+
         // ── ViewModel setup ──────────────────────────────────────────
-        // Works once you bind a SlotVm instance as the artboard's Data Context in the Rive editor:
-        //   Select artboard → right panel → Data / Data Context → + → SlotVm → re-export
         try {
           slotVmInst = doneRive.viewModelInstance;
+          console.log('[DoneItSlot] viewModelInstance:', slotVmInst);
 
           if (!slotVmInst) {
-            const vmDef = doneRive.viewModelByName('SlotVm');
+            const vmDef = doneRive.viewModelByName ? doneRive.viewModelByName('SlotVm') : null;
+            console.log('[DoneItSlot] vmDef:', vmDef);
             if (vmDef) {
-              slotVmInst = doneRive.createViewModelInstanceFromViewModel(vmDef);
-              if (slotVmInst) doneRive.setDataContextFromViewModelInstance(slotVmInst);
+              const proto = Object.getPrototypeOf(vmDef);
+              console.log('[DoneItSlot] vmDef methods:', proto ? Object.getOwnPropertyNames(proto) : []);
+
+              if      (typeof vmDef.defaultInstance  === 'function') slotVmInst = vmDef.defaultInstance();
+              else if (typeof vmDef.instance         === 'function') slotVmInst = vmDef.instance();
+              else if (typeof vmDef.createInstance   === 'function') slotVmInst = vmDef.createInstance();
+
+              console.log('[DoneItSlot] created vmInst:', slotVmInst);
+              if (slotVmInst && typeof doneRive.setDataContextFromViewModelInstance === 'function') {
+                doneRive.setDataContextFromViewModelInstance(slotVmInst);
+              }
             }
           }
 
           if (slotVmInst) {
-            slotTextProp = slotVmInst.string('slotText');
-            spinTrigger  = slotVmInst.trigger('trigSpin');
-            console.log('[DoneItSlot] ViewModel OK — text prop:', slotTextProp, '| trigger:', spinTrigger);
+            slotTextProp = slotVmInst.string  ? slotVmInst.string('slotText')  : null;
+            spinTrigger  = slotVmInst.trigger ? slotVmInst.trigger('trigSpin') : null;
+            console.log('[DoneItSlot] ViewModel OK — textProp:', slotTextProp, '| trigger:', spinTrigger);
           } else {
-            console.warn('[DoneItSlot] ViewModel instance not found. Bind a SlotVm instance as the artboard Data Context in the Rive editor, then re-export.');
+            console.warn('[DoneItSlot] ViewModel still null — text will stay as baked value until Rive editor step is complete.');
           }
         } catch(e) {
-          console.warn('[DoneItSlot] ViewModel setup error:', e.message || e);
+          console.warn('[DoneItSlot] ViewModel error:', e.message || e);
         }
 
         setSlotText(slotTitles[0]);
