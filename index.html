@@ -516,8 +516,7 @@
       src: 'DoneItSlot.riv',
       canvas: doneCanvas,
       artboard: 'Slot',
-      stateMachines: 'SlotStateMachine',
-      autoplay: true,
+      autoplay: false,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
@@ -528,25 +527,42 @@
         idleAnimName = anims.find(n => n.toLowerCase().includes('idle')) || anims[0];
         pullAnimName = anims.find(n => n !== idleAnimName) || anims[1];
 
+        if (idleAnimName) doneRive.play(idleAnimName);
+
         // ── ViewModel setup ──────────────────────────────────────────
         try {
+          // Log all ViewModel/context-related methods on the Rive instance
+          const rProto = Object.getPrototypeOf(doneRive);
+          const vmMethods = Object.getOwnPropertyNames(rProto).filter(n =>
+            /viewmodel|context|databind|instance/i.test(n)
+          );
+          console.log('[DoneItSlot] Rive VM methods:', vmMethods);
+
           slotVmInst = doneRive.viewModelInstance;
           console.log('[DoneItSlot] viewModelInstance:', slotVmInst);
 
           if (!slotVmInst) {
             const vmDef = doneRive.viewModelByName ? doneRive.viewModelByName('SlotVm') : null;
-            console.log('[DoneItSlot] vmDef:', vmDef);
             if (vmDef) {
-              const proto = Object.getPrototypeOf(vmDef);
-              console.log('[DoneItSlot] vmDef methods:', proto ? Object.getOwnPropertyNames(proto) : []);
+              console.log('[DoneItSlot] instanceCount:', vmDef.instanceCount);
 
-              if      (typeof vmDef.defaultInstance  === 'function') slotVmInst = vmDef.defaultInstance();
-              else if (typeof vmDef.instance         === 'function') slotVmInst = vmDef.instance();
-              else if (typeof vmDef.createInstance   === 'function') slotVmInst = vmDef.createInstance();
+              // Prefer a pre-existing instance (already wired to artboard)
+              if (vmDef.instanceCount > 0 && typeof vmDef.instanceByIndex === 'function') {
+                slotVmInst = vmDef.instanceByIndex(0);
+                console.log('[DoneItSlot] got instanceByIndex(0):', slotVmInst);
+              }
+              if (!slotVmInst && typeof vmDef.defaultInstance === 'function') {
+                slotVmInst = vmDef.defaultInstance();
+                console.log('[DoneItSlot] got defaultInstance:', slotVmInst);
+              }
 
-              console.log('[DoneItSlot] created vmInst:', slotVmInst);
-              if (slotVmInst && typeof doneRive.setDataContextFromViewModelInstance === 'function') {
-                doneRive.setDataContextFromViewModelInstance(slotVmInst);
+              // Bind to artboard — try every known method name
+              const bindFn = doneRive.setDataContextFromViewModelInstance
+                          || doneRive.bindViewModelInstance;
+              console.log('[DoneItSlot] bind fn:', typeof bindFn);
+              if (slotVmInst && typeof bindFn === 'function') {
+                bindFn.call(doneRive, slotVmInst);
+                console.log('[DoneItSlot] data context bound');
               }
             }
           }
@@ -556,7 +572,7 @@
             spinTrigger  = slotVmInst.trigger ? slotVmInst.trigger('trigSpin') : null;
             console.log('[DoneItSlot] ViewModel OK — textProp:', slotTextProp, '| trigger:', spinTrigger);
           } else {
-            console.warn('[DoneItSlot] ViewModel still null — text will stay as baked value until Rive editor step is complete.');
+            console.warn('[DoneItSlot] ViewModel null — text stays as baked default.');
           }
         } catch(e) {
           console.warn('[DoneItSlot] ViewModel error:', e.message || e);
@@ -590,11 +606,8 @@
     function fireSlot() {
       if (isPulling) return;
       isPulling = true;
-      if (spinTrigger) {
-        spinTrigger.trigger();
-      } else if (pullAnimName) {
-        doneRive.play(pullAnimName);
-      }
+      if (pullAnimName) doneRive.play(pullAnimName);
+      if (spinTrigger && typeof spinTrigger.trigger === 'function') spinTrigger.trigger();
       setTimeout(changeSlotTitle, Math.round(15 * 1000 / 60));
     }
 
