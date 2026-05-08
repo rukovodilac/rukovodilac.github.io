@@ -436,6 +436,10 @@
   <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
   <script>
+    // Prevent browser from restoring scroll position on refresh
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+
     function heroH() {
       return Math.min(window.innerHeight, window.innerWidth * 1.5);
     }
@@ -607,7 +611,6 @@
       if (isPulling) return;
       isPulling = true;
       if (pullAnimName) doneRive.play(pullAnimName);
-      if (spinTrigger && typeof spinTrigger.trigger === 'function') spinTrigger.trigger();
       setTimeout(changeSlotTitle, Math.round(15 * 1000 / 60));
     }
 
