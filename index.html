@@ -36,68 +36,20 @@
   <script src="https://unpkg.com/@rive-app/canvas@2.23.10/rive.js"></script>
   <script>
     const canvas = document.getElementById('rive-canvas');
-    const isMobile = () => window.matchMedia('(pointer: coarse)').matches;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     const r = new rive.Rive({
       src: 'web_head_full.riv',
       canvas: canvas,
-      stateMachines: 'State Machine 1',
       autoplay: true,
-      fit: rive.Fit.Cover,
-      alignment: rive.Alignment.Center,
       onLoad: () => {
-        console.log('Rive loaded. Artboards:', r.artboardNames, '| State machines:', r.stateMachineNames);
-        resizeCanvas();
-        r.playbackRate = 1.0;
+        console.log('animations:', r.animationNames);
+        console.log('state machines:', r.stateMachineNames);
+        r.resizeDrawingSurfaceToCanvas();
       },
-      onLoadError: (e) => {
-        console.error('Rive load error:', e);
-      },
-      onStateChange: (e) => {
-        console.log('State change:', e);
-      }
+      onLoadError: (e) => console.error('Rive error:', e)
     });
-
-    // --- Resize ---
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      r.resizeDrawingSurfaceToCanvas();
-    }
-    window.addEventListener('resize', resizeCanvas);
-
-    // --- Speed control ---
-    let targetSpeed = 1.0;
-    let currentSpeed = 1.0;
-    let mouseTimeout;
-
-    function triggerSpeedUp() {
-      targetSpeed = 1.0;
-      clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => {
-        targetSpeed = 0.05;
-      }, 150);
-    }
-
-    // Desktop: mousemove
-    document.addEventListener('mousemove', () => {
-      if (!isMobile()) triggerSpeedUp();
-    });
-
-    // Mobile: tap
-    document.addEventListener('touchstart', () => {
-      if (isMobile()) triggerSpeedUp();
-    });
-
-    // --- Lerp loop ---
-    function tick() {
-      const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
-      currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
-      r.playbackRate = currentSpeed;
-      requestAnimationFrame(tick);
-    }
-
-    tick();
   </script>
 
 </body>
