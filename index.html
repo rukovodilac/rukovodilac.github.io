@@ -269,7 +269,7 @@
     }
 
     .done-it-wrapper {
-      width: 50%;
+      width: 40%;
     }
 
     @media (max-width: 768px) {
@@ -494,10 +494,10 @@
     let lastSlotIdx  = 0;
     let isPulling    = false;
     let pullInput    = null;
-    let pullAnimName = null; // fallback: direct animation name if SM has no JS inputs
+    let pullAnimName = null;
 
     function sizeDoneCanvas() {
-      const w = doneCanvas.clientWidth || Math.round(window.innerWidth * 0.5);
+      const w = doneCanvas.clientWidth || Math.round(window.innerWidth * 0.4);
       doneCanvas.width  = w;
       doneCanvas.height = Math.round(w * 9 / 16);
     }
@@ -509,36 +509,34 @@
       artboard: 'Slot',
       stateMachines: SLOT_SM,
       autoplay: true,
-      fit: rive.Fit.Contain,
+      fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
         sizeDoneCanvas();
         doneRive.resizeDrawingSurfaceToCanvas();
 
         console.log('[DoneItSlot] animations:', doneRive.animationNames);
-        console.log('[DoneItSlot] stateMachines:', doneRive.stateMachineNames);
 
         const inputs = doneRive.stateMachineInputs(SLOT_SM);
         if (inputs && inputs.length) {
           pullInput = inputs.find(i => typeof i.fire === 'function')
                    || inputs.find(i => typeof i.value === 'boolean')
                    || inputs[0];
-          console.log('[DoneItSlot] SM input found:', pullInput?.name, '(type', pullInput?.type, ')');
+          console.log('[DoneItSlot] SM input:', pullInput?.name);
         } else {
-          // SM uses built-in Rive pointer listeners — also prepare animation fallback
           const anims = doneRive.animationNames || [];
           pullAnimName = anims.find(n => !n.toLowerCase().includes('idle')) || null;
-          console.log('[DoneItSlot] SM has no JS inputs. Rive pointer-listeners active. Anim fallback:', pullAnimName);
+          console.log('[DoneItSlot] No SM inputs. Animations:', anims, '— pull candidate:', pullAnimName);
         }
 
-        try {
-          doneRive.setTextRunValue(SLOT_TEXT, slotTitles[0]);
-        } catch(e) {
-          console.warn('[DoneItSlot] Text run not queryable — open the .riv file, select the text node and give it a name (e.g. "slotText"), then update SLOT_TEXT.');
-        }
+        try { doneRive.setTextRunValue(SLOT_TEXT, slotTitles[0]); } catch(e) {}
       },
       onLoadError: (e) => console.error('DoneItSlot Rive error:', e)
     });
+
+    // Stop/Loop resets the pull lock when using direct animation playback
+    doneRive.on(rive.EventType.Stop, () => { isPulling = false; });
+    doneRive.on(rive.EventType.Loop, () => { isPulling = false; });
 
     function changeSlotTitle() {
       let idx;
@@ -548,44 +546,23 @@
       try { doneRive.setTextRunValue(SLOT_TEXT, slotTitles[idx]); } catch(e) {}
     }
 
-    // State machine transitions
-    doneRive.on(rive.EventType.StateChange, (event) => {
-      const states = event.data || [];
-      console.log('[DoneItSlot] StateChange:', states);
-      const active = states.some(s => s.toLowerCase() !== 'idle' && s !== '');
-      if (active && !isPulling) {
-        isPulling = true;
-        setTimeout(changeSlotTitle, Math.round(15 * 1000 / 60));
-      } else if (!active) {
-        isPulling = false;
-      }
-    });
-
-    // Animation events (fallback path — direct animation play)
-    doneRive.on(rive.EventType.Play, (event) => {
-      const playing = (event.data || []).some(n => n === pullAnimName);
-      if (playing && !isPulling) {
-        isPulling = true;
-        setTimeout(changeSlotTitle, Math.round(15 * 1000 / 60));
-      }
-    });
-    doneRive.on(rive.EventType.Stop, () => { if (pullAnimName) isPulling = false; });
-    doneRive.on(rive.EventType.Loop, () => { if (pullAnimName) isPulling = false; });
-
     function fireSlot() {
       if (isPulling) return;
-      // 1. JS trigger/boolean input
+      isPulling = true;
+
+      // Text changes after 15 frames on every click — independent of Rive visual state
+      setTimeout(changeSlotTitle, Math.round(15 * 1000 / 60));
+      // Fallback unlock if Stop/Loop events don't fire (SM-driven animation)
+      setTimeout(() => { isPulling = false; }, 1500);
+
+      // Trigger Rive visual
       if (pullInput) {
-        if (typeof pullInput.fire === 'function') { pullInput.fire(); return; }
-        if (typeof pullInput.value === 'boolean') { pullInput.value = true; return; }
-      }
-      // 2. Direct animation fallback (SM uses built-in Rive listeners but we can also drive via play())
-      if (pullAnimName) {
-        console.log('[DoneItSlot] Playing anim directly:', pullAnimName);
+        if (typeof pullInput.fire === 'function') pullInput.fire();
+        else if (typeof pullInput.value === 'boolean') pullInput.value = true;
+      } else if (pullAnimName) {
         doneRive.play(pullAnimName);
-        return;
       }
-      // 3. Rive's own pointer-listeners should have already handled it
+      // else: SM uses built-in Rive pointer-listeners, already fired on pointerdown
     }
 
     doneCanvas.addEventListener('click', fireSlot);
