@@ -88,7 +88,7 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    const isMobile = () => window.matchMedia('(pointer: coarse)').matches;
+    let inputs = {};
 
     const r = new rive.Rive({
       src: 'web_head_full.riv',
@@ -99,7 +99,9 @@
       alignment: rive.Alignment.Center,
       onLoad: () => {
         r.resizeDrawingSurfaceToCanvas();
-        tick();
+        const all = r.stateMachineInputs('State Machine 1');
+        console.log('Inputs:', all?.map(i => i.name));
+        all?.forEach(i => { inputs[i.name] = i; });
       },
       onLoadError: (e) => console.error('Rive error:', e)
     });
@@ -110,25 +112,24 @@
       r.resizeDrawingSurfaceToCanvas();
     });
 
-    let targetSpeed = 0.3;
-    let currentSpeed = 0.3;
-    let mouseTimeout;
-
-    function triggerSpeedUp() {
-      targetSpeed = 1.0;
-      clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => { targetSpeed = 0.3; }, 150);
+    function setInput(name, value) {
+      if (inputs[name] !== undefined) inputs[name].value = value;
     }
 
-    document.addEventListener('mousemove', () => { if (!isMobile()) triggerSpeedUp(); });
-    document.addEventListener('touchstart', () => { if (isMobile()) triggerSpeedUp(); });
+    document.addEventListener('mousemove', (e) => {
+      setInput('mouseX', e.clientX / window.innerWidth);
+      setInput('mouseY', e.clientY / window.innerHeight);
+      setInput('x', e.clientX);
+      setInput('y', e.clientY);
+    });
 
-    function tick() {
-      const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
-      currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
-      r.playbackRate = currentSpeed;
-      requestAnimationFrame(tick);
-    }
+    document.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      setInput('mouseX', t.clientX / window.innerWidth);
+      setInput('mouseY', t.clientY / window.innerHeight);
+      setInput('x', t.clientX);
+      setInput('y', t.clientY);
+    }, { passive: true });
   </script>
 
 </body>
