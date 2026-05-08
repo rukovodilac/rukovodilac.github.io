@@ -154,7 +154,7 @@
       left: clamp(14px, 2vw, 24px);
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 0;
       font-size: clamp(13px, 1.2vw, 17px);
       font-weight: 500;
       line-height: 1;
@@ -169,12 +169,12 @@
 
     .work-tag span {
       padding: 3px 9px 4px;
-      color: #000;
+      color: #fff;
     }
 
     .work-tag--hot span    { background: rgb(249,66,58); }
     .work-tag--latest span { background: rgb(255,192,63); }
-    .work-tag--rerun span  { background: rgb(9,87,195); color: #fff; }
+    .work-tag--rerun span  { background: rgb(9,87,195); }
 
     /* Title block */
     .work-title {
@@ -199,7 +199,7 @@
       background-image: linear-gradient(#000, #000);
       background-position: 0 100%;
       background-repeat: no-repeat;
-      background-size: 0% 1.5px;
+      background-size: 0% 3px;
       padding: 2px 12px 4px;
       transition: background-size 0.45s cubic-bezier(0.25, 1, 0.5, 1);
     }
@@ -210,14 +210,14 @@
 
     @media (hover: hover) {
       .work-item:hover .work-title span {
-        background-size: 100% 1.5px;
+        background-size: 100% 3px;
       }
     }
 
     /* Mobile: underline always visible */
     @media (hover: none) {
       .work-title span {
-        background-size: 100% 1.5px;
+        background-size: 100% 3px;
       }
     }
 
@@ -236,12 +236,12 @@
   <svg aria-hidden="true" focusable="false" style="display:none;position:absolute;width:0;height:0">
     <defs>
       <symbol id="arr" viewBox="0 0 20 9" overflow="visible">
-        <line x1="0" y1="4.5" x2="14.5" y2="4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
-        <polyline points="10,0 16,4.5 10,9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/>
+        <line x1="0" y1="4.5" x2="14.5" y2="4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        <polyline points="10,0 16,4.5 10,9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/>
       </symbol>
       <symbol id="icon-hot" viewBox="0 0 77 77" style="fill-rule:evenodd;clip-rule:evenodd;">
         <g transform="matrix(1,0,0,1,-2301.604938,-1072.595502)">
-          <g transform="matrix(1.013291,0,0,1.013291,-26.536668,-124.591888)">
+          <g transform="matrix(0.868535,0,0,0.868535,311.554395,51.934305)">
             <circle cx="2335.6" cy="1219.48" r="37.995" fill="white"/>
           </g>
           <g transform="matrix(1,0,0,1,3,-19.521117)">
@@ -251,7 +251,7 @@
       </symbol>
       <symbol id="icon-latest" viewBox="0 0 77 77" style="fill-rule:evenodd;clip-rule:evenodd;">
         <g transform="matrix(1,0,0,1,-2297.604938,-1181.484688)">
-          <g transform="matrix(1.013291,0,0,1.013291,-30.536668,-15.702702)">
+          <g transform="matrix(0.855375,0,0,0.855375,337.290809,176.871392)">
             <circle cx="2335.6" cy="1219.48" r="37.995" fill="white"/>
           </g>
           <g transform="matrix(1,0,0,1,-1,0)">
@@ -261,7 +261,7 @@
       </symbol>
       <symbol id="icon-rerun" viewBox="0 0 77 77" style="fill-rule:evenodd;clip-rule:evenodd;">
         <g transform="matrix(1,0,0,1,-2296.594981,-1279.524582)">
-          <g transform="matrix(1.013291,0,0,1.013291,-31.546625,82.337192)">
+          <g transform="matrix(0.868535,0,0,0.868535,306.544438,258.863385)">
             <circle cx="2335.6" cy="1219.48" r="37.995" fill="white"/>
           </g>
           <g transform="matrix(1,0,0,1,-2.009957,1.039894)">
