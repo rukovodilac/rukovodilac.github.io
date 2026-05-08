@@ -93,12 +93,13 @@
     const r = new rive.Rive({
       src: 'web_head_full.riv',
       canvas: canvas,
-      stateMachines: 'State Machine 1',
+      animations: 'Idle',
       autoplay: true,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
         r.resizeDrawingSurfaceToCanvas();
+        tick();
       },
       onLoadError: (e) => console.error('Rive error:', e)
     });
@@ -108,6 +109,28 @@
       canvas.height = window.innerHeight;
       r.resizeDrawingSurfaceToCanvas();
     });
+
+    const isMobile = () => window.matchMedia('(pointer: coarse)').matches;
+
+    let targetSpeed = 0.3;
+    let currentSpeed = 0.3;
+    let mouseTimeout;
+
+    function triggerSpeedUp() {
+      targetSpeed = 1.0;
+      clearTimeout(mouseTimeout);
+      mouseTimeout = setTimeout(() => { targetSpeed = 0.3; }, 150);
+    }
+
+    document.addEventListener('mousemove', () => { if (!isMobile()) triggerSpeedUp(); });
+    document.addEventListener('touchstart', () => { if (isMobile()) triggerSpeedUp(); }, { passive: true });
+
+    function tick() {
+      const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
+      currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
+      r.playbackRate = currentSpeed;
+      requestAnimationFrame(tick);
+    }
 
   </script>
 
