@@ -84,30 +84,40 @@
   <script src="https://unpkg.com/@rive-app/canvas@2.23.10/rive.js"></script>
   <script>
     const canvas = document.getElementById('rive-canvas');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const dpr = window.devicePixelRatio || 1;
+    
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
 
     const isMobile = () => window.matchMedia('(pointer: coarse)').matches;
+
+    let speedInput; // We'll store the Rive input reference here
 
     const r = new rive.Rive({
       src: 'web_head_full.riv',
       canvas: canvas,
-      stateMachines: 'State Machine 1',
+      stateMachines: 'State Machine 1', // Ensure this matches your Rive file exactly
       autoplay: true,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
         r.resizeDrawingSurfaceToCanvas();
-        tick();
+        
+        // Grab the inputs from the State Machine
+        const inputs = r.stateMachineInputs('State Machine 1');
+        if (inputs) {
+          // Find the input you created in the Rive editor
+          speedInput = inputs.find(i => i.name === 'SpeedMultiplier');
+        }
+        
+        tick(); // Start the custom logic loop
       },
       onLoadError: (e) => console.error('Rive error:', e)
     });
 
     window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
       r.resizeDrawingSurfaceToCanvas();
     });
 
@@ -127,7 +137,12 @@
     function tick() {
       const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
       currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
-      r.playbackRate = currentSpeed;
+      
+      // Feed the lerped value directly to the Rive State Machine input
+      if (speedInput) {
+        speedInput.value = currentSpeed;
+      }
+      
       requestAnimationFrame(tick);
     }
   </script>
