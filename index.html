@@ -44,7 +44,7 @@
       font-size: clamp(48px, 6.5vw, 96px);
       font-weight: 500;
       line-height: 1;
-      color: #3C1011;
+      color: #000;
       text-decoration: none;
       pointer-events: auto;
     }
@@ -68,7 +68,7 @@
       font-size: clamp(24px, 3.5vw, 48px);
       font-weight: 500;
       line-height: 1;
-      color: #3C1011;
+      color: #000;
     }
   </style>
 </head>
@@ -90,10 +90,8 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    let targetSpeed = 0.05;
-    let currentSpeed = 0.05;
     let mouseTimeout;
-    let lastTime = null;
+    let isActive = false;
 
     const r = new rive.Rive({
       src: 'web_head_full.riv',
@@ -103,11 +101,10 @@
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
       onLoad: () => {
-        setTimeout(() => {
-          r.resizeDrawingSurfaceToCanvas();
-          r.stopRendering();
-          requestAnimationFrame(tick);
-        }, 0);
+        r.resizeDrawingSurfaceToCanvas();
+        r.playbackRate = 0.15;
+        r.pause();
+        r.play('Idle');
       },
       onLoadError: (e) => console.error('Rive error:', e)
     });
@@ -116,29 +113,26 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       r.resizeDrawingSurfaceToCanvas();
-      lastTime = null;
     });
 
-    function triggerSpeedUp() {
-      targetSpeed = 2.0;
-      clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => { targetSpeed = 0.05; }, 200);
-    }
-
-    canvas.addEventListener('mousemove', triggerSpeedUp);
-    canvas.addEventListener('touchstart', triggerSpeedUp, { passive: true });
-
-    function tick(timestamp) {
-      if (lastTime !== null) {
-        const dt = (timestamp - lastTime) / 1000;
-        const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
-        currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
-        r.advance(dt * currentSpeed);
-        r.drawFrame();
+    function activate() {
+      if (!isActive) {
+        isActive = true;
+        r.playbackRate = 2.0;
+        r.pause();
+        r.play('Idle');
       }
-      lastTime = timestamp;
-      requestAnimationFrame(tick);
+      clearTimeout(mouseTimeout);
+      mouseTimeout = setTimeout(() => {
+        isActive = false;
+        r.playbackRate = 0.15;
+        r.pause();
+        r.play('Idle');
+      }, 300);
     }
+
+    canvas.addEventListener('mousemove', activate);
+    canvas.addEventListener('touchstart', activate, { passive: true });
 
   </script>
 
