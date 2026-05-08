@@ -29,6 +29,15 @@
       overflow: hidden;
     }
 
+    @media (max-width: 768px) {
+      #hero {
+        height: min(100svh, calc(100vw * 1.5));
+      }
+      #headline {
+        bottom: max(22%, 28px);
+      }
+    }
+
     #rive-canvas {
       display: block;
       position: absolute;
@@ -164,7 +173,7 @@
       pointer-events: none;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 0;
     }
 
     /* Per-line highlight + underline draw animation */
@@ -196,9 +205,27 @@
         background-size: 100% 1.5px;
       }
     }
+
+    .arrow-icon {
+      display: inline-block;
+      width: 0.85em;
+      height: 0.45em;
+      vertical-align: 0.12em;
+      margin-left: 0.25em;
+      overflow: visible;
+    }
   </style>
 </head>
 <body>
+
+  <svg aria-hidden="true" focusable="false" style="display:none;position:absolute;width:0;height:0">
+    <defs>
+      <symbol id="arr" viewBox="0 0 20 9" overflow="visible">
+        <line x1="0" y1="4.5" x2="14.5" y2="4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+        <polyline points="10,0 16,4.5 10,9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none" vector-effect="non-scaling-stroke"/>
+      </symbol>
+    </defs>
+  </svg>
 
   <section id="hero">
     <canvas id="trail-canvas"></canvas>
@@ -221,7 +248,7 @@
       </div>
       <div class="work-title">
         <span>Odd</span>
-        <span>Mechanics →</span>
+        <span>Mechanics <svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg></span>
       </div>
     </a>
 
@@ -232,7 +259,7 @@
       <div class="work-tag">Latest</div>
       <div class="work-title">
         <span>Tetris Story</span>
-        <span>Mobile Game →</span>
+        <span>Mobile Game <svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg></span>
       </div>
     </a>
 
@@ -242,7 +269,7 @@
       </div>
       <div class="work-title">
         <span>Tetris 40th</span>
-        <span>Mobile Game →</span>
+        <span>Mobile Game <svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg></span>
       </div>
     </a>
 
@@ -253,7 +280,7 @@
       <div class="work-tag">Rerun</div>
       <div class="work-title">
         <span>The Show</span>
-        <span>vol.1 →</span>
+        <span>vol.1 <svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg></span>
       </div>
     </a>
 
@@ -262,9 +289,13 @@
   <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
   <script>
+    function heroH() {
+      return Math.min(window.innerHeight, window.innerWidth * 1.5);
+    }
+
     const canvas = document.getElementById('rive-canvas');
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.height = heroH();
 
     const r = new rive.Rive({
       src: 'web_head_full.riv',
@@ -280,14 +311,14 @@
     const trailCanvas = document.getElementById('trail-canvas');
     const tc = trailCanvas.getContext('2d');
     trailCanvas.width = window.innerWidth;
-    trailCanvas.height = window.innerHeight;
+    trailCanvas.height = heroH();
 
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.height = heroH();
       r.resizeDrawingSurfaceToCanvas();
       trailCanvas.width = window.innerWidth;
-      trailCanvas.height = window.innerHeight;
+      trailCanvas.height = heroH();
     });
 
     const squares = [];
