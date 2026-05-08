@@ -100,13 +100,11 @@
     #work {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 50vh 50vh;
     }
 
     @media (max-width: 768px) {
       #work {
         grid-template-columns: 1fr;
-        grid-template-rows: none;
       }
     }
 
@@ -117,12 +115,7 @@
       text-decoration: none;
       color: #000;
       cursor: pointer;
-    }
-
-    @media (max-width: 768px) {
-      .work-item {
-        aspect-ratio: 4 / 3;
-      }
+      aspect-ratio: 16 / 9;
     }
 
     /* Video container */
