@@ -262,10 +262,21 @@
       margin-top: clamp(12px, 2vw, 28px);
     }
 
+    .done-it-wrapper {
+      width: 50%;
+    }
+
+    @media (max-width: 768px) {
+      .done-it-wrapper {
+        width: 100%;
+      }
+    }
+
     #done-it-canvas {
       display: block;
       width: 100%;
       aspect-ratio: 16 / 9;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -405,7 +416,9 @@
       motion design, and creative direction for
       mobile products and entertainment experiences.</p>
     <span class="about-highlight">You name it, I've done it!</span>
-    <canvas id="done-it-canvas"></canvas>
+    <div class="done-it-wrapper">
+      <canvas id="done-it-canvas"></canvas>
+    </div>
   </section>
 
   <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
@@ -435,24 +448,100 @@
     trailCanvas.width = window.innerWidth;
     trailCanvas.height = heroH();
 
-    // DoneItSlot Rive
+    // ── DoneItSlot Rive ──
+    // SLOT_SM:   state machine name as set in the Rive editor
+    // SLOT_TEXT: text run name as set in the Rive editor
+    const SLOT_SM   = 'State Machine 1';
+    const SLOT_TEXT = 'text';
+
+    const slotTitles = [
+      'INTERACTIVE\nMOTION DESIGN',
+      'GRAPHIC DESIGN',
+      'ANIMATION',
+      'ANIMATION\nDIRECTION',
+      'ART DIRECTION',
+      'CREATIVE\nDIRECTION',
+      'ILLUSTRATION',
+      'CAMPAIGN\nDESIGN',
+      'ADVERTISING\nCREATIVE\nPRODUCTION',
+      'UI/UX MOTION\nDESIGN',
+      'WEB GRAPHICS\nDESIGN',
+      'SOCIAL MEDIA\nASSET DESIGN',
+      'VISUAL IDENTITY\nDEVELOPMENT',
+      'SCALABLE\nMOTION\nSYSTEMS',
+      'TEAM\nLEADERSHIP',
+      'NEW IP\nDEVELOPMENT',
+      'LIVE GAME\nCONTENT\nPRODUCTION',
+      'GAME JAM\nMENTORING',
+      'A/B TESTING\nCOLLABORATION',
+      'CREATIVE TEAM\nMANAGEMENT',
+      'BRANDING',
+    ];
+
     const doneCanvas = document.getElementById('done-it-canvas');
+    let lastSlotIdx = 0;
+    let isPulling   = false;
+    let pullInput   = null;
 
     function sizeDoneCanvas() {
-      doneCanvas.width = doneCanvas.clientWidth || window.innerWidth;
-      doneCanvas.height = doneCanvas.clientHeight || (window.innerWidth * 9 / 16);
+      const w = doneCanvas.clientWidth;
+      const h = doneCanvas.clientHeight;
+      if (w > 0) { doneCanvas.width = w; doneCanvas.height = h; }
     }
-    sizeDoneCanvas();
 
     const doneRive = new rive.Rive({
       src: 'DoneItSlot.riv',
       canvas: doneCanvas,
+      stateMachines: SLOT_SM,
       autoplay: true,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
-      onLoad: () => { sizeDoneCanvas(); doneRive.resizeDrawingSurfaceToCanvas(); },
+      onLoad: () => {
+        sizeDoneCanvas();
+        doneRive.resizeDrawingSurfaceToCanvas();
+
+        const inputs = doneRive.stateMachineInputs(SLOT_SM);
+        if (inputs && inputs.length) {
+          pullInput = inputs.find(i => typeof i.fire === 'function') || null;
+          console.log('[DoneItSlot] inputs:', inputs.map(i => `${i.name} (type ${i.type})`));
+        } else {
+          console.warn('[DoneItSlot] No inputs found for SM "' + SLOT_SM + '" — check name in Rive editor.');
+        }
+
+        try {
+          doneRive.setTextRunValue(SLOT_TEXT, slotTitles[0]);
+        } catch(e) {
+          console.warn('[DoneItSlot] Text run "' + SLOT_TEXT + '" not found — check name in Rive editor.');
+        }
+      },
       onLoadError: (e) => console.error('DoneItSlot Rive error:', e)
     });
+
+    doneRive.on(rive.EventType.StateChange, (event) => {
+      const states = event.data || [];
+      const enteringPull = states.some(s => s.toLowerCase().includes('pull'));
+      if (enteringPull && !isPulling) {
+        isPulling = true;
+        setTimeout(() => {
+          let idx;
+          do { idx = Math.floor(Math.random() * slotTitles.length); }
+          while (slotTitles.length > 1 && idx === lastSlotIdx);
+          lastSlotIdx = idx;
+          try { doneRive.setTextRunValue(SLOT_TEXT, slotTitles[idx]); } catch(e) {}
+        }, Math.round(15 * 1000 / 60)); // 15 frames @ 60 fps ≈ 250 ms
+      } else if (!enteringPull) {
+        isPulling = false;
+      }
+    });
+
+    doneCanvas.addEventListener('click', () => {
+      if (pullInput && !isPulling) pullInput.fire();
+    });
+
+    doneCanvas.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (pullInput && !isPulling) pullInput.fire();
+    }, { passive: false });
 
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
