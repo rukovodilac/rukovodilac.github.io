@@ -17,7 +17,53 @@
   </style>
 </head>
 <body>
-  <h1>Hello, I am Aleksandar</h1>
-  <p>Portfolio coming soon.</p>
+<!-- in <body> -->
+<canvas id="rive-canvas"></canvas>
+
+<!-- in <style> -->
+<style>
+  #rive-canvas {
+    width: 100%;
+    height: 100vh;
+    display: block;
+  }
+</style>
+
+<!-- before </body> -->
+<script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
+<script>
+  const r = new rive.Rive({
+    src: 'web_head_full.riv',
+    canvas: document.getElementById('rive-canvas'),
+    artboard: 'Web_Head',
+    stateMachines: 'State Machine 1',
+    autoplay: true,
+    onLoad: () => {
+      r.resizeDrawingSurfaceToCanvas();
+      r.playbackRate = 0.05;
+    }
+  });
+
+  let targetSpeed = 0.05;
+  let currentSpeed = 0.05;
+  let mouseTimeout;
+
+  document.addEventListener('mousemove', () => {
+    targetSpeed = 1.0;
+    clearTimeout(mouseTimeout);
+    mouseTimeout = setTimeout(() => {
+      targetSpeed = 0.05; // start easing back after mouse stops
+    }, 150);
+  });
+
+  function tick() {
+    const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
+    currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
+    r.playbackRate = currentSpeed;
+    requestAnimationFrame(tick);
+  }
+
+  tick();
+</script>
 </body>
 </html>
