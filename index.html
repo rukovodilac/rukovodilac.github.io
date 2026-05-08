@@ -39,17 +39,49 @@
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    const isMobile = () => window.matchMedia('(pointer: coarse)').matches;
+
     const r = new rive.Rive({
       src: 'web_head_full.riv',
       canvas: canvas,
+      stateMachines: 'State Machine 1',
       autoplay: true,
       onLoad: () => {
-        console.log('animations:', r.animationNames);
-        console.log('state machines:', r.stateMachineNames);
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         r.resizeDrawingSurfaceToCanvas();
+        r.playbackRate = 0.05;
       },
       onLoadError: (e) => console.error('Rive error:', e)
     });
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      r.resizeDrawingSurfaceToCanvas();
+    });
+
+    // --- Speed control ---
+    let targetSpeed = 0.05;
+    let currentSpeed = 0.05;
+    let mouseTimeout;
+
+    function triggerSpeedUp() {
+      targetSpeed = 1.0;
+      clearTimeout(mouseTimeout);
+      mouseTimeout = setTimeout(() => { targetSpeed = 0.05; }, 150);
+    }
+
+    document.addEventListener('mousemove', () => { if (!isMobile()) triggerSpeedUp(); });
+    document.addEventListener('touchstart', () => { if (isMobile()) triggerSpeedUp(); });
+
+    function tick() {
+      const lerpFactor = currentSpeed < targetSpeed ? 0.12 : 0.04;
+      currentSpeed += (targetSpeed - currentSpeed) * lerpFactor;
+      r.playbackRate = currentSpeed;
+      requestAnimationFrame(tick);
+    }
+    tick();
   </script>
 
 </body>
