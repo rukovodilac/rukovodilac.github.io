@@ -133,16 +133,23 @@
       overflow: hidden;
     }
 
-    .work-media video {
+    .work-media video,
+    .work-media iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      border: none;
+      pointer-events: none;
       transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     @media (hover: hover) {
-      .work-item:hover .work-media video {
+      .work-item:hover .work-media video,
+      .work-item:hover .work-media iframe {
         transform: scale(1.06);
       }
     }
@@ -244,7 +251,6 @@
 
     <a href="#" class="work-item">
       <div class="work-media">
-        <video autoplay muted loop playsinline></video>
       </div>
       <div class="work-title">
         <span>Odd</span>
@@ -254,7 +260,12 @@
 
     <a href="#" class="work-item">
       <div class="work-media">
-        <video autoplay muted loop playsinline></video>
+        <iframe
+          src="https://player.cloudinary.com/embed/?cloud_name=dzar7cp0b&public_id=TetrisStory_Pre_pbezjz&autoplay=true&muted=true&loop=true&controls=false"
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allowfullscreen
+          frameborder="0"
+        ></iframe>
       </div>
       <div class="work-tag">Latest</div>
       <div class="work-title">
@@ -265,7 +276,12 @@
 
     <a href="#" class="work-item">
       <div class="work-media">
-        <video autoplay muted loop playsinline></video>
+        <iframe
+          src="https://player.cloudinary.com/embed/?cloud_name=dzar7cp0b&public_id=Tetris40_Pre_clttxf&autoplay=true&muted=true&loop=true&controls=false"
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allowfullscreen
+          frameborder="0"
+        ></iframe>
       </div>
       <div class="work-title">
         <span>Tetris 40th</span>
@@ -275,7 +291,12 @@
 
     <a href="#" class="work-item">
       <div class="work-media">
-        <video autoplay muted loop playsinline></video>
+        <iframe
+          src="https://player.cloudinary.com/embed/?cloud_name=dzar7cp0b&public_id=TheShow_Pre_lmjx2h&autoplay=true&muted=true&loop=true&controls=false"
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allowfullscreen
+          frameborder="0"
+        ></iframe>
       </div>
       <div class="work-tag">Rerun</div>
       <div class="work-title">
