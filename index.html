@@ -521,11 +521,31 @@
 
         if (idleAnimName) doneRive.play(idleAnimName);
 
+        // Diagnostic: list what the artboard exposes
+        try {
+          const ab = doneRive.artboard;
+          console.log('[DoneItSlot] artboard object:', ab);
+          // Try direct artboard text run lookup (faster path, skips nested search)
+          if (ab && typeof ab.textRun === 'function') {
+            const run = ab.textRun(SLOT_TEXT);
+            console.log('[DoneItSlot] ab.textRun("slotText"):', run);
+            if (run) { run.text = slotTitles[0]; console.log('[DoneItSlot] set via ab.textRun OK'); }
+          }
+        } catch(e) {
+          console.log('[DoneItSlot] artboard textRun probe failed:', e.message);
+        }
         try {
           doneRive.setTextRunValue(SLOT_TEXT, slotTitles[0]);
-          console.log('[DoneItSlot] initial text set OK');
+          console.log('[DoneItSlot] setTextRunValue OK — initial text set');
         } catch(e) {
-          console.warn('[DoneItSlot] setTextRunValue failed — text run not yet named in Rive editor:', e.message || e);
+          console.error(
+            '[DoneItSlot] setTextRunValue still failing.\n' +
+            'MOST LIKELY CAUSE: the text element is inside a nested Rive component (symbol/artboard).\n' +
+            'In that case setTextRunValue only searches the top-level artboard and cannot reach it.\n' +
+            'FIX: In Rive editor, check if the text node is inside a component — if so, move it out to\n' +
+            'the Slot artboard directly (not inside a nested component), then rename the run and re-export.\n' +
+            'Error was:', e.message || e
+          );
         }
       },
       onLoadError: (e) => console.error('DoneItSlot Rive error:', e)
@@ -536,8 +556,10 @@
       console.log('[DoneItSlot] Stop event:', stopped);
       if (stopped.some(n => n === pullAnimName)) {
         isPulling = false;
-        if (idleAnimName) doneRive.play(idleAnimName);
-      } else if (!isPulling && idleAnimName && stopped.some(n => n === idleAnimName)) {
+        // idle is still playing underneath — do NOT restart it (that causes jitter)
+      }
+      // only restart idle if idle itself stopped (one-shot animation case)
+      if (!isPulling && idleAnimName && stopped.some(n => n === idleAnimName)) {
         doneRive.play(idleAnimName);
       }
     });
@@ -550,7 +572,9 @@
       try {
         doneRive.setTextRunValue(SLOT_TEXT, slotTitles[idx]);
         console.log('[DoneItSlot] text changed to:', slotTitles[idx]);
-      } catch(e) {}
+      } catch(e) {
+        console.warn('[DoneItSlot] changeSlotTitle failed:', e.message);
+      }
     }
 
     function fireSlot() {
