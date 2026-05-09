@@ -434,6 +434,9 @@
         opts.onLoad = () => {
           sizeCoinCanvas();
           coinRive.resizeDrawingSurfaceToCanvas();
+          const inputs = coinRive.stateMachineInputs(smName) || [];
+          console.log('[coin] SM:', smName);
+          console.log('[coin] inputs:', inputs.map(i => `${i.name} type=${i.type}`));
         };
       } else {
         // Probe run — load silently to discover what's inside the file
