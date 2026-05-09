@@ -604,7 +604,6 @@
           frogInputs = Object.fromEntries(inputs.map(i => [i.name, i]));
           const vmi = frogRive.viewModelInstance;
           if (vmi) frogVMI = vmi;
-          console.log('[froggy] inputs:', inputs.map(i => `${i.name}(${i.type})`), '| vmi:', !!vmi, Object.keys(vmi || {}));
         },
         onLoadError: (e) => console.error('froggy:', e),
       });
