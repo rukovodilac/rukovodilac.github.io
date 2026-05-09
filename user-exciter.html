@@ -601,34 +601,39 @@
       });
     }
 
-    function frogPointerPos(e) {
+    function frogCSSPos(e) {
       const r = frogCanvas.getBoundingClientRect();
-      return {
-        x: (e.clientX - r.left) / r.width  * 400,
-        y: (e.clientY - r.top)  / r.height * 400,
-      };
+      return { cx: e.clientX - r.left, cy: e.clientY - r.top, w: r.width, h: r.height };
     }
 
-    frogCanvas.addEventListener('pointerenter', () => {
+    frogCanvas.addEventListener('pointerenter', e => {
       if (frogInputs.isActive) frogInputs.isActive.value = true;
+      const { cx, cy, w, h } = frogCSSPos(e);
+      if (frogInputs.targetX) frogInputs.targetX.value = (cx / w) * 400;
+      if (frogInputs.targetY) frogInputs.targetY.value = (cy / h) * 400;
+      if (frogRive) frogRive.pointerMove(cx, cy);
     });
-    frogCanvas.addEventListener('pointerleave', () => {
+    frogCanvas.addEventListener('pointerleave', e => {
       if (frogInputs.isActive) frogInputs.isActive.value = false;
       if (frogInputs.Bool1)    frogInputs.Bool1.value    = false;
+      if (frogRive) { const { cx, cy } = frogCSSPos(e); frogRive.pointerMove(cx, cy); }
     });
     frogCanvas.addEventListener('pointermove', e => {
-      const { x, y } = frogPointerPos(e);
-      if (frogInputs.targetX) frogInputs.targetX.value = x;
-      if (frogInputs.targetY) frogInputs.targetY.value = y;
+      const { cx, cy, w, h } = frogCSSPos(e);
+      if (frogInputs.targetX) frogInputs.targetX.value = (cx / w) * 400;
+      if (frogInputs.targetY) frogInputs.targetY.value = (cy / h) * 400;
+      if (frogRive) frogRive.pointerMove(cx, cy);
     });
     frogCanvas.addEventListener('pointerdown', e => {
-      const { x, y } = frogPointerPos(e);
-      if (frogInputs.targetX) frogInputs.targetX.value = x;
-      if (frogInputs.targetY) frogInputs.targetY.value = y;
+      const { cx, cy, w, h } = frogCSSPos(e);
+      if (frogInputs.targetX) frogInputs.targetX.value = (cx / w) * 400;
+      if (frogInputs.targetY) frogInputs.targetY.value = (cy / h) * 400;
       if (frogInputs.Bool1)   frogInputs.Bool1.value   = true;
+      if (frogRive) frogRive.pointerDown(cx, cy);
     });
-    frogCanvas.addEventListener('pointerup', () => {
+    frogCanvas.addEventListener('pointerup', e => {
       if (frogInputs.Bool1) frogInputs.Bool1.value = false;
+      if (frogRive) { const { cx, cy } = frogCSSPos(e); frogRive.pointerUp(cx, cy); }
     });
 
     requestAnimationFrame(() => requestAnimationFrame(async () => {
