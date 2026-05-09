@@ -596,6 +596,7 @@
           frogRive.play(FROG_SM);
           const inputs = frogRive.stateMachineInputs(FROG_SM) || [];
           frogInputs = Object.fromEntries(inputs.map(i => [i.name, i]));
+          console.log('[froggy] inputs found:', inputs.map(i => `${i.name}(${i.type})`));
         },
         onLoadError: (e) => console.error('froggy:', e),
       });
@@ -607,17 +608,25 @@
     }
 
     let frogOver = false;
+    let frogLogCount = 0;
 
     frogCanvas.addEventListener('pointerenter', e => {
       frogOver = true;
+      frogLogCount = 0;
       if (frogInputs.isActive) frogInputs.isActive.value = true;
-      const { cx, cy } = frogCSSPos(e);
-      // Simulate press so Rive's drag system picks up cursor_target
+      const { cx, cy, w, h } = frogCSSPos(e);
+      if (frogInputs.targetX) frogInputs.targetX.value = (cx / w) * 400;
+      if (frogInputs.targetY) frogInputs.targetY.value = (cy / h) * 400;
       if (frogRive) { frogRive.pointerDown(cx, cy); frogRive.pointerMove(cx, cy); }
     });
     frogCanvas.addEventListener('pointermove', e => {
-      const { cx, cy } = frogCSSPos(e);
+      const { cx, cy, w, h } = frogCSSPos(e);
+      const tx = (cx / w) * 400;
+      const ty = (cy / h) * 400;
+      if (frogInputs.targetX) frogInputs.targetX.value = tx;
+      if (frogInputs.targetY) frogInputs.targetY.value = ty;
       if (frogRive) frogRive.pointerMove(cx, cy);
+      if (frogLogCount++ < 5) console.log('[froggy] move css:', cx.toFixed(1), cy.toFixed(1), '→ artboard:', tx.toFixed(1), ty.toFixed(1), '| targetX set?', !!frogInputs.targetX);
     });
     frogCanvas.addEventListener('pointerleave', e => {
       frogOver = false;
@@ -631,7 +640,6 @@
     });
     frogCanvas.addEventListener('pointerup', e => {
       if (frogInputs.Bool1) frogInputs.Bool1.value = false;
-      // Keep cursor_target dragging after user releases click
       if (frogOver) {
         const { cx, cy } = frogCSSPos(e);
         if (frogRive) frogRive.pointerDown(cx, cy);
