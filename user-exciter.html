@@ -434,7 +434,6 @@
           coinRive.resizeDrawingSurfaceToCanvas();
           coinRive.play(SM);
           loopPending = false;
-          requestAnimationFrame(() => coinCanvas.classList.remove('coin-reload'));
         },
         onLoadError: (e) => console.error('coin_anim:', e),
       });
@@ -443,11 +442,7 @@
         const states = event.data || [];
         if (!loopPending && states.some(s => s === 'NextCoin')) {
           loopPending = true;
-          // wait for 30-frame animation (500ms), then fade out and restart
-          setTimeout(() => {
-            coinCanvas.classList.add('coin-reload');
-            setTimeout(startRive, 160);
-          }, 520);
+          setTimeout(startRive, 1520); // 90 frames @ 60fps = 1500ms + buffer
         }
       });
     }
