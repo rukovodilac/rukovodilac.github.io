@@ -232,6 +232,8 @@
 
     /* ── ABOUT SECTION ── */
     #about {
+      position: relative;
+      overflow: hidden;
       background: #E0EC8A;
       padding: clamp(60px, 10vw, 140px) clamp(20px, 3.5vw, 48px) clamp(20px, 3vw, 40px);
       display: flex;
@@ -278,6 +280,8 @@
 
     /* ── Footer / Contact ── */
     #contact {
+      position: relative;
+      overflow: hidden;
       background: #E0EC8A;
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
       display: flex;
@@ -502,7 +506,8 @@
         <span>Rerun</span>
       </div>
       <div class="work-title">
-        <span>This Is My Show <svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg></span>
+        <span>This Is</span>
+        <span>My Show <svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg></span>
       </div>
     </a>
 
@@ -764,12 +769,67 @@
     window.addEventListener('mousemove', (e) => {
       const [cx, cy] = clientToCanvas(e.clientX, e.clientY);
       spawnSquare(cx, cy);
+      aboutTrail.spawn(e.clientX, e.clientY);
+      contactTrail.spawn(e.clientX, e.clientY);
     });
     window.addEventListener('touchmove', (e) => {
       const t = e.touches[0];
       const [cx, cy] = clientToCanvas(t.clientX, t.clientY);
       spawnSquare(cx, cy);
+      aboutTrail.spawn(t.clientX, t.clientY);
+      contactTrail.spawn(t.clientX, t.clientY);
     }, { passive: true });
+
+    // ── Lime section square trails ──
+    function makeLimeTrail(sectionEl) {
+      const canvas = document.createElement('canvas');
+      canvas.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;';
+      sectionEl.appendChild(canvas);
+      const ctx = canvas.getContext('2d');
+      const sqs = [];
+      let lpx = null, lpy = null;
+
+      function resize() {
+        canvas.width  = sectionEl.offsetWidth;
+        canvas.height = sectionEl.offsetHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      return {
+        spawn(clientX, clientY) {
+          const rect = sectionEl.getBoundingClientRect();
+          const x = clientX - rect.left;
+          const y = clientY - rect.top;
+          const dx = lpx === null ? 999 : x - lpx;
+          const dy = lpy === null ? 999 : y - lpy;
+          if (dx * dx + dy * dy < 400) return;
+          lpx = x; lpy = y;
+          const vmin = Math.min(window.innerWidth, window.innerHeight);
+          const size = vmin * (0.015 + Math.random() * 0.08);
+          sqs.push({
+            x: x - size / 2 + (Math.random() - 0.5) * 30,
+            y: y - size / 2 + (Math.random() - 0.5) * 30,
+            s: size, born: performance.now(),
+            life: 2700 + Math.random() * 1800
+          });
+        },
+        tick(now) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          for (let i = sqs.length - 1; i >= 0; i--) {
+            const sq = sqs[i];
+            const t = (now - sq.born) / sq.life;
+            if (t >= 1) { sqs.splice(i, 1); continue; }
+            const opacity = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
+            ctx.fillStyle = `rgba(255,255,255,${opacity})`;
+            ctx.fillRect(sq.x, sq.y, sq.s, sq.s);
+          }
+        }
+      };
+    }
+
+    const aboutTrail   = makeLimeTrail(document.getElementById('about'));
+    const contactTrail = makeLimeTrail(document.getElementById('contact'));
 
     // Lenis smooth scroll
     const lenis = new Lenis({
@@ -789,6 +849,8 @@
         tc.fillStyle = `rgba(255,255,255,${opacity})`;
         tc.fillRect(sq.x, sq.y, sq.s, sq.s);
       }
+      aboutTrail.tick(now);
+      contactTrail.tick(now);
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
