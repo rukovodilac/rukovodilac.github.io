@@ -287,12 +287,13 @@
 
     /* ── Footer / Contact ── */
     #contact {
-      background: #0f0f0f;
-      padding: clamp(48px, 8vw, 100px) clamp(20px, 3.5vw, 48px);
+      background: #E0EC8A;
+      padding: clamp(48px, 7vw, 100px) clamp(20px, 3.5vw, 48px);
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
+      align-items: flex-start;
       gap: clamp(32px, 5vw, 64px);
+      border-top: 1.5px solid rgba(0,0,0,0.12);
     }
 
     .contact-left {
@@ -300,17 +301,20 @@
     }
 
     .contact-tagline {
-      font-size: clamp(26px, 3.2vw, 48px);
+      font-size: clamp(36px, 5.5vw, 80px);
       font-weight: 500;
-      line-height: 1.25;
-      color: #f0f0f0;
+      line-height: 1.1;
+      color: #fff;
       margin: 0;
     }
 
     .contact-linkedin {
-      color: inherit;
-      text-decoration: underline;
-      text-underline-offset: 4px;
+      display: inline-block;
+      background: #F8F0F0;
+      color: #000;
+      padding: 0 12px 2px;
+      text-decoration: none;
+      line-height: inherit;
     }
 
     .contact-email-wrap {
@@ -319,42 +323,40 @@
     }
 
     .contact-email-btn {
-      background: none;
+      background: #FFC03F;
       border: none;
-      padding: 0;
+      padding: 0 12px 2px;
       margin: 0;
       font: inherit;
-      color: inherit;
+      color: #000;
       cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 4px;
+      line-height: inherit;
     }
 
     .email-tooltip {
       position: absolute;
-      bottom: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%);
-      background: #333;
-      color: #fff;
-      font-size: 12px;
-      font-weight: 400;
-      padding: 5px 10px;
-      border-radius: 6px;
+      top: calc(100% + 12px);
+      left: 0;
+      background: #000;
+      color: #FFC03F;
+      font-size: clamp(18px, 2vw, 28px);
+      font-weight: 500;
+      padding: 10px 28px;
+      border-radius: 60px;
       white-space: nowrap;
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.15s;
+      z-index: 10;
     }
 
-    .email-tooltip::after {
+    .email-tooltip::before {
       content: '';
       position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border: 5px solid transparent;
-      border-top-color: #333;
+      bottom: 100%;
+      left: 28px;
+      border: 7px solid transparent;
+      border-bottom-color: #000;
     }
 
     .contact-email-wrap:hover .email-tooltip,
@@ -367,24 +369,23 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: clamp(12px, 2vw, 24px);
-    }
-
-    .contact-legal {
-      font-size: clamp(10px, 0.85vw, 13px);
-      color: #555;
-      text-align: right;
-      line-height: 1.6;
-      margin: 0;
-      max-width: 360px;
+      gap: clamp(8px, 1.5vw, 16px);
     }
 
     #footer-logo {
-      font-size: clamp(40px, 5vw, 72px);
+      font-size: clamp(48px, 6vw, 88px);
       font-weight: 500;
       line-height: 1;
-      color: #f0f0f0;
+      color: #000;
       text-decoration: none;
+    }
+
+    .contact-legal {
+      font-size: clamp(10px, 0.9vw, 13px);
+      color: rgba(0,0,0,0.45);
+      text-align: right;
+      line-height: 1.6;
+      margin: 0;
     }
 
     @media (max-width: 768px) {
@@ -552,18 +553,18 @@
   <footer id="contact">
     <div class="contact-left">
       <p class="contact-tagline">
-        Get in touch via
-        <a class="contact-linkedin" href="https://www.linkedin.com/in/a-zdravkovic" target="_blank" rel="noopener">LinkedIn&#x2197;</a>
+        Get in touch<br>
+        via <a class="contact-linkedin" href="https://www.linkedin.com/in/a-zdravkovic" target="_blank" rel="noopener">LinkedIn&#x2197;</a>
         or
         <span class="contact-email-wrap" id="email-wrap">
-          <button class="contact-email-btn" id="email-btn">email</button>
-          <span class="email-tooltip" id="email-tooltip">Copy email</span>
+          <button class="contact-email-btn" id="email-btn">e-mail</button>
+          <span class="email-tooltip" id="email-tooltip">Copy e-mail</span>
         </span>
       </p>
     </div>
     <div class="contact-right">
-      <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials belong to their respective owners.</p>
       <a href="/" id="footer-logo">a–z</a>
+      <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials<br>belong to their respective owners.</p>
     </div>
   </footer>
 
