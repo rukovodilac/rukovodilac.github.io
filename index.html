@@ -578,7 +578,7 @@
           { type: 'hot',         label: 'Hot',        icon: 'icon-hot' },
           { type: 'interactive', label: 'Interactive', icon: 'icon-interactive' }
         ],
-        iframe: 'https://player.cloudinary.com/embed/?cloud_name=dzar7cp0b&public_id=MakeItPop_Pre_ve1ord&autoplay=true&muted=true&loop=true&controls=false'
+        video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/MakeItPop_Pre_ve1ord.mp4'
       },
       {
         href:  'tetris-story.html',
@@ -617,12 +617,6 @@
           media.innerHTML =
             `<video autoplay muted loop playsinline disablePictureInPicture>` +
             `<source src="${p.video}" type="video/mp4"></video>`;
-        } else if (p.iframe) {
-          const fr = document.createElement('iframe');
-          fr.src = p.iframe;
-          fr.allow = 'autoplay; fullscreen; encrypted-media; picture-in-picture';
-          fr.allowFullscreen = true;
-          media.appendChild(fr);
         }
         a.appendChild(media);
 
