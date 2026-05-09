@@ -436,10 +436,15 @@
       });
 
       let inNextCoin = false;
+      let loopPending = false;
       coinRive.on(rive.EventType.StateChange, (event) => {
         const states = event.data || [];
+        console.log('[coin]', states.join(', '));
         const nowIn = states.some(s => s === 'NextCoin');
-        if (inNextCoin && !nowIn) requestAnimationFrame(initCoinRive);
+        if (inNextCoin && !nowIn && !loopPending) {
+          loopPending = true;
+          setTimeout(initCoinRive, 100);
+        }
         inNextCoin = nowIn;
       });
     }
