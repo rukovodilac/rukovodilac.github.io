@@ -177,9 +177,23 @@
       color: #fff;
     }
 
-    .work-tag--hot span    { background: rgb(249,66,58);  color: #3C1011; }
-    .work-tag--latest span { background: rgb(255,192,63); color: #988541; }
-    .work-tag--rerun span  { background: rgb(9,87,195);   color: #7CE1D3; }
+    .work-tag--hot span         { background: rgb(249,66,58);  color: #3C1011; }
+    .work-tag--latest span      { background: rgb(255,192,63); color: #988541; }
+    .work-tag--rerun span       { background: rgb(9,87,195);   color: #7CE1D3; }
+    .work-tag--interactive span { background: rgb(224,236,138); color: #000; }
+
+    .work-tags {
+      position: absolute;
+      top: clamp(14px, 2vw, 24px);
+      left: clamp(14px, 2vw, 24px);
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .work-tags .work-tag {
+      position: static;
+    }
 
     /* Title block */
     .work-title {
@@ -468,6 +482,37 @@
           </g>
         </g>
       </symbol>
+      <symbol id="icon-interactive" viewBox="0 0 77 77" style="fill-rule:evenodd;clip-rule:evenodd;">
+        <g transform="matrix(1,0,0,1,-2149.604938,-1183.484688)">
+          <g transform="matrix(1,0,0,1,-149,91.368069)">
+            <circle cx="2337.105" cy="1130.617" r="38.5" fill="rgb(224,236,138)"/>
+          </g>
+          <g transform="matrix(0.157025,0,0,0.157025,1855.447913,1025.917434)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0,0.157025,-0.157025,0,2384.172192,889.327663)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(-0.157025,0,0,-0.157025,2520.761963,1418.051942)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0,-0.157025,0.157025,0,1992.037685,1554.641713)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0.111033,-0.111033,0.111033,0.111033,1814.240416,1318.568241)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(0.111033,0.111033,-0.111033,0.111033,2091.521385,848.120165)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(-0.111033,0.111033,-0.111033,-0.111033,2561.969461,1125.401134)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(-0.111033,-0.111033,0.111033,-0.111033,2284.688492,1595.849211)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+        </g>
+      </symbol>
     </defs>
   </svg>
 
@@ -489,9 +534,15 @@
     <a href="user-exciter.html" class="work-item">
       <div class="work-media">
       </div>
-      <div class="work-tag work-tag--hot">
-        <svg aria-hidden="true"><use href="#icon-hot"/></svg>
-        <span>Hot</span>
+      <div class="work-tags">
+        <div class="work-tag work-tag--hot">
+          <svg aria-hidden="true"><use href="#icon-hot"/></svg>
+          <span>Hot</span>
+        </div>
+        <div class="work-tag work-tag--interactive">
+          <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+          <span>Interactive</span>
+        </div>
       </div>
       <div class="work-title">
         <span>User</span>
