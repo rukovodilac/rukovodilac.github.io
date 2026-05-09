@@ -434,16 +434,21 @@
           coinRive.resizeDrawingSurfaceToCanvas();
           coinRive.play(SM);
           loopPending = false;
-          coinCanvas.classList.remove('coin-reload');
+          requestAnimationFrame(() => coinCanvas.classList.remove('coin-reload'));
         },
         onLoadError: (e) => console.error('coin_anim:', e),
       });
 
-      coinRive.on(rive.EventType.Stop, () => {
-        if (loopPending) return;
-        loopPending = true;
-        coinCanvas.classList.add('coin-reload');  // CSS fade-out (0.15s)
-        setTimeout(startRive, 160);              // restart after fade
+      coinRive.on(rive.EventType.StateChange, (event) => {
+        const states = event.data || [];
+        if (!loopPending && states.some(s => s === 'NextCoin')) {
+          loopPending = true;
+          // wait for 30-frame animation (500ms), then fade out and restart
+          setTimeout(() => {
+            coinCanvas.classList.add('coin-reload');
+            setTimeout(startRive, 160);
+          }, 520);
+        }
       });
     }
 
