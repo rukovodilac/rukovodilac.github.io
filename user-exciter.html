@@ -423,7 +423,7 @@
       if (coinRive) { try { coinRive.cleanup(); } catch (e) {} coinRive = null; }
 
       coinRive = new rive.Rive({
-        buffer: rivBuffer,
+        buffer: rivBuffer.slice(0),
         canvas: coinCanvas,
         stateMachines: SM,
         autoplay: true,
