@@ -297,14 +297,18 @@
       aspect-ratio: 1 / 1;
     }
 
+    .showcase-item--square-4 {
+      grid-column: 4 / 5;
+      aspect-ratio: 1 / 1;
+    }
+
     @media (max-width: 768px) {
       #showcase {
         grid-template-columns: 1fr;
       }
-      .showcase-item {
-        grid-column: span 1;
-      }
-      .showcase-item--square {
+      .showcase-item,
+      .showcase-item--square,
+      .showcase-item--square-4 {
         grid-column: span 1;
       }
     }
@@ -389,6 +393,9 @@
     </div>
     <div class="showcase-item showcase-item--square">
       <canvas id="knob-canvas"></canvas>
+    </div>
+    <div class="showcase-item showcase-item--square-4">
+      <canvas id="froggy-canvas"></canvas>
     </div>
     <div class="showcase-item">
       <canvas id="progress-canvas"></canvas>
@@ -551,6 +558,88 @@
     window.addEventListener('resize', () => {
       sizeKnobCanvas();
       if (knobRive) knobRive.resizeDrawingSurfaceToCanvas();
+    });
+  </script>
+
+  <script>
+    // ── Froggy animation ──
+    const FROG_SM = 'State Machine 1';
+    const frogCanvas = document.getElementById('froggy-canvas');
+    let frogRive   = null;
+    let frogBuffer = null;
+    let frogInputs = {};
+
+    function sizeFrogCanvas() {
+      const parent = frogCanvas.parentElement;
+      const dpr  = Math.min(2, window.devicePixelRatio || 1);
+      const cssW = parent.offsetWidth  || Math.round(window.innerWidth / 4);
+      const cssH = parent.offsetHeight || cssW;
+      frogCanvas.width        = Math.round(cssW * dpr);
+      frogCanvas.height       = Math.round(cssH * dpr);
+      frogCanvas.style.width  = cssW + 'px';
+      frogCanvas.style.height = cssH + 'px';
+    }
+
+    function startFrogRive() {
+      if (frogRive) { try { frogRive.cleanup(); } catch (e) {} frogRive = null; }
+
+      frogRive = new rive.Rive({
+        buffer: frogBuffer.slice(0),
+        canvas: frogCanvas,
+        stateMachines: FROG_SM,
+        autoplay: true,
+        autoBind: true,
+        fit: rive.Fit.Cover,
+        alignment: rive.Alignment.Center,
+        onLoad: () => {
+          frogRive.resizeDrawingSurfaceToCanvas();
+          frogRive.play(FROG_SM);
+          const inputs = frogRive.stateMachineInputs(FROG_SM) || [];
+          frogInputs = Object.fromEntries(inputs.map(i => [i.name, i]));
+        },
+        onLoadError: (e) => console.error('froggy:', e),
+      });
+    }
+
+    function frogPointerPos(e) {
+      const r = frogCanvas.getBoundingClientRect();
+      return {
+        x: ((e.clientX - r.left) / r.width)  * 400,
+        y: ((e.clientY - r.top)  / r.height) * 400,
+      };
+    }
+
+    frogCanvas.addEventListener('pointerenter', () => {
+      if (frogInputs.isActive) frogInputs.isActive.value = true;
+    });
+    frogCanvas.addEventListener('pointerleave', () => {
+      if (frogInputs.isActive) frogInputs.isActive.value = false;
+      if (frogInputs.Bool1)    frogInputs.Bool1.value    = false;
+    });
+    frogCanvas.addEventListener('pointermove', e => {
+      const { x, y } = frogPointerPos(e);
+      if (frogInputs.targetX) frogInputs.targetX.value = x;
+      if (frogInputs.targetY) frogInputs.targetY.value = y;
+    });
+    frogCanvas.addEventListener('pointerdown', e => {
+      const { x, y } = frogPointerPos(e);
+      if (frogInputs.targetX) frogInputs.targetX.value = x;
+      if (frogInputs.targetY) frogInputs.targetY.value = y;
+      if (frogInputs.Bool1)   frogInputs.Bool1.value   = true;
+    });
+    frogCanvas.addEventListener('pointerup', () => {
+      if (frogInputs.Bool1) frogInputs.Bool1.value = false;
+    });
+
+    requestAnimationFrame(() => requestAnimationFrame(async () => {
+      sizeFrogCanvas();
+      frogBuffer = await fetch('froggy.riv').then(r => r.arrayBuffer());
+      startFrogRive();
+    }));
+
+    window.addEventListener('resize', () => {
+      sizeFrogCanvas();
+      if (frogRive) frogRive.resizeDrawingSurfaceToCanvas();
     });
   </script>
 
