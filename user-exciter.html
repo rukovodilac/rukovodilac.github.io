@@ -604,8 +604,8 @@
     function frogPointerPos(e) {
       const r = frogCanvas.getBoundingClientRect();
       return {
-        x: ((e.clientX - r.left) / r.width  - 0.5) * 400,
-        y: ((e.clientY - r.top)  / r.height - 0.5) * 400,
+        x: (e.clientX - r.left) / r.width  * 400,
+        y: (e.clientY - r.top)  / r.height * 400,
       };
     }
 
