@@ -397,7 +397,7 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
+  <script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
   <script>
     // ── Coin animation ──
     const coinCanvas = document.getElementById('coin-canvas');
@@ -421,11 +421,13 @@
         canvas: coinCanvas,
         stateMachines: 'State Machine 1',
         autoplay: true,
+        useOffscreenRenderer: true,
         fit: rive.Fit.Cover,
         alignment: rive.Alignment.Center,
         onLoad: () => {
           sizeCoinCanvas();
           coinRive.resizeDrawingSurfaceToCanvas();
+          coinRive.play('State Machine 1');
           console.log('[coin] loaded, canvas:', coinCanvas.width, 'x', coinCanvas.height);
         },
         onLoadError: (e) => console.error('coin_anim:', e),
