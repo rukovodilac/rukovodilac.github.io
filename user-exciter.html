@@ -242,9 +242,71 @@
         width: 100%;
       }
     }
+
+    /* ── INTERACTIVE TAG ── */
+    .project-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      font-size: clamp(13px, 1.2vw, 17px);
+      font-weight: 500;
+      line-height: 1;
+      margin-top: clamp(12px, 1.5vw, 20px);
+    }
+
+    .project-tag svg {
+      width: 1.7em;
+      height: 1.7em;
+      flex-shrink: 0;
+    }
+
+    .project-tag span {
+      height: 1.7em;
+      display: flex;
+      align-items: center;
+      padding: 0 9px;
+      background: rgb(224,236,138);
+      color: #000;
+    }
   </style>
 </head>
 <body>
+
+  <svg aria-hidden="true" focusable="false" style="display:none;position:absolute;width:0;height:0">
+    <defs>
+      <symbol id="icon-interactive" viewBox="0 0 77 77" style="fill-rule:evenodd;clip-rule:evenodd;">
+        <g transform="matrix(1,0,0,1,-2149.604938,-1183.484688)">
+          <g transform="matrix(1,0,0,1,-149,91.368069)">
+            <circle cx="2337.105" cy="1130.617" r="38.5" fill="rgb(224,236,138)"/>
+          </g>
+          <g transform="matrix(0.157025,0,0,0.157025,1855.447913,1025.917434)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0,0.157025,-0.157025,0,2384.172192,889.327663)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(-0.157025,0,0,-0.157025,2520.761963,1418.051942)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0,-0.157025,0.157025,0,1992.037685,1554.641713)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0.111033,-0.111033,0.111033,0.111033,1814.240416,1318.568241)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(0.111033,0.111033,-0.111033,0.111033,2091.521385,848.120165)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(-0.111033,0.111033,-0.111033,-0.111033,2561.969461,1125.401134)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(-0.111033,-0.111033,0.111033,-0.111033,2284.688492,1595.849211)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
 
   <header id="header">
     <a href="/" id="logo">a–z</a>
@@ -260,6 +322,10 @@
     <div id="tagline">
       <span>Turning UX into</span>
       <span>User Excitement.</span>
+    </div>
+    <div class="project-tag">
+      <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      <span>Interactive elements. Feel free to explore.</span>
     </div>
   </div>
 
