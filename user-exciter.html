@@ -420,7 +420,7 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/@rive-app/webgl@latest/rive.js"></script>
+  <script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
   <script>
     // ── Coin animation ──
     const SM = 'State Machine 1';
@@ -471,7 +471,10 @@
     function fwd(e, method) {
       if (!coinRive) return;
       const r = coinCanvas.getBoundingClientRect();
-      coinRive[method](e.clientX - r.left, e.clientY - r.top);
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const ab = coinRive.artboard;
+      if (ab && ab[method]) ab[method](x, y);
+      else if (coinRive[method]) coinRive[method](x, y);
     }
     coinCanvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
     coinCanvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
@@ -534,7 +537,10 @@
     function fwdKnob(e, method) {
       if (!knobRive) return;
       const r = knobCanvas.getBoundingClientRect();
-      knobRive[method](e.clientX - r.left, e.clientY - r.top);
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const ab = knobRive.artboard;
+      if (ab && ab[method]) ab[method](x, y);
+      else if (knobRive[method]) knobRive[method](x, y);
     }
     knobCanvas.addEventListener('pointermove', e => fwdKnob(e, 'pointerMove'));
     knobCanvas.addEventListener('pointerdown', e => {
@@ -595,7 +601,9 @@
           frogRive.play(FROG_SM);
           const inputs = frogRive.stateMachineInputs(FROG_SM) || [];
           frogInputs = Object.fromEntries(inputs.map(i => [i.name, i]));
-          console.log('[froggy] inputs found:', inputs.map(i => `${i.name}(${i.type})`));
+          const vmi = frogRive.viewModelInstance;
+          if (vmi) frogVMI = vmi;
+          console.log('[froggy] inputs:', inputs.map(i => `${i.name}(${i.type})`), '| vmi:', !!vmi, Object.keys(vmi || {}));
         },
         onLoadError: (e) => console.error('froggy:', e),
       });
@@ -607,30 +615,42 @@
     }
 
     let frogOver = false;
-    let frogLogCount = 0;
+    let frogVMI  = null;
+
+    function frogPtr(method, cx, cy) {
+      if (!frogRive) return;
+      const ab = frogRive.artboard;
+      if (ab && ab[method]) ab[method](cx, cy);
+      else if (frogRive[method]) frogRive[method](cx, cy);
+    }
+
+    function setFrogPos(cx, cy, w, h) {
+      const tx = (cx / w) * 400, ty = (cy / h) * 400;
+      if (frogInputs.targetX) frogInputs.targetX.value = tx;
+      if (frogInputs.targetY) frogInputs.targetY.value = ty;
+      if (frogVMI) {
+        try { const p = frogVMI.number('targetX'); if (p) p.value = tx; } catch(e){}
+        try { const p = frogVMI.number('targetY'); if (p) p.value = ty; } catch(e){}
+      }
+    }
 
     frogCanvas.addEventListener('pointerenter', e => {
       frogOver = true;
-      frogLogCount = 0;
       if (frogInputs.isActive) frogInputs.isActive.value = true;
       const { cx, cy, w, h } = frogCSSPos(e);
-      if (frogInputs.targetX) frogInputs.targetX.value = (cx / w) * 400;
-      if (frogInputs.targetY) frogInputs.targetY.value = (cy / h) * 400;
-      if (frogRive) { frogRive.pointerDown(cx, cy); frogRive.pointerMove(cx, cy); }
+      setFrogPos(cx, cy, w, h);
+      frogPtr('pointerDown', cx, cy);
+      frogPtr('pointerMove', cx, cy);
     });
     frogCanvas.addEventListener('pointermove', e => {
       const { cx, cy, w, h } = frogCSSPos(e);
-      const tx = (cx / w) * 400;
-      const ty = (cy / h) * 400;
-      if (frogInputs.targetX) frogInputs.targetX.value = tx;
-      if (frogInputs.targetY) frogInputs.targetY.value = ty;
-      if (frogRive) frogRive.pointerMove(cx, cy);
-      if (frogLogCount++ < 5) console.log('[froggy] move css:', cx.toFixed(1), cy.toFixed(1), '→ artboard:', tx.toFixed(1), ty.toFixed(1), '| targetX set?', !!frogInputs.targetX);
+      setFrogPos(cx, cy, w, h);
+      frogPtr('pointerMove', cx, cy);
     });
     frogCanvas.addEventListener('pointerleave', e => {
       frogOver = false;
       const { cx, cy } = frogCSSPos(e);
-      if (frogRive) frogRive.pointerUp(cx, cy);
+      frogPtr('pointerUp', cx, cy);
       if (frogInputs.isActive) frogInputs.isActive.value = false;
       if (frogInputs.Bool1)    frogInputs.Bool1.value    = false;
     });
@@ -639,10 +659,7 @@
     });
     frogCanvas.addEventListener('pointerup', e => {
       if (frogInputs.Bool1) frogInputs.Bool1.value = false;
-      if (frogOver) {
-        const { cx, cy } = frogCSSPos(e);
-        if (frogRive) frogRive.pointerDown(cx, cy);
-      }
+      if (frogOver) { const { cx, cy } = frogCSSPos(e); frogPtr('pointerDown', cx, cy); }
     });
 
     requestAnimationFrame(() => requestAnimationFrame(async () => {
