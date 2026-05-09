@@ -390,6 +390,9 @@
     <div class="showcase-item showcase-item--square">
       <canvas id="knob-canvas"></canvas>
     </div>
+    <div class="showcase-item">
+      <canvas id="progress-canvas"></canvas>
+    </div>
   </section>
 
   <footer id="contact">
@@ -548,6 +551,64 @@
     window.addEventListener('resize', () => {
       sizeKnobCanvas();
       if (knobRive) knobRive.resizeDrawingSurfaceToCanvas();
+    });
+  </script>
+
+  <script>
+    // ── Progress animation ──
+    const PROG_SM = 'State Machine 1';
+    const progressCanvas = document.getElementById('progress-canvas');
+    let progressRive   = null;
+    let progressBuffer = null;
+
+    function sizeProgressCanvas() {
+      const parent = progressCanvas.parentElement;
+      const dpr  = Math.min(2, window.devicePixelRatio || 1);
+      const cssW = parent.offsetWidth  || Math.round(window.innerWidth / 2);
+      const cssH = parent.offsetHeight || Math.round(cssW / 2);
+      progressCanvas.width        = Math.round(cssW * dpr);
+      progressCanvas.height       = Math.round(cssH * dpr);
+      progressCanvas.style.width  = cssW + 'px';
+      progressCanvas.style.height = cssH + 'px';
+    }
+
+    function startProgressRive() {
+      if (progressRive) { try { progressRive.cleanup(); } catch (e) {} progressRive = null; }
+
+      progressRive = new rive.Rive({
+        buffer: progressBuffer.slice(0),
+        canvas: progressCanvas,
+        stateMachines: PROG_SM,
+        autoplay: true,
+        autoBind: true,
+        fit: rive.Fit.Cover,
+        alignment: rive.Alignment.Center,
+        onLoad: () => {
+          progressRive.resizeDrawingSurfaceToCanvas();
+          progressRive.play(PROG_SM);
+        },
+        onLoadError: (e) => console.error('progress:', e),
+      });
+    }
+
+    function fwdProgress(e, method) {
+      if (!progressRive) return;
+      const r = progressCanvas.getBoundingClientRect();
+      progressRive[method](e.clientX - r.left, e.clientY - r.top);
+    }
+    progressCanvas.addEventListener('pointermove', e => fwdProgress(e, 'pointerMove'));
+    progressCanvas.addEventListener('pointerdown', e => fwdProgress(e, 'pointerDown'));
+    progressCanvas.addEventListener('pointerup',   e => fwdProgress(e, 'pointerUp'));
+
+    requestAnimationFrame(() => requestAnimationFrame(async () => {
+      sizeProgressCanvas();
+      progressBuffer = await fetch('progress.riv').then(r => r.arrayBuffer());
+      startProgressRive();
+    }));
+
+    window.addEventListener('resize', () => {
+      sizeProgressCanvas();
+      if (progressRive) progressRive.resizeDrawingSurfaceToCanvas();
     });
   </script>
 
