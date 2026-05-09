@@ -242,7 +242,7 @@
     /* ── ABOUT SECTION ── */
     #about {
       background: #E0EC8A;
-      padding: clamp(60px, 10vw, 140px) clamp(20px, 3.5vw, 48px);
+      padding: clamp(60px, 10vw, 140px) clamp(20px, 3.5vw, 48px) clamp(20px, 3vw, 40px);
       display: flex;
       flex-direction: column;
       gap: clamp(20px, 3vw, 40px);
@@ -288,7 +288,7 @@
     /* ── Footer / Contact ── */
     #contact {
       background: #E0EC8A;
-      padding: clamp(48px, 7vw, 100px) clamp(20px, 3.5vw, 48px);
+      padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -316,12 +316,18 @@
       line-height: inherit;
     }
 
-    .contact-arrow {
-      width: 0.55em;
-      height: 0.55em;
+    .contact-linkedin::after {
+      content: '';
+      display: inline-block;
+      width: 0.38em;
+      height: 0.38em;
+      border-top: 0.1em solid currentColor;
+      border-right: 0.1em solid currentColor;
+      transform: rotate(45deg);
+      margin-left: 0.28em;
       vertical-align: middle;
-      margin-left: 4px;
-      margin-bottom: 0.1em;
+      position: relative;
+      top: -0.06em;
     }
 
     .contact-email-wrap {
@@ -561,7 +567,7 @@
     <div class="contact-left">
       <p class="contact-tagline">
         Get in touch<br>
-        via <a class="contact-linkedin" href="https://www.linkedin.com/in/a-zdravkovic" target="_blank" rel="noopener">LinkedIn<svg class="contact-arrow" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"/></svg></a>
+        via <a class="contact-linkedin" href="https://www.linkedin.com/in/a-zdravkovic" target="_blank" rel="noopener">LinkedIn</a>
         or
         <span class="contact-email-wrap" id="email-wrap">
           <button class="contact-email-btn" id="email-btn">e-mail</button>
