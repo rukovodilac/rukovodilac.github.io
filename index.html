@@ -652,9 +652,11 @@
       return Math.min(window.innerHeight, Math.round(window.innerWidth * 9 / 16));
     }
 
+    const dpr = window.devicePixelRatio || 1;
+
     const canvas = document.getElementById('rive-canvas');
-    canvas.width = window.innerWidth;
-    canvas.height = heroH();
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = heroH() * dpr;
 
     const r = new rive.Rive({
       src: 'web_head_full.riv',
@@ -663,14 +665,15 @@
       autoplay: true,
       fit: rive.Fit.Cover,
       alignment: rive.Alignment.Center,
-      onLoad: () => r.resizeDrawingSurfaceToCanvas(),
+      onLoad: () => requestAnimationFrame(() => r.resizeDrawingSurfaceToCanvas()),
       onLoadError: (e) => console.error('Rive error:', e)
     });
 
     const trailCanvas = document.getElementById('trail-canvas');
     const tc = trailCanvas.getContext('2d');
-    trailCanvas.width = window.innerWidth;
-    trailCanvas.height = heroH();
+    trailCanvas.width = window.innerWidth * dpr;
+    trailCanvas.height = heroH() * dpr;
+    tc.scale(dpr, dpr);
 
     // ── DoneItSlot Rive ──
     // SLOT_TEXT: name of the text run — set this in the Rive editor (see below)
@@ -734,7 +737,7 @@
       alignment: rive.Alignment.Center,
       onLoad: () => {
         sizeDoneCanvas();
-        doneRive.resizeDrawingSurfaceToCanvas();
+        requestAnimationFrame(() => doneRive.resizeDrawingSurfaceToCanvas());
 
         const anims = doneRive.animationNames || [];
         idleAnimName = anims.find(n => n.toLowerCase().includes('idle')) || anims[0];
@@ -828,11 +831,10 @@
     doneCanvas.addEventListener('touchend', (e) => { e.preventDefault(); fireSlot(); }, { passive: false });
 
     window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = heroH();
       r.resizeDrawingSurfaceToCanvas();
-      trailCanvas.width = window.innerWidth;
-      trailCanvas.height = heroH();
+      trailCanvas.width = window.innerWidth * dpr;
+      trailCanvas.height = heroH() * dpr;
+      tc.scale(dpr, dpr);
       sizeDoneCanvas();
       doneRive.resizeDrawingSurfaceToCanvas();
     });
@@ -858,9 +860,7 @@
 
     function clientToCanvas(clientX, clientY) {
       const rect = trailCanvas.getBoundingClientRect();
-      const scaleX = trailCanvas.width / rect.width;
-      const scaleY = trailCanvas.height / rect.height;
-      return [(clientX - rect.left) * scaleX, (clientY - rect.top) * scaleY];
+      return [clientX - rect.left, clientY - rect.top];
     }
 
     window.addEventListener('mousemove', (e) => {
@@ -883,12 +883,14 @@
       canvas.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:-1;';
       sectionEl.appendChild(canvas);
       const ctx = canvas.getContext('2d');
+      const lDpr = window.devicePixelRatio || 1;
       const sqs = [];
       let lpx = null, lpy = null;
 
       function resize() {
-        canvas.width  = sectionEl.offsetWidth;
-        canvas.height = sectionEl.offsetHeight;
+        canvas.width  = sectionEl.offsetWidth * lDpr;
+        canvas.height = sectionEl.offsetHeight * lDpr;
+        ctx.scale(lDpr, lDpr);
       }
       resize();
       window.addEventListener('resize', resize);
@@ -912,7 +914,7 @@
           });
         },
         tick(now) {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.clearRect(0, 0, canvas.width / lDpr, canvas.height / lDpr);
           for (let i = sqs.length - 1; i >= 0; i--) {
             const sq = sqs[i];
             const t = (now - sq.born) / sq.life;
@@ -937,7 +939,7 @@
 
     function tick(now) {
       lenis.raf(now);
-      tc.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+      tc.clearRect(0, 0, trailCanvas.width / dpr, trailCanvas.height / dpr);
       for (let i = squares.length - 1; i >= 0; i--) {
         const sq = squares[i];
         const t = (now - sq.born) / sq.life;
