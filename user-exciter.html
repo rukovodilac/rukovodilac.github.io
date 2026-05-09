@@ -400,6 +400,7 @@
   <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
   <script>
     // ── Coin animation ──
+    const SM = 'State Machine 1';
     const coinCanvas = document.getElementById('coin-canvas');
 
     function sizeCoinCanvas() {
@@ -412,67 +413,37 @@
 
     let coinRive = null;
 
-    function startCoinRive(smName) {
+    function initCoinRive() {
       if (coinRive) { try { coinRive.cleanup(); } catch (e) {} coinRive = null; }
       sizeCoinCanvas();
 
       coinRive = new rive.Rive({
         src: 'coin_anim.riv',
         canvas: coinCanvas,
-        stateMachines: smName,
+        stateMachines: SM,
         autoplay: true,
         fit: rive.Fit.Cover,
         alignment: rive.Alignment.Center,
         onLoad: () => {
           sizeCoinCanvas();
           coinRive.resizeDrawingSurfaceToCanvas();
-          coinRive.play(smName);
-          const inputs = coinRive.stateMachineInputs(smName) || [];
-          console.log('[coin] SM:', smName, '| inputs:', inputs.map(i => `${i.name}(type=${i.type})`));
-          inputs.forEach(inp => { if (inp.type === 3) inp.fire(); });
+          coinRive.play(SM);
+          console.log('[coin] canvas:', coinCanvas.width, 'x', coinCanvas.height,
+            '| state:', coinRive.stateMachineNames);
         },
-        onLoadError: (e) => console.error('coin_anim:', e),
+        onLoadError: (e) => console.error('coin_anim load error:', e),
       });
 
       let inNextCoin = false;
       coinRive.on(rive.EventType.StateChange, (event) => {
         const states = event.data || [];
-        console.log('[coin] state:', states);
         const nowIn = states.some(s => s === 'NextCoin');
-        if (inNextCoin && !nowIn) startCoinRive(smName);
+        if (inNextCoin && !nowIn) initCoinRive();
         inNextCoin = nowIn;
       });
     }
 
-    // probe to discover the real SM + animation names, then start
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      sizeCoinCanvas();
-      const probe = new rive.Rive({
-        src: 'coin_anim.riv',
-        canvas: coinCanvas,
-        autoplay: false,
-        onLoad: () => {
-          const sms   = probe.stateMachineNames || [];
-          const anims = probe.animationNames    || [];
-          console.log('[coin] state machines:', sms, '| animations:', anims);
-          probe.cleanup();
-          if (sms.length) {
-            startCoinRive(sms[0]);
-          } else if (anims.length) {
-            coinRive = new rive.Rive({
-              src: 'coin_anim.riv',
-              canvas: coinCanvas,
-              animations: anims[0],
-              autoplay: true,
-              fit: rive.Fit.Cover,
-              alignment: rive.Alignment.Center,
-              onLoad: () => { sizeCoinCanvas(); coinRive.resizeDrawingSurfaceToCanvas(); },
-            });
-          }
-        },
-        onLoadError: (e) => console.error('coin probe:', e),
-      });
-    }));
+    requestAnimationFrame(() => requestAnimationFrame(initCoinRive));
 
     window.addEventListener('resize', () => {
       sizeCoinCanvas();
