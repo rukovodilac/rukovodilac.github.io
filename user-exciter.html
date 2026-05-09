@@ -397,7 +397,7 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
+  <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
   <script>
     // ── Coin animation ──
     const coinCanvas = document.getElementById('coin-canvas');
@@ -421,7 +421,6 @@
         canvas: coinCanvas,
         stateMachines: smName,
         autoplay: true,
-        useOffscreenRenderer: true,
         fit: rive.Fit.Cover,
         alignment: rive.Alignment.Center,
         onLoad: () => {
@@ -430,6 +429,7 @@
           coinRive.play(smName);
           const inputs = coinRive.stateMachineInputs(smName) || [];
           console.log('[coin] SM:', smName, '| inputs:', inputs.map(i => `${i.name}(type=${i.type})`));
+          inputs.forEach(inp => { if (inp.type === 3) inp.fire(); });
         },
         onLoadError: (e) => console.error('coin_anim:', e),
       });
@@ -444,7 +444,7 @@
       });
     }
 
-    // probe to discover the real state machine name, then start
+    // probe to discover the real SM + animation names, then start
     requestAnimationFrame(() => requestAnimationFrame(() => {
       sizeCoinCanvas();
       const probe = new rive.Rive({
@@ -452,20 +452,18 @@
         canvas: coinCanvas,
         autoplay: false,
         onLoad: () => {
-          const sms = probe.stateMachineNames || [];
-          const anims = probe.animationNames || [];
+          const sms   = probe.stateMachineNames || [];
+          const anims = probe.animationNames    || [];
           console.log('[coin] state machines:', sms, '| animations:', anims);
           probe.cleanup();
           if (sms.length) {
             startCoinRive(sms[0]);
           } else if (anims.length) {
-            // no state machine — play the raw animation directly
             coinRive = new rive.Rive({
               src: 'coin_anim.riv',
               canvas: coinCanvas,
               animations: anims[0],
               autoplay: true,
-              useOffscreenRenderer: true,
               fit: rive.Fit.Cover,
               alignment: rive.Alignment.Center,
               onLoad: () => { sizeCoinCanvas(); coinRive.resizeDrawingSurfaceToCanvas(); },
