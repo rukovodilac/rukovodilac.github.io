@@ -410,64 +410,35 @@
     }
 
     let coinRive = null;
-    let coinSM   = null; // discovered state machine name
 
-    function initCoinRive(smName) {
-      if (coinRive) {
-        try { coinRive.cleanup(); } catch (e) {}
-        coinRive = null;
-      }
+    function initCoinRive() {
+      if (coinRive) { try { coinRive.cleanup(); } catch (e) {} coinRive = null; }
       sizeCoinCanvas();
 
-      const opts = {
+      coinRive = new rive.Rive({
         src: 'coin_anim.riv',
         canvas: coinCanvas,
+        stateMachines: 'State Machine 1',
         autoplay: true,
         fit: rive.Fit.Contain,
         alignment: rive.Alignment.Center,
-        onLoadError: (e) => console.error('coin_anim Rive error:', e),
-      };
-
-      if (smName) {
-        // Real run — use state machine so interaction works
-        opts.stateMachines = smName;
-        opts.onLoad = () => {
+        onLoad: () => {
           sizeCoinCanvas();
           coinRive.resizeDrawingSurfaceToCanvas();
-          const inputs = coinRive.stateMachineInputs(smName) || [];
-          console.log('[coin] SM:', smName);
-          console.log('[coin] inputs:', inputs.map(i => `${i.name} type=${i.type}`));
-        };
-      } else {
-        // Probe run — load silently to discover what's inside the file
-        opts.autoplay = false;
-        opts.onLoad = () => {
-          const sms   = coinRive.stateMachineNames || [];
-          const anims = coinRive.animationNames    || [];
-          console.log('[coin] state machines:', sms, '| animations:', anims);
-          coinSM = sms[0] || null;
-          initCoinRive(coinSM); // reinit properly
-        };
-      }
+        },
+        onLoadError: (e) => console.error('coin_anim:', e),
+      });
 
-      coinRive = new rive.Rive(opts);
-
-      if (smName) {
-        // Track NextCoin state so we know when it finishes
-        let inNextCoin = false;
-        coinRive.on(rive.EventType.StateChange, (event) => {
-          const states = event.data || [];
-          const nowInNextCoin = states.some(s => /nextcoin/i.test(s));
-          if (inNextCoin && !nowInNextCoin) {
-            // NextCoin just exited — restart everything to loop
-            initCoinRive(coinSM);
-          }
-          inNextCoin = nowInNextCoin;
-        });
-      }
+      let inNextCoin = false;
+      coinRive.on(rive.EventType.StateChange, (event) => {
+        const states = event.data || [];
+        const nowIn  = states.some(s => s === 'NextCoin');
+        if (inNextCoin && !nowIn) initCoinRive();
+        inNextCoin = nowIn;
+      });
     }
 
-    initCoinRive(null); // start with probe
+    initCoinRive();
 
     window.addEventListener('resize', () => {
       sizeCoinCanvas();
