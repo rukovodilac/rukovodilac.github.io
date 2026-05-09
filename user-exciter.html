@@ -287,6 +287,7 @@
       display: block;
       width: 100%;
       height: 100%;
+      touch-action: none;
     }
 
     @media (max-width: 768px) {
@@ -420,11 +421,12 @@
         canvas: coinCanvas,
         stateMachines: 'State Machine 1',
         autoplay: true,
-        fit: rive.Fit.Contain,
+        fit: rive.Fit.Cover,
         alignment: rive.Alignment.Center,
         onLoad: () => {
           sizeCoinCanvas();
           coinRive.resizeDrawingSurfaceToCanvas();
+          console.log('[coin] loaded, canvas:', coinCanvas.width, 'x', coinCanvas.height);
         },
         onLoadError: (e) => console.error('coin_anim:', e),
       });
@@ -432,13 +434,15 @@
       let inNextCoin = false;
       coinRive.on(rive.EventType.StateChange, (event) => {
         const states = event.data || [];
+        console.log('[coin] state:', states);
         const nowIn  = states.some(s => s === 'NextCoin');
         if (inNextCoin && !nowIn) initCoinRive();
         inNextCoin = nowIn;
       });
     }
 
-    initCoinRive();
+    // defer until grid layout is fully computed
+    requestAnimationFrame(() => requestAnimationFrame(initCoinRive));
 
     window.addEventListener('resize', () => {
       sizeCoinCanvas();
