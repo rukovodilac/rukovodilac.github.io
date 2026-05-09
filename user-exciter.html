@@ -904,9 +904,9 @@
   <script>
     // ── Arrows animation ──
     (function() {
-      const SM = 'State Machine 1';
+      const SM = 'ArrowsVm';
       const canvas = document.getElementById('arrows-canvas');
-      let riveInst = null, buffer = null;
+      let riveInst = null, buffer = null, boolPress = null;
 
       function sizeCanvas() {
         const p = canvas.parentElement;
@@ -923,7 +923,12 @@
           buffer: buffer.slice(0), canvas,
           stateMachines: SM, autoplay: true, autoBind: true,
           fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
-          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoad: () => {
+            riveInst.resizeDrawingSurfaceToCanvas();
+            riveInst.play(SM);
+            const inputs = riveInst.stateMachineInputs(SM) || [];
+            boolPress = inputs.find(i => i.name === 'boolPress') || null;
+          },
           onLoadError: e => console.error('arrows:', e),
         });
       }
@@ -936,8 +941,8 @@
         if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
       }
       canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
-      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
-      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+      canvas.addEventListener('pointerdown', e => { fwd(e, 'pointerDown'); if (boolPress) boolPress.value = true; });
+      canvas.addEventListener('pointerup',   e => { fwd(e, 'pointerUp');   if (boolPress) boolPress.value = false; });
 
       requestAnimationFrame(() => requestAnimationFrame(async () => {
         sizeCanvas();
