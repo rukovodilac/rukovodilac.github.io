@@ -234,6 +234,7 @@
     #about {
       position: relative;
       overflow: hidden;
+      isolation: isolate;
       background: #E0EC8A;
       padding: clamp(60px, 10vw, 140px) clamp(20px, 3.5vw, 48px) clamp(20px, 3vw, 40px);
       display: flex;
@@ -282,6 +283,7 @@
     #contact {
       position: relative;
       overflow: hidden;
+      isolation: isolate;
       background: #E0EC8A;
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
       display: flex;
@@ -783,7 +785,7 @@
     // ── Lime section square trails ──
     function makeLimeTrail(sectionEl) {
       const canvas = document.createElement('canvas');
-      canvas.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;';
+      canvas.style.cssText = 'position:absolute;top:0;left:0;pointer-events:none;z-index:-1;';
       sectionEl.appendChild(canvas);
       const ctx = canvas.getContext('2d');
       const sqs = [];
