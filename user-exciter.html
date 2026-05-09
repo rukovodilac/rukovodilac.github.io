@@ -278,7 +278,7 @@
     .showcase-item {
       grid-column: span 2;
       position: relative;
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 2 / 1;
       overflow: hidden;
       background: #000;
     }
@@ -408,7 +408,7 @@
       const parent = coinCanvas.parentElement;
       const dpr    = Math.min(2, window.devicePixelRatio || 1);
       const cssW   = parent.offsetWidth  || Math.round(window.innerWidth / 2);
-      const cssH   = parent.offsetHeight || Math.round(cssW * 9 / 16);
+      const cssH   = parent.offsetHeight || Math.round(cssW / 2);
       coinCanvas.width        = Math.round(cssW * dpr);
       coinCanvas.height       = Math.round(cssH * dpr);
       coinCanvas.style.width  = cssW + 'px';
@@ -439,7 +439,7 @@
       coinRive.on(rive.EventType.StateChange, (event) => {
         const states = event.data || [];
         const nowIn = states.some(s => s === 'NextCoin');
-        if (inNextCoin && !nowIn) initCoinRive();
+        if (inNextCoin && !nowIn) requestAnimationFrame(initCoinRive);
         inNextCoin = nowIn;
       });
     }
