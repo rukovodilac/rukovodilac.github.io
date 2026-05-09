@@ -385,11 +385,7 @@
         align-items: flex-start;
       }
       .contact-right {
-        align-items: flex-start;
         width: 100%;
-      }
-      .contact-legal {
-        text-align: left;
       }
     }
   </style>
@@ -552,7 +548,7 @@
     window.scrollTo(0, 0);
 
     function heroH() {
-      return Math.min(window.innerHeight, window.innerWidth * 1.5);
+      return Math.min(window.innerHeight, Math.round(window.innerWidth * 9 / 16));
     }
 
     const canvas = document.getElementById('rive-canvas');
@@ -759,8 +755,22 @@
       });
     }
 
-    window.addEventListener('mousemove', (e) => spawnSquare(e.clientX, e.clientY));
-    window.addEventListener('touchmove', (e) => spawnSquare(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+    function clientToCanvas(clientX, clientY) {
+      const rect = trailCanvas.getBoundingClientRect();
+      const scaleX = trailCanvas.width / rect.width;
+      const scaleY = trailCanvas.height / rect.height;
+      return [(clientX - rect.left) * scaleX, (clientY - rect.top) * scaleY];
+    }
+
+    window.addEventListener('mousemove', (e) => {
+      const [cx, cy] = clientToCanvas(e.clientX, e.clientY);
+      spawnSquare(cx, cy);
+    });
+    window.addEventListener('touchmove', (e) => {
+      const t = e.touches[0];
+      const [cx, cy] = clientToCanvas(t.clientX, t.clientY);
+      spawnSquare(cx, cy);
+    }, { passive: true });
 
     // Lenis smooth scroll
     const lenis = new Lenis({
