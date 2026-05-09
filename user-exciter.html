@@ -292,11 +292,19 @@
     }
     .showcase-item canvas.coin-reload { opacity: 0; }
 
+    .showcase-item--square {
+      grid-column: 3 / 4;
+      aspect-ratio: 1 / 1;
+    }
+
     @media (max-width: 768px) {
       #showcase {
         grid-template-columns: 1fr;
       }
       .showcase-item {
+        grid-column: span 1;
+      }
+      .showcase-item--square {
         grid-column: span 1;
       }
     }
@@ -378,6 +386,9 @@
   <section id="showcase">
     <div class="showcase-item">
       <canvas id="coin-canvas"></canvas>
+    </div>
+    <div class="showcase-item showcase-item--square">
+      <canvas id="knob-canvas"></canvas>
     </div>
   </section>
 
@@ -465,6 +476,70 @@
     window.addEventListener('resize', () => {
       sizeCoinCanvas();
       if (coinRive) coinRive.resizeDrawingSurfaceToCanvas();
+    });
+  </script>
+
+  <script>
+    // ── Knob animation ──
+    const KNOB_SM = 'State Machine 1';
+    const knobCanvas = document.getElementById('knob-canvas');
+    let knobRive = null;
+    let knobBuffer = null;
+    let trigPushInput = null;
+
+    function sizeKnobCanvas() {
+      const parent = knobCanvas.parentElement;
+      const dpr  = Math.min(2, window.devicePixelRatio || 1);
+      const cssW = parent.offsetWidth  || Math.round(window.innerWidth / 4);
+      const cssH = parent.offsetHeight || cssW;
+      knobCanvas.width        = Math.round(cssW * dpr);
+      knobCanvas.height       = Math.round(cssH * dpr);
+      knobCanvas.style.width  = cssW + 'px';
+      knobCanvas.style.height = cssH + 'px';
+    }
+
+    function startKnobRive() {
+      if (knobRive) { try { knobRive.cleanup(); } catch (e) {} knobRive = null; }
+
+      knobRive = new rive.Rive({
+        buffer: knobBuffer.slice(0),
+        canvas: knobCanvas,
+        stateMachines: KNOB_SM,
+        autoplay: true,
+        autoBind: true,
+        fit: rive.Fit.Cover,
+        alignment: rive.Alignment.Center,
+        onLoad: () => {
+          knobRive.resizeDrawingSurfaceToCanvas();
+          knobRive.play(KNOB_SM);
+          const inputs = knobRive.stateMachineInputs(KNOB_SM);
+          trigPushInput = inputs && inputs.find(i => i.name === 'trigPush');
+        },
+        onLoadError: (e) => console.error('knob:', e),
+      });
+    }
+
+    function fwdKnob(e, method) {
+      if (!knobRive) return;
+      const r = knobCanvas.getBoundingClientRect();
+      knobRive[method](e.clientX - r.left, e.clientY - r.top);
+    }
+    knobCanvas.addEventListener('pointermove', e => fwdKnob(e, 'pointerMove'));
+    knobCanvas.addEventListener('pointerdown', e => {
+      fwdKnob(e, 'pointerDown');
+      if (trigPushInput) trigPushInput.fire();
+    });
+    knobCanvas.addEventListener('pointerup', e => fwdKnob(e, 'pointerUp'));
+
+    requestAnimationFrame(() => requestAnimationFrame(async () => {
+      sizeKnobCanvas();
+      knobBuffer = await fetch('knob.riv').then(r => r.arrayBuffer());
+      startKnobRive();
+    }));
+
+    window.addEventListener('resize', () => {
+      sizeKnobCanvas();
+      if (knobRive) knobRive.resizeDrawingSurfaceToCanvas();
     });
   </script>
 
