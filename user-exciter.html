@@ -302,6 +302,15 @@
       aspect-ratio: 1 / 1;
     }
 
+    .showcase-item--progress {
+      align-self: start;
+    }
+
+    .showcase-item--stemp {
+      aspect-ratio: 1 / 1;
+      cursor: crosshair;
+    }
+
     @media (max-width: 768px) {
       #showcase {
         grid-template-columns: 1fr;
@@ -310,7 +319,8 @@
       }
       .showcase-item,
       .showcase-item--square,
-      .showcase-item--square-4 {
+      .showcase-item--square-4,
+      .showcase-item--stemp {
         grid-column: span 1;
       }
     }
@@ -351,6 +361,17 @@
           </g>
         </g>
       </symbol>
+
+      <!-- Stamp recolor filters — source green #00923D (R=0, G=0.573, B=0.239) mapped via G channel -->
+      <filter id="stamp-pink" color-interpolation-filters="sRGB">
+        <feColorMatrix type="matrix" values="0 1.745 0 0 0  0 1.129 0 0 0  0 1.368 0 0 0  0 0 0 1 0"/>
+      </filter>
+      <filter id="stamp-orange" color-interpolation-filters="sRGB">
+        <feColorMatrix type="matrix" values="0 1.745 0 0 0  0 0.548 0 0 0  0 0.014 0 0 0  0 0 0 1 0"/>
+      </filter>
+      <filter id="stamp-yellow" color-interpolation-filters="sRGB">
+        <feColorMatrix type="matrix" values="0 1.745 0 0 0  0 1.253 0 0 0  0 0.164 0 0 0  0 0 0 1 0"/>
+      </filter>
     </defs>
   </svg>
 
@@ -399,8 +420,11 @@
     <div class="showcase-item showcase-item--square-4">
       <canvas id="froggy-canvas"></canvas>
     </div>
-    <div class="showcase-item">
+    <div class="showcase-item showcase-item--progress">
       <canvas id="progress-canvas"></canvas>
+    </div>
+    <div class="showcase-item showcase-item--stemp">
+      <canvas id="stemp-board-canvas" style="touch-action: pan-y;"></canvas>
     </div>
   </section>
 
@@ -731,6 +755,136 @@
     window.addEventListener('resize', () => {
       sizeProgressCanvas();
       if (progressRive) progressRive.resizeDrawingSurfaceToCanvas();
+    });
+  </script>
+
+  <script>
+    // ── Stemp Board ──
+    const STEMP_BOARD_NAME = 'StempBoard';
+    const BOARD_SIZE       = 800;
+    const STAMP_SIZE       = 200;
+    const MAX_STAMPS       = 12;
+    const STAMP_COLORS     = ['#00923D', '#FFA5C8', '#FF5002', '#FFB718'];
+    const STAMP_FILTERS    = {
+      '#FFA5C8': 'url(#stamp-pink)',
+      '#FF5002': 'url(#stamp-orange)',
+      '#FFB718': 'url(#stamp-yellow)',
+    };
+
+    const stempContainer   = document.querySelector('.showcase-item--stemp');
+    const stempBoardCanvas = document.getElementById('stemp-board-canvas');
+    let stempBuffer        = null;
+    let stempBoardRive     = null;
+    const activeStamps     = [];
+
+    function sizeStempBoardCanvas() {
+      const dpr  = Math.min(2, window.devicePixelRatio || 1);
+      const cssW = stempContainer.offsetWidth;
+      const cssH = stempContainer.offsetHeight;
+      stempBoardCanvas.width        = Math.round(cssW * dpr);
+      stempBoardCanvas.height       = Math.round(cssH * dpr);
+      stempBoardCanvas.style.width  = cssW + 'px';
+      stempBoardCanvas.style.height = cssH + 'px';
+    }
+
+    function startStempBoard() {
+      if (stempBoardRive) { try { stempBoardRive.cleanup(); } catch(e){} stempBoardRive = null; }
+      stempBoardRive = new rive.Rive({
+        buffer: stempBuffer.slice(0),
+        canvas: stempBoardCanvas,
+        artboard: STEMP_BOARD_NAME,
+        autoplay: true,
+        autoBind: true,
+        fit: rive.Fit.Contain,
+        alignment: rive.Alignment.Center,
+        onLoad: () => stempBoardRive.resizeDrawingSurfaceToCanvas(),
+        onLoadError: (e) => console.error('stempBoard:', e),
+      });
+    }
+
+    function spawnStamp(clickX, clickY) {
+      if (!stempBuffer) return;
+
+      const cssW  = stempContainer.offsetWidth;
+      const cssH  = stempContainer.offsetHeight;
+      // Fit.Contain: scale = min(cssW/800, cssH/800); artboard centered
+      const scale   = Math.min(cssW / BOARD_SIZE, cssH / BOARD_SIZE);
+      const offsetX = (cssW - BOARD_SIZE * scale) / 2;
+      const offsetY = (cssH - BOARD_SIZE * scale) / 2;
+
+      // Reject clicks outside the visible artboard area
+      const bx = (clickX - offsetX) / scale;
+      const by = (clickY - offsetY) / scale;
+      if (bx < 0 || bx > BOARD_SIZE || by < 0 || by > BOARD_SIZE) return;
+
+      const stampCSS = STAMP_SIZE * scale;
+      const dpr      = Math.min(2, window.devicePixelRatio || 1);
+      const stampPx  = Math.round(stampCSS * dpr);
+
+      const stampNum  = Math.floor(Math.random() * 10) + 1;
+      const color     = STAMP_COLORS[Math.floor(Math.random() * STAMP_COLORS.length)];
+      const filterVal = STAMP_FILTERS[color] || 'none';
+
+      // Position stamp so its center matches the click point, clamped to container
+      const left = Math.max(0, Math.min(cssW - stampCSS, clickX - stampCSS / 2));
+      const top  = Math.max(0, Math.min(cssH - stampCSS, clickY - stampCSS / 2));
+
+      const stampCanvas = document.createElement('canvas');
+      stampCanvas.width  = stampPx;
+      stampCanvas.height = stampPx;
+      Object.assign(stampCanvas.style, {
+        width:         stampCSS + 'px',
+        height:        stampCSS + 'px',
+        position:      'absolute',
+        left:          left + 'px',
+        top:           top  + 'px',
+        pointerEvents: 'none',
+        zIndex:        '1',
+        filter:        filterVal,
+      });
+      stempContainer.appendChild(stampCanvas);
+
+      const stampRive = new rive.Rive({
+        buffer:    stempBuffer.slice(0),
+        canvas:    stampCanvas,
+        artboard:  `Stemp${stampNum}`,
+        autoplay:  true,
+        fit:       rive.Fit.Contain,
+        alignment: rive.Alignment.Center,
+        onLoad: () => {
+          stampRive.resizeDrawingSurfaceToCanvas();
+          stampRive.play();
+        },
+        onStop: () => {
+          try { stampRive.pause(); } catch(e) {}
+        },
+        onLoadError: (e) => console.error(`Stemp${stampNum}:`, e),
+      });
+
+      activeStamps.push({ canvas: stampCanvas, riveInst: stampRive });
+
+      // Remove oldest stamp once over limit
+      if (activeStamps.length > MAX_STAMPS) {
+        const oldest = activeStamps.shift();
+        try { oldest.riveInst.cleanup(); } catch(e) {}
+        oldest.canvas.remove();
+      }
+    }
+
+    stempBoardCanvas.addEventListener('click', e => {
+      const r = stempBoardCanvas.getBoundingClientRect();
+      spawnStamp(e.clientX - r.left, e.clientY - r.top);
+    });
+
+    requestAnimationFrame(() => requestAnimationFrame(async () => {
+      sizeStempBoardCanvas();
+      stempBuffer = await fetch('stemp.riv').then(r => r.arrayBuffer());
+      startStempBoard();
+    }));
+
+    window.addEventListener('resize', () => {
+      sizeStempBoardCanvas();
+      if (stempBoardRive) stempBoardRive.resizeDrawingSurfaceToCanvas();
     });
   </script>
 
