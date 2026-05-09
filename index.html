@@ -9,14 +9,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 
+  <link rel="icon" type="image/png" href="favicon.png">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <meta property="og:title" content="Aleksandar Zdravkovic — Interactive Motion Designer">
   <meta property="og:description" content="Strong art generalist with 10+ years of experience across advertising, branding, motion, and digital design.">
-  <meta property="og:image" content="https://rukovodilac.github.io/og-image.svg">
+  <meta property="og:image" content="https://rukovodilac.github.io/og-image.png">
   <meta property="og:url" content="https://rukovodilac.github.io">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://rukovodilac.github.io/og-image.svg">
+  <meta name="twitter:image" content="https://rukovodilac.github.io/og-image.png">
 
   <style>
     * {
@@ -88,25 +89,12 @@
     #headline span {
       display: block;
       width: fit-content;
-      background-color: transparent;
-      background-image: linear-gradient(#E0EC8A, #E0EC8A);
-      background-position: 0 0;
-      background-repeat: no-repeat;
-      background-size: 0% 100%;
-      transition: background-size 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+      background: #E0EC8A;
       padding: 2px 10px;
       font-size: clamp(24px, 3.5vw, 48px);
       font-weight: 500;
       line-height: 1;
       color: #000;
-    }
-
-    #headline span:nth-child(2) {
-      transition-delay: 0.18s;
-    }
-
-    #headline span.in-view {
-      background-size: 100% 100%;
     }
 
     /* ── WORK SECTION ── */
@@ -275,22 +263,13 @@
     .about-highlight {
       display: block;
       width: fit-content;
-      background-color: transparent;
-      background-image: linear-gradient(#F4E9D5, #F4E9D5);
-      background-position: 0 0;
-      background-repeat: no-repeat;
-      background-size: 0% 100%;
-      transition: background-size 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+      background: #F4E9D5;
       padding: 2px 10px;
       font-size: clamp(24px, 3.5vw, 48px);
       font-weight: 500;
       line-height: 1;
       color: #000;
       margin-top: clamp(12px, 2vw, 28px);
-    }
-
-    .about-highlight.in-view {
-      background-size: 100% 100%;
     }
 
     .done-it-wrapper {
@@ -437,7 +416,7 @@
       bottom: 0;
       left: 0;
       width: 0;
-      height: 2px;
+      height: 3px;
       background: currentColor;
       transition: width 0.45s cubic-bezier(0.25, 1, 0.5, 1);
       pointer-events: none;
@@ -915,21 +894,6 @@
     const emailBtn     = document.getElementById('email-btn');
     const emailWrap    = document.getElementById('email-wrap');
     const emailTooltip = document.getElementById('email-tooltip');
-
-    // ── Headline highlight sweep on page load ──
-    document.querySelectorAll('#headline span').forEach((span, i) => {
-      setTimeout(() => span.classList.add('in-view'), 150 + i * 200);
-    });
-
-    // ── About highlight underline on scroll into view ──
-    const aboutHighlight = document.querySelector('.about-highlight');
-    if (aboutHighlight) {
-      new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) entry.target.classList.add('in-view');
-        });
-      }, { threshold: 0.6 }).observe(aboutHighlight);
-    }
 
     emailBtn.addEventListener('click', () => {
       navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
