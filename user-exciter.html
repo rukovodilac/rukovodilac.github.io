@@ -402,20 +402,10 @@
     // ── Coin animation ──
     const SM = 'State Machine 1';
     const coinCanvas = document.getElementById('coin-canvas');
-
-    function sizeCoinCanvas() {
-      const parent = coinCanvas.parentElement;
-      const w = parent.offsetWidth  || Math.round(window.innerWidth / 2);
-      const h = parent.offsetHeight || Math.round(w * 9 / 16);
-      coinCanvas.width  = w;
-      coinCanvas.height = h;
-    }
-
     let coinRive = null;
 
     function initCoinRive() {
       if (coinRive) { try { coinRive.cleanup(); } catch (e) {} coinRive = null; }
-      sizeCoinCanvas();
 
       coinRive = new rive.Rive({
         src: 'coin_anim.riv',
@@ -425,13 +415,10 @@
         fit: rive.Fit.Cover,
         alignment: rive.Alignment.Center,
         onLoad: () => {
-          sizeCoinCanvas();
           coinRive.resizeDrawingSurfaceToCanvas();
           coinRive.play(SM);
-          console.log('[coin] canvas:', coinCanvas.width, 'x', coinCanvas.height,
-            '| state:', coinRive.stateMachineNames);
         },
-        onLoadError: (e) => console.error('coin_anim load error:', e),
+        onLoadError: (e) => console.error('coin_anim:', e),
       });
 
       let inNextCoin = false;
@@ -443,10 +430,19 @@
       });
     }
 
+    // Explicitly forward pointer events so Rive Listeners get correct CSS-space coords
+    function fwd(e, method) {
+      if (!coinRive) return;
+      const r = coinCanvas.getBoundingClientRect();
+      coinRive[method](e.clientX - r.left, e.clientY - r.top);
+    }
+    coinCanvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+    coinCanvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+    coinCanvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
     requestAnimationFrame(() => requestAnimationFrame(initCoinRive));
 
     window.addEventListener('resize', () => {
-      sizeCoinCanvas();
       if (coinRive) coinRive.resizeDrawingSurfaceToCanvas();
     });
   </script>
