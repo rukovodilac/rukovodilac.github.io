@@ -276,9 +276,7 @@
     }
 
     .showcase-item {
-      grid-column: span 2;
       position: relative;
-      aspect-ratio: 2 / 1;
       overflow: hidden;
       background: #000;
     }
@@ -292,24 +290,17 @@
     }
     .showcase-item canvas.coin-reload { opacity: 0; }
 
-    .showcase-item--square {
-      grid-column: 3 / 4;
-      aspect-ratio: 1 / 1;
-    }
-
-    .showcase-item--square-4 {
-      grid-column: 4 / 5;
-      aspect-ratio: 1 / 1;
-    }
-
-    .showcase-item--progress {
-      align-self: start;
-    }
-
-    .showcase-item--stemp {
-      aspect-ratio: 1 / 1;
-      cursor: crosshair;
-    }
+    /* Explicit grid placement per item */
+    .si-coin     { grid-column: 1 / 3; grid-row: 1; aspect-ratio: 2 / 1; }
+    .si-knob     { grid-column: 3 / 4; grid-row: 2; aspect-ratio: 1 / 1; }
+    .si-progress { grid-column: 1 / 3; grid-row: 3; aspect-ratio: 2 / 1; }
+    .si-soda     { grid-column: 3 / 4; grid-row: 3; aspect-ratio: 1 / 1; }
+    .si-froggy   { grid-column: 4 / 5; grid-row: 3; aspect-ratio: 1 / 1; }
+    .si-battery  { grid-column: 2 / 4; grid-row: 4; aspect-ratio: 2 / 1; }
+    .si-egg      { grid-column: 2 / 3; grid-row: 5; aspect-ratio: 1 / 1; }
+    .si-arrows   { grid-column: 1 / 3; grid-row: 6; aspect-ratio: 4 / 1; }
+    .si-illusion { grid-column: 2 / 4; grid-row: 7; aspect-ratio: 2 / 1; }
+    .si-box      { grid-column: 3 / 4; grid-row: 8; aspect-ratio: 1 / 1; }
 
     @media (max-width: 768px) {
       #showcase {
@@ -317,11 +308,9 @@
         gap: 25vw;
         padding: 0 0 25vw;
       }
-      .showcase-item,
-      .showcase-item--square,
-      .showcase-item--square-4,
-      .showcase-item--stemp {
-        grid-column: span 1;
+      .showcase-item {
+        grid-column: 1 / -1 !important;
+        grid-row: auto !important;
       }
     }
   </style>
@@ -401,20 +390,43 @@
   </div>
 
   <section id="showcase">
-    <div class="showcase-item">
+    <!-- Row 1: coin cols 1-2 -->
+    <div class="showcase-item si-coin">
       <canvas id="coin-canvas"></canvas>
     </div>
-    <div class="showcase-item showcase-item--square">
+    <!-- Row 2: knob col 3 -->
+    <div class="showcase-item si-knob">
       <canvas id="knob-canvas"></canvas>
     </div>
-    <div class="showcase-item showcase-item--square-4">
-      <canvas id="froggy-canvas"></canvas>
-    </div>
-    <div class="showcase-item showcase-item--progress">
+    <!-- Row 3: progress cols 1-2 | soda col 3 | froggy col 4 -->
+    <div class="showcase-item si-progress">
       <canvas id="progress-canvas"></canvas>
     </div>
-    <div class="showcase-item showcase-item--stemp">
-      <canvas id="stemp-board-canvas" style="touch-action: pan-y;"></canvas>
+    <div class="showcase-item si-soda">
+      <canvas id="soda-canvas"></canvas>
+    </div>
+    <div class="showcase-item si-froggy">
+      <canvas id="froggy-canvas"></canvas>
+    </div>
+    <!-- Row 4: battery cols 2-3 -->
+    <div class="showcase-item si-battery">
+      <canvas id="battery-canvas"></canvas>
+    </div>
+    <!-- Row 5: egg col 2 -->
+    <div class="showcase-item si-egg">
+      <canvas id="egg-canvas"></canvas>
+    </div>
+    <!-- Row 6: arrows cols 1-2 (4:1 ratio) -->
+    <div class="showcase-item si-arrows">
+      <canvas id="arrows-canvas"></canvas>
+    </div>
+    <!-- Row 7: illusion cols 2-3 -->
+    <div class="showcase-item si-illusion">
+      <canvas id="illusion-canvas"></canvas>
+    </div>
+    <!-- Row 8: box col 3 -->
+    <div class="showcase-item si-box">
+      <canvas id="box-canvas"></canvas>
     </div>
   </section>
 
@@ -749,120 +761,285 @@
   </script>
 
   <script>
-    // ── Stemp Board ──
-    const STEMP_BOARD_NAME = 'StempBoard';
-    const BOARD_SIZE = 800;
-    const STAMP_SIZE = 200;
-    const MAX_STAMPS = 12;
-    const STAMP_COLORS  = ['#00923D', '#FFA5C8', '#FF5002', '#FFB718'];
-    const STAMP_FILTERS = { '#FFA5C8': 'url(#stamp-pink)', '#FF5002': 'url(#stamp-orange)', '#FFB718': 'url(#stamp-yellow)' };
+    // ── Soda animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('soda-canvas');
+      let riveInst = null, buffer = null;
 
-    const stempContainer   = document.querySelector('.showcase-item--stemp');
-    const stempBoardCanvas = document.getElementById('stemp-board-canvas');
-    let stempBuffer    = null;
-    let stempBoardRive = null;
-    const activeStamps = [];
-
-    function sizeStempBoardCanvas() {
-      const dpr  = Math.min(2, window.devicePixelRatio || 1);
-      const cssW = stempContainer.offsetWidth;
-      const cssH = stempContainer.offsetHeight;
-      stempBoardCanvas.width        = Math.round(cssW * dpr);
-      stempBoardCanvas.height       = Math.round(cssH * dpr);
-      stempBoardCanvas.style.width  = cssW + 'px';
-      stempBoardCanvas.style.height = cssH + 'px';
-    }
-
-    function startStempBoard() {
-      if (stempBoardRive) { try { stempBoardRive.cleanup(); } catch(e){} stempBoardRive = null; }
-      stempBoardRive = new rive.Rive({
-        buffer: stempBuffer.slice(0),
-        canvas: stempBoardCanvas,
-        artboard: STEMP_BOARD_NAME,
-        autoplay: true,
-        fit: rive.Fit.Contain,
-        alignment: rive.Alignment.Center,
-        onLoad: () => stempBoardRive.resizeDrawingSurfaceToCanvas(),
-        onLoadError: (e) => console.error('StempBoard load error:', e),
-      });
-    }
-
-    function spawnStamp(clickX, clickY) {
-      if (!stempBuffer) return;
-
-      const cssW    = stempContainer.offsetWidth;
-      const cssH    = stempContainer.offsetHeight;
-      const scale   = Math.min(cssW / BOARD_SIZE, cssH / BOARD_SIZE);
-      const offsetX = (cssW - BOARD_SIZE * scale) / 2;
-      const offsetY = (cssH - BOARD_SIZE * scale) / 2;
-
-      const bx = (clickX - offsetX) / scale;
-      const by = (clickY - offsetY) / scale;
-      if (bx < 0 || bx > BOARD_SIZE || by < 0 || by > BOARD_SIZE) return;
-
-      const stampCSS = STAMP_SIZE * scale;
-      const dpr      = Math.min(2, window.devicePixelRatio || 1);
-      const stampPx  = Math.round(stampCSS * dpr);
-
-      const stampNum  = Math.floor(Math.random() * 10) + 1;
-      const color     = STAMP_COLORS[Math.floor(Math.random() * STAMP_COLORS.length)];
-      const filterVal = STAMP_FILTERS[color] || 'none';
-
-      const left = Math.max(0, Math.min(cssW - stampCSS, clickX - stampCSS / 2));
-      const top  = Math.max(0, Math.min(cssH - stampCSS, clickY - stampCSS / 2));
-
-      // Wrapper div carries the CSS filter — never put filter on a WebGL canvas
-      const wrapper = document.createElement('div');
-      wrapper.style.cssText = `position:absolute;left:${left}px;top:${top}px;width:${stampCSS}px;height:${stampCSS}px;z-index:1;pointer-events:none;filter:${filterVal};`;
-
-      const stampCanvas = document.createElement('canvas');
-      stampCanvas.width  = stampPx;
-      stampCanvas.height = stampPx;
-      // Inline styles override the .showcase-item canvas { width/height: 100% } rule
-      stampCanvas.style.cssText = `display:block;width:${stampCSS}px;height:${stampCSS}px;`;
-
-      wrapper.appendChild(stampCanvas);
-      stempContainer.appendChild(wrapper);
-
-      const stampRive = new rive.Rive({
-        buffer:    stempBuffer.slice(0),
-        canvas:    stampCanvas,
-        artboard:  `Stemp${stampNum}`,
-        autoplay:  true,
-        fit:       rive.Fit.Contain,
-        alignment: rive.Alignment.Center,
-        onLoad: () => {
-          stampRive.resizeDrawingSurfaceToCanvas();
-          stampRive.play();
-        },
-        onLoadError: (e) => console.error(`Stemp${stampNum} load error:`, e),
-      });
-
-      activeStamps.push({ wrapper, riveInst: stampRive });
-
-      if (activeStamps.length > MAX_STAMPS) {
-        const oldest = activeStamps.shift();
-        try { oldest.riveInst.cleanup(); } catch(e) {}
-        oldest.wrapper.remove();
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 4);
+        const cssH = p.offsetHeight || cssW;
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
       }
-    }
 
-    // Listen on the container so any click inside the board area registers
-    stempContainer.addEventListener('click', e => {
-      const r = stempContainer.getBoundingClientRect();
-      spawnStamp(e.clientX - r.left, e.clientY - r.top);
-    });
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('soda:', e),
+        });
+      }
 
-    requestAnimationFrame(() => requestAnimationFrame(async () => {
-      sizeStempBoardCanvas();
-      stempBuffer = await fetch('stemp.riv').then(r => r.arrayBuffer());
-      startStempBoard();
-    }));
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
 
-    window.addEventListener('resize', () => {
-      sizeStempBoardCanvas();
-      if (stempBoardRive) stempBoardRive.resizeDrawingSurfaceToCanvas();
-    });
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('soda.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Battery animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('battery-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || Math.round(cssW / 2);
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('battery:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('battery.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Egg animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('egg-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 4);
+        const cssH = p.offsetHeight || cssW;
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('egg:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('egg.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Arrows animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('arrows-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || Math.round(cssW / 4);
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('arrows:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('arrows.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Illusion animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('illusion-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || Math.round(cssW / 2);
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('illusion:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('illusion.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Box animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('box-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 4);
+        const cssH = p.offsetHeight || cssW;
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('box:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('box.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
   </script>
 
   <script>
