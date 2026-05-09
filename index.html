@@ -110,6 +110,10 @@
       }
     }
 
+    .work-item--featured {
+      grid-column: 1 / -1;
+    }
+
     .work-item {
       position: relative;
       display: block;
@@ -529,76 +533,7 @@
     </div>
   </section>
 
-  <section id="work">
-
-    <a href="user-exciter.html" class="work-item">
-      <div class="work-media">
-      </div>
-      <div class="work-tags">
-        <div class="work-tag work-tag--hot">
-          <svg aria-hidden="true"><use href="#icon-hot"/></svg>
-          <span>Hot</span>
-        </div>
-        <div class="work-tag work-tag--interactive">
-          <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
-          <span>Interactive</span>
-        </div>
-      </div>
-      <div class="work-title">
-        <span>User</span>
-        <span>Exciter <svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg></span>
-      </div>
-    </a>
-
-    <a href="tetris-story.html" class="work-item">
-      <div class="work-media">
-        <video autoplay muted loop playsinline disablePictureInPicture>
-          <source src="https://res.cloudinary.com/dzar7cp0b/video/upload/TetrisStory_Pre_pbezjz.mp4" type="video/mp4">
-        </video>
-      </div>
-      <div class="work-tag work-tag--latest">
-        <svg aria-hidden="true"><use href="#icon-latest"/></svg>
-        <span>Latest</span>
-      </div>
-      <div class="work-title">
-        <span>Tetris® Story</span>
-        <span>Mobile Game <svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg></span>
-      </div>
-    </a>
-
-    <a href="tetris-40th.html" class="work-item">
-      <div class="work-media">
-        <video autoplay muted loop playsinline disablePictureInPicture>
-          <source src="https://res.cloudinary.com/dzar7cp0b/video/upload/Tetris40_Pre_clttxf.mp4" type="video/mp4">
-        </video>
-      </div>
-      <div class="work-tag work-tag--latest">
-        <svg aria-hidden="true"><use href="#icon-latest"/></svg>
-        <span>Latest</span>
-      </div>
-      <div class="work-title">
-        <span>Tetris® 40th</span>
-        <span>Mobile Game <svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg></span>
-      </div>
-    </a>
-
-    <a href="this-is-my-show.html" class="work-item">
-      <div class="work-media">
-        <video autoplay muted loop playsinline disablePictureInPicture>
-          <source src="https://res.cloudinary.com/dzar7cp0b/video/upload/TheShow_Pre_lmjx2h.mp4" type="video/mp4">
-        </video>
-      </div>
-      <div class="work-tag work-tag--rerun">
-        <svg aria-hidden="true"><use href="#icon-rerun"/></svg>
-        <span>Rerun</span>
-      </div>
-      <div class="work-title">
-        <span>This Is</span>
-        <span>My Show <svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg></span>
-      </div>
-    </a>
-
-  </section>
+  <section id="work"></section>
 
   <section id="about">
     <p class="about-bio">Strong art generalist with 10+ years of experience
@@ -634,6 +569,87 @@
   <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
   <script>
+    // ── Projects config — add / remove / reorder here ──────────────────
+    const projects = [
+      {
+        href:  'user-exciter.html',
+        title: ['User', 'Exciter'],
+        tags:  [
+          { type: 'hot',         label: 'Hot',        icon: 'icon-hot' },
+          { type: 'interactive', label: 'Interactive', icon: 'icon-interactive' }
+        ],
+        video: null
+      },
+      {
+        href:  'tetris-story.html',
+        title: ['Tetris® Story', 'Mobile Game'],
+        tags:  [{ type: 'latest', label: 'Latest', icon: 'icon-latest' }],
+        video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/TetrisStory_Pre_pbezjz.mp4'
+      },
+      {
+        href:  'tetris-40th.html',
+        title: ['Tetris® 40th', 'Mobile Game'],
+        tags:  [{ type: 'latest', label: 'Latest', icon: 'icon-latest' }],
+        video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/Tetris40_Pre_clttxf.mp4'
+      },
+      {
+        href:  'this-is-my-show.html',
+        title: ['This Is', 'My Show'],
+        tags:  [{ type: 'rerun', label: 'Rerun', icon: 'icon-rerun' }],
+        video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/TheShow_Pre_lmjx2h.mp4'
+      },
+      {
+        href:  '#',
+        title: ['Coming', 'Soon'],
+        tags:  [{ type: 'latest', label: 'Latest', icon: 'icon-latest' }],
+        video: null
+      }
+    ];
+
+    (function renderWork() {
+      const section = document.getElementById('work');
+      const odd     = projects.length % 2 !== 0;
+      const arrowSVG = '<svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg>';
+
+      projects.forEach((p, i) => {
+        const featured = odd && i === projects.length - 1;
+        const a = document.createElement('a');
+        a.href      = p.href;
+        a.className = 'work-item' + (featured ? ' work-item--featured' : '');
+
+        const media = document.createElement('div');
+        media.className = 'work-media';
+        if (p.video) {
+          media.innerHTML =
+            `<video autoplay muted loop playsinline disablePictureInPicture>` +
+            `<source src="${p.video}" type="video/mp4"></video>`;
+        }
+        a.appendChild(media);
+
+        const tagsEl = document.createElement('div');
+        tagsEl.className = 'work-tags';
+        p.tags.forEach(t => {
+          const tag = document.createElement('div');
+          tag.className = `work-tag work-tag--${t.type}`;
+          tag.innerHTML =
+            `<svg aria-hidden="true"><use href="#${t.icon}"/></svg><span>${t.label}</span>`;
+          tagsEl.appendChild(tag);
+        });
+        a.appendChild(tagsEl);
+
+        const titleEl = document.createElement('div');
+        titleEl.className = 'work-title';
+        p.title.forEach((line, li) => {
+          const span = document.createElement('span');
+          span.innerHTML = li === p.title.length - 1 ? `${line} ${arrowSVG}` : line;
+          titleEl.appendChild(span);
+        });
+        a.appendChild(titleEl);
+
+        section.appendChild(a);
+      });
+    })();
+
     // Prevent browser from restoring scroll position on refresh
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
