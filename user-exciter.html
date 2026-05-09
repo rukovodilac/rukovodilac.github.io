@@ -362,15 +362,18 @@
         </g>
       </symbol>
 
-      <!-- Stamp recolor filters — source green #00923D (R=0, G=0.573, B=0.239) mapped via G channel -->
-      <filter id="stamp-pink" color-interpolation-filters="sRGB">
-        <feColorMatrix type="matrix" values="0 1.745 0 0 0  0 1.129 0 0 0  0 1.368 0 0 0  0 0 0 1 0"/>
+      <!-- Stamp recolor: flood fill with target color, masked by source alpha -->
+      <filter id="stamp-pink">
+        <feFlood flood-color="#FFA5C8" flood-opacity="1" result="color"/>
+        <feComposite in="color" in2="SourceAlpha" operator="in"/>
       </filter>
-      <filter id="stamp-orange" color-interpolation-filters="sRGB">
-        <feColorMatrix type="matrix" values="0 1.745 0 0 0  0 0.548 0 0 0  0 0.014 0 0 0  0 0 0 1 0"/>
+      <filter id="stamp-orange">
+        <feFlood flood-color="#FF5002" flood-opacity="1" result="color"/>
+        <feComposite in="color" in2="SourceAlpha" operator="in"/>
       </filter>
-      <filter id="stamp-yellow" color-interpolation-filters="sRGB">
-        <feColorMatrix type="matrix" values="0 1.745 0 0 0  0 1.253 0 0 0  0 0.164 0 0 0  0 0 0 1 0"/>
+      <filter id="stamp-yellow">
+        <feFlood flood-color="#FFB718" flood-opacity="1" result="color"/>
+        <feComposite in="color" in2="SourceAlpha" operator="in"/>
       </filter>
     </defs>
   </svg>
@@ -761,21 +764,17 @@
   <script>
     // ── Stemp Board ──
     const STEMP_BOARD_NAME = 'StempBoard';
-    const BOARD_SIZE       = 800;
-    const STAMP_SIZE       = 200;
-    const MAX_STAMPS       = 12;
-    const STAMP_COLORS     = ['#00923D', '#FFA5C8', '#FF5002', '#FFB718'];
-    const STAMP_FILTERS    = {
-      '#FFA5C8': 'url(#stamp-pink)',
-      '#FF5002': 'url(#stamp-orange)',
-      '#FFB718': 'url(#stamp-yellow)',
-    };
+    const BOARD_SIZE = 800;
+    const STAMP_SIZE = 200;
+    const MAX_STAMPS = 12;
+    const STAMP_COLORS  = ['#00923D', '#FFA5C8', '#FF5002', '#FFB718'];
+    const STAMP_FILTERS = { '#FFA5C8': 'url(#stamp-pink)', '#FF5002': 'url(#stamp-orange)', '#FFB718': 'url(#stamp-yellow)' };
 
     const stempContainer   = document.querySelector('.showcase-item--stemp');
     const stempBoardCanvas = document.getElementById('stemp-board-canvas');
-    let stempBuffer        = null;
-    let stempBoardRive     = null;
-    const activeStamps     = [];
+    let stempBuffer    = null;
+    let stempBoardRive = null;
+    const activeStamps = [];
 
     function sizeStempBoardCanvas() {
       const dpr  = Math.min(2, window.devicePixelRatio || 1);
@@ -794,25 +793,22 @@
         canvas: stempBoardCanvas,
         artboard: STEMP_BOARD_NAME,
         autoplay: true,
-        autoBind: true,
         fit: rive.Fit.Contain,
         alignment: rive.Alignment.Center,
         onLoad: () => stempBoardRive.resizeDrawingSurfaceToCanvas(),
-        onLoadError: (e) => console.error('stempBoard:', e),
+        onLoadError: (e) => console.error('StempBoard load error:', e),
       });
     }
 
     function spawnStamp(clickX, clickY) {
       if (!stempBuffer) return;
 
-      const cssW  = stempContainer.offsetWidth;
-      const cssH  = stempContainer.offsetHeight;
-      // Fit.Contain: scale = min(cssW/800, cssH/800); artboard centered
+      const cssW    = stempContainer.offsetWidth;
+      const cssH    = stempContainer.offsetHeight;
       const scale   = Math.min(cssW / BOARD_SIZE, cssH / BOARD_SIZE);
       const offsetX = (cssW - BOARD_SIZE * scale) / 2;
       const offsetY = (cssH - BOARD_SIZE * scale) / 2;
 
-      // Reject clicks outside the visible artboard area
       const bx = (clickX - offsetX) / scale;
       const by = (clickY - offsetY) / scale;
       if (bx < 0 || bx > BOARD_SIZE || by < 0 || by > BOARD_SIZE) return;
@@ -825,24 +821,21 @@
       const color     = STAMP_COLORS[Math.floor(Math.random() * STAMP_COLORS.length)];
       const filterVal = STAMP_FILTERS[color] || 'none';
 
-      // Position stamp so its center matches the click point, clamped to container
       const left = Math.max(0, Math.min(cssW - stampCSS, clickX - stampCSS / 2));
       const top  = Math.max(0, Math.min(cssH - stampCSS, clickY - stampCSS / 2));
+
+      // Wrapper div carries the CSS filter — never put filter on a WebGL canvas
+      const wrapper = document.createElement('div');
+      wrapper.style.cssText = `position:absolute;left:${left}px;top:${top}px;width:${stampCSS}px;height:${stampCSS}px;z-index:1;pointer-events:none;filter:${filterVal};`;
 
       const stampCanvas = document.createElement('canvas');
       stampCanvas.width  = stampPx;
       stampCanvas.height = stampPx;
-      Object.assign(stampCanvas.style, {
-        width:         stampCSS + 'px',
-        height:        stampCSS + 'px',
-        position:      'absolute',
-        left:          left + 'px',
-        top:           top  + 'px',
-        pointerEvents: 'none',
-        zIndex:        '1',
-        filter:        filterVal,
-      });
-      stempContainer.appendChild(stampCanvas);
+      // Inline styles override the .showcase-item canvas { width/height: 100% } rule
+      stampCanvas.style.cssText = `display:block;width:${stampCSS}px;height:${stampCSS}px;`;
+
+      wrapper.appendChild(stampCanvas);
+      stempContainer.appendChild(wrapper);
 
       const stampRive = new rive.Rive({
         buffer:    stempBuffer.slice(0),
@@ -855,24 +848,21 @@
           stampRive.resizeDrawingSurfaceToCanvas();
           stampRive.play();
         },
-        onStop: () => {
-          try { stampRive.pause(); } catch(e) {}
-        },
-        onLoadError: (e) => console.error(`Stemp${stampNum}:`, e),
+        onLoadError: (e) => console.error(`Stemp${stampNum} load error:`, e),
       });
 
-      activeStamps.push({ canvas: stampCanvas, riveInst: stampRive });
+      activeStamps.push({ wrapper, riveInst: stampRive });
 
-      // Remove oldest stamp once over limit
       if (activeStamps.length > MAX_STAMPS) {
         const oldest = activeStamps.shift();
         try { oldest.riveInst.cleanup(); } catch(e) {}
-        oldest.canvas.remove();
+        oldest.wrapper.remove();
       }
     }
 
-    stempBoardCanvas.addEventListener('click', e => {
-      const r = stempBoardCanvas.getBoundingClientRect();
+    // Listen on the container so any click inside the board area registers
+    stempContainer.addEventListener('click', e => {
+      const r = stempContainer.getBoundingClientRect();
       spawnStamp(e.clientX - r.left, e.clientY - r.top);
     });
 
