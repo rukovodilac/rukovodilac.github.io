@@ -270,8 +270,16 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 0;
+      align-items: center;
+      padding: 0 clamp(20px, 3.5vw, 48px) 0 clamp(24px, 3vw, 48px);
+    }
+
+    .jelly-text-inner {
+      display: flex;
+      flex-direction: column;
       gap: clamp(20px, 2.5vw, 36px);
+      max-width: 480px;
+      width: 100%;
     }
 
     .jelly-title {
@@ -385,6 +393,7 @@
       grid-column: 2;
       position: relative;
       overflow: hidden;
+      aspect-ratio: 1 / 1;
     }
 
     #jiggle-canvas {
@@ -546,14 +555,16 @@
       <canvas id="rive-canvas"></canvas>
     </div>
     <div class="jelly-text">
-      <h2 class="jelly-title">
-        <span>Less Hard Drop,</span>
-        <span>More Soft Bop</span>
-      </h2>
-      <div class="jelly-body">
-        <p>The goal of this R&D initiative was to merge classic Tetris mechanics with the juicy, tactile elements of modern casual games.</p>
-        <p>This brief triggered a complete &ldquo;jellification&rdquo; of all game elements.</p>
-        <p>But how much jelly is enough?</p>
+      <div class="jelly-text-inner">
+        <h2 class="jelly-title">
+          <span>Less Hard Drop,</span>
+          <span>More Soft Bop</span>
+        </h2>
+        <div class="jelly-body">
+          <p>The goal of this R&D initiative was to merge classic Tetris mechanics with the juicy, tactile elements of modern casual games.</p>
+          <p>This brief triggered a complete &ldquo;jellification&rdquo; of all game elements.</p>
+          <p>But how much jelly is enough?</p>
+        </div>
       </div>
     </div>
   </section>
@@ -704,9 +715,6 @@
           fit: rive.Fit.Cover,
           alignment: rive.Alignment.Center,
           onLoad: () => {
-            const b = riveInst.bounds;
-            const aw = b.maxX - b.minX, ah = b.maxY - b.minY;
-            canvas.parentElement.style.aspectRatio = `${aw} / ${ah}`;
             sizeCanvas();
             riveInst.resizeDrawingSurfaceToCanvas();
             riveInst.play(JIGGLE_SM);
