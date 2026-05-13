@@ -308,19 +308,19 @@
     /* ── JIGGLE SECTION ── */
     #jiggle-section {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      column-gap: clamp(24px, 3vw, 48px);
+      grid-template-columns: 1fr 1fr;
+      column-gap: 0;
       align-items: center;
       background: #F4E9D5;
-      padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
+      padding: clamp(40px, 6vw, 80px) 0 clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
     }
 
     .jiggle-text {
-      grid-column: 1 / 3;
+      grid-column: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 0;
+      padding: 0 clamp(20px, 3vw, 48px) 0 0;
       gap: clamp(20px, 2.5vw, 36px);
     }
 
@@ -350,15 +350,17 @@
     }
 
     .jiggle-rive {
-      grid-column: 3 / 5;
+      grid-column: 2;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
     }
 
     #jiggle-canvas {
       display: block;
+      cursor: pointer;
     }
 
     .jiggle-interactive-tag {
@@ -367,28 +369,13 @@
       left: clamp(14px, 2vw, 24px);
       display: flex;
       align-items: center;
-      gap: 0;
-      font-size: clamp(13px, 1.2vw, 17px);
-      font-family: "Host Grotesk", sans-serif;
-      font-weight: 500;
-      line-height: 1;
       pointer-events: none;
       z-index: 2;
     }
 
     .jiggle-interactive-tag svg {
-      width: 1.7em;
-      height: 1.7em;
-      flex-shrink: 0;
-    }
-
-    .jiggle-interactive-tag span {
-      height: 1.7em;
-      display: flex;
-      align-items: center;
-      padding: 0 9px;
-      background: rgb(224, 236, 138);
-      color: #000;
+      width: clamp(32px, 3.5vw, 52px);
+      height: clamp(32px, 3.5vw, 52px);
     }
 
     @media (max-width: 768px) {
@@ -406,8 +393,9 @@
       .jelly-text { grid-column: 1; }
       #jiggle-section {
         grid-template-columns: 1fr;
+        padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
       }
-      .jiggle-text { grid-column: 1; order: 2; }
+      .jiggle-text { grid-column: 1; order: 2; padding: 0; }
       .jiggle-rive { grid-column: 1; order: 1; }
     }
 
@@ -556,7 +544,6 @@
       <canvas id="jiggle-canvas"></canvas>
       <div class="jiggle-interactive-tag">
         <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
-        <span>Interactive</span>
       </div>
     </div>
   </section>
@@ -654,12 +641,13 @@
 
     function applyJiggleSize() {
       if (jiggleRatio === null) return;
+      const dpr = window.devicePixelRatio || 1;
       const w = jiggleCanvas.parentElement.clientWidth;
       const h = Math.round(w * jiggleRatio);
-      jiggleCanvas.width = w;
-      jiggleCanvas.height = h;
       jiggleCanvas.style.width = w + 'px';
       jiggleCanvas.style.height = h + 'px';
+      jiggleCanvas.width = Math.round(w * dpr);
+      jiggleCanvas.height = Math.round(h * dpr);
       jiggleAnim.resizeDrawingSurfaceToCanvas();
     }
 
@@ -669,7 +657,7 @@
       autoplay: true,
       stateMachines: 'Jiggle_SM',
       layout: new rive.Layout({
-        fit: rive.Fit.Fill,
+        fit: rive.Fit.Contain,
         alignment: rive.Alignment.Center,
       }),
       onLoad: () => {
@@ -681,6 +669,23 @@
     });
 
     window.addEventListener('resize', applyJiggleSize);
+
+    jiggleCanvas.addEventListener('mousemove', (e) => {
+      const rect = jiggleCanvas.getBoundingClientRect();
+      jiggleAnim.stateMachinePointerMove(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    jiggleCanvas.addEventListener('mousedown', (e) => {
+      const rect = jiggleCanvas.getBoundingClientRect();
+      jiggleAnim.stateMachinePointerDown(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    jiggleCanvas.addEventListener('mouseup', (e) => {
+      const rect = jiggleCanvas.getBoundingClientRect();
+      jiggleAnim.stateMachinePointerUp(e.clientX - rect.left, e.clientY - rect.top);
+    });
+    jiggleCanvas.addEventListener('mouseleave', (e) => {
+      const rect = jiggleCanvas.getBoundingClientRect();
+      jiggleAnim.stateMachinePointerMove(e.clientX - rect.left, e.clientY - rect.top);
+    });
 
     const emailBtn     = document.getElementById('email-btn');
     const emailWrap    = document.getElementById('email-wrap');
