@@ -347,7 +347,14 @@
       justify-content: center;
       align-items: center;
       padding: clamp(40px, 6vw, 80px) clamp(24px, 3vw, 48px) clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
+    }
+
+    .jiggle-text-inner {
+      display: flex;
+      flex-direction: column;
       gap: clamp(20px, 2.5vw, 36px);
+      max-width: 480px;
+      width: 100%;
     }
 
     .jiggle-title {
@@ -369,7 +376,6 @@
       font-weight: 400;
       line-height: 1.6;
       color: #000;
-      max-width: 480px;
       display: flex;
       flex-direction: column;
       gap: 1em;
@@ -560,17 +566,19 @@
 
   <section id="jiggle-section">
     <div class="jiggle-text">
-      <h2 class="jiggle-title">
-        <span>The Rules</span>
-        <span>of the Jiggle</span>
-      </h2>
-      <div class="jiggle-body">
-        <p>Maintaining tactile satisfaction comes down to context and material integrity.</p>
-        <p>To find the sweet spot, I created two distinct sets of animation rules:</p>
-        <p><strong>Material Integrity:</strong><br>
-        We maintained the core identity of the physical objects, ensuring structures kept their weight and friction.</p>
-        <p><strong>Maximum Tactility:</strong><br>
-        UI elements squash, stretch, and pop back into place. Menus and pop-ups spring onto the screen with playful elasticity.</p>
+      <div class="jiggle-text-inner">
+        <h2 class="jiggle-title">
+          <span>The Rules</span>
+          <span>of the Jiggle</span>
+        </h2>
+        <div class="jiggle-body">
+          <p>Maintaining tactile satisfaction comes down to context and material integrity.</p>
+          <p>To find the sweet spot, I created two distinct sets of animation rules:</p>
+          <p><strong>Material Integrity:</strong><br>
+          We maintained the core identity of the physical objects, ensuring structures kept their weight and friction.</p>
+          <p><strong>Maximum Tactility:</strong><br>
+          UI elements squash, stretch, and pop back into place. Menus and pop-ups spring onto the screen with playful elasticity.</p>
+        </div>
       </div>
     </div>
     <div class="jiggle-rive">
