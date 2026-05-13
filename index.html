@@ -146,6 +146,14 @@
       transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
+    .work-media video::-webkit-media-controls,
+    .work-media video::-webkit-media-controls-start-playback-button,
+    .work-media video::-webkit-media-controls-overlay-play-button {
+      display: none !important;
+      opacity: 0 !important;
+      -webkit-appearance: none;
+    }
+
     @media (hover: hover) {
       .work-item:hover .work-media video,
       .work-item:hover .work-media iframe {
@@ -615,7 +623,7 @@
         media.className = 'work-media';
         if (p.video) {
           media.innerHTML =
-            `<video autoplay muted loop playsinline disablePictureInPicture>` +
+            `<video autoplay muted loop playsinline preload="auto" disablePictureInPicture>` +
             `<source src="${p.video}" type="video/mp4"></video>`;
         }
         a.appendChild(media);
