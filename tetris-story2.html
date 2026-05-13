@@ -429,6 +429,7 @@
       }
       #jelly-section {
         grid-template-columns: 1fr;
+        row-gap: clamp(40px, 6vw, 80px);
       }
       .jelly-rive { grid-column: 1; }
       .jelly-text { grid-column: 1; }
@@ -437,10 +438,10 @@
       }
       .jiggle-text {
         grid-column: 1;
-        order: 2;
+        order: 1;
         padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
       }
-      .jiggle-rive { grid-column: 1; order: 1; }
+      .jiggle-rive { grid-column: 1; order: 2; }
     }
 
     /* ── Global link underline animation ── */
@@ -522,7 +523,7 @@
     </div>
     <div class="project-tag">
       <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
-      <span>Some elements on this page are interactive. Feel free to explore.</span>
+      <span>Some elements on this page are interactive.<br>Feel free to explore.</span>
     </div>
   </div>
 
@@ -695,11 +696,10 @@
 
       function sizeCanvas() {
         const p = canvas.parentElement;
-        const dpr = Math.min(2, window.devicePixelRatio || 1);
         const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
         const cssH = p.offsetHeight || cssW;
-        canvas.width        = Math.round(cssW * dpr);
-        canvas.height       = Math.round(cssH * dpr);
+        canvas.width        = cssW;
+        canvas.height       = cssH;
         canvas.style.width  = cssW + 'px';
         canvas.style.height = cssH + 'px';
       }
