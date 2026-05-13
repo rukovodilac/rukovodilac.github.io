@@ -301,7 +301,25 @@
 
     .done-it-wrapper {
       width: 40%;
+    }
+
+    @media (max-width: 768px) {
+      .done-it-wrapper {
+        width: 100%;
+      }
+    }
+
+    .done-it-canvas-wrap {
       position: relative;
+      display: block;
+      line-height: 0;
+    }
+
+    #done-it-canvas {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1110 / 540;
+      cursor: pointer;
     }
 
     .done-it-interactive-tag {
@@ -317,19 +335,6 @@
     .done-it-interactive-tag svg {
       width: clamp(16px, 1.75vw, 26px);
       height: clamp(16px, 1.75vw, 26px);
-    }
-
-    @media (max-width: 768px) {
-      .done-it-wrapper {
-        width: 100%;
-      }
-    }
-
-    #done-it-canvas {
-      display: block;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      cursor: pointer;
     }
 
     /* ── Footer / Contact ── */
@@ -568,9 +573,11 @@
       mobile products and entertainment experiences.</p>
     <span class="about-highlight">You name it, I've done it!</span>
     <div class="done-it-wrapper">
-      <canvas id="done-it-canvas"></canvas>
-      <div class="done-it-interactive-tag">
-        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      <div class="done-it-canvas-wrap">
+        <canvas id="done-it-canvas"></canvas>
+        <div class="done-it-interactive-tag">
+          <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+        </div>
       </div>
     </div>
   </section>
@@ -742,7 +749,7 @@
     function sizeDoneCanvas() {
       const w = doneCanvas.clientWidth || Math.round(window.innerWidth * 0.4);
       doneCanvas.width  = w;
-      doneCanvas.height = Math.round(w * 9 / 16);
+      doneCanvas.height = Math.round(w * 540 / 1110);
     }
     sizeDoneCanvas();
 
