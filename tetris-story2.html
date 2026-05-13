@@ -229,6 +229,32 @@
       margin: 0;
     }
 
+    /* ── PROJECT TAG ── */
+    .project-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      font-size: clamp(13px, 1.2vw, 17px);
+      font-weight: 500;
+      line-height: 1;
+      margin-top: clamp(12px, 1.5vw, 20px);
+    }
+
+    .project-tag svg {
+      width: 1.7em;
+      height: 1.7em;
+      flex-shrink: 0;
+    }
+
+    .project-tag span {
+      height: 1.7em;
+      display: flex;
+      align-items: center;
+      padding: 0 9px;
+      background: rgb(224, 236, 138);
+      color: #000;
+    }
+
     /* ── JELLY SECTION ── */
     #jelly-section {
       display: grid;
@@ -478,6 +504,10 @@
     <div id="tagline">
       <span>Classic puzzle.</span>
       <span>Contemporary twist.</span>
+    </div>
+    <div class="project-tag">
+      <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      <span>Some elements on this page are interactive. Feel free to explore.</span>
     </div>
   </div>
 
