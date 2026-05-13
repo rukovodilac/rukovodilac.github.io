@@ -778,13 +778,21 @@
       const section = document.getElementById('character-section');
       const canvas  = document.getElementById('character-canvas');
       let riveInst = null;
+      let snapped = false;
+      let scrollTimer = null;
+      let prevScrollY = window.scrollY;
 
       function sizeCanvas() {
         canvas.width  = section.offsetWidth;
         canvas.height = section.offsetHeight;
       }
 
-      function initCharacter() {
+      function initAndPlay() {
+        if (riveInst) {
+          try { riveInst.stop(); } catch(e) {}
+          riveInst.play();
+          return;
+        }
         sizeCanvas();
         riveInst = new rive.Rive({
           src: 'story_character.riv',
@@ -803,21 +811,34 @@
         });
       }
 
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            if (!riveInst) {
-              initCharacter();
-            } else {
-              riveInst.play();
-            }
-          } else if (riveInst) {
-            riveInst.pause();
-          }
-        });
-      }, { threshold: 0.1 });
+      window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        const scrollingDown  = currentScrollY > prevScrollY;
+        prevScrollY = currentScrollY;
 
-      observer.observe(section);
+        const rect = section.getBoundingClientRect();
+        const vh   = window.innerHeight;
+
+        // Section out of view — reset so it can snap again next time
+        if (rect.bottom < 0 || rect.top > vh) {
+          snapped = false;
+          if (riveInst) riveInst.pause();
+          clearTimeout(scrollTimer);
+          return;
+        }
+
+        // Snap when scrolling down and the section top has crossed 60% of the viewport
+        if (!snapped && scrollingDown && rect.top <= vh * 0.6 && rect.top >= -vh * 0.2) {
+          clearTimeout(scrollTimer);
+          scrollTimer = setTimeout(() => {
+            if (snapped) return;
+            snapped = true;
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Play after smooth scroll settles
+            setTimeout(initAndPlay, 600);
+          }, 150);
+        }
+      }, { passive: true });
 
       window.addEventListener('resize', () => {
         sizeCanvas();
