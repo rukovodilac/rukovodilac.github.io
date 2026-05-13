@@ -442,6 +442,23 @@
       .jiggle-rive { grid-column: 1; order: 2; }
     }
 
+    /* ── CHARACTER SECTION ── */
+    #character-section {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #character-canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
     /* ── Global link underline animation ── */
     a {
       position: relative;
@@ -600,6 +617,10 @@
     </div>
   </section>
 
+  <section id="character-section">
+    <canvas id="character-canvas"></canvas>
+  </section>
+
   <footer id="contact">
     <div class="contact-left">
       <p class="contact-tagline">
@@ -751,6 +772,57 @@
           if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
         }).observe(canvas.parentElement);
       }
+    })();
+
+    (function() {
+      const section = document.getElementById('character-section');
+      const canvas  = document.getElementById('character-canvas');
+      let riveInst = null;
+
+      function sizeCanvas() {
+        canvas.width  = section.offsetWidth;
+        canvas.height = section.offsetHeight;
+      }
+
+      function initCharacter() {
+        sizeCanvas();
+        riveInst = new rive.Rive({
+          src: 'story_character.riv',
+          canvas,
+          autoplay: false,
+          layout: new rive.Layout({
+            fit: rive.Fit.Cover,
+            alignment: rive.Alignment.Center,
+          }),
+          onLoad: () => {
+            sizeCanvas();
+            riveInst.resizeDrawingSurfaceToCanvas();
+            riveInst.play();
+          },
+          onLoadError: e => console.error('[character] load error:', e),
+        });
+      }
+
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!riveInst) {
+              initCharacter();
+            } else {
+              riveInst.play();
+            }
+          } else if (riveInst) {
+            riveInst.pause();
+          }
+        });
+      }, { threshold: 0.1 });
+
+      observer.observe(section);
+
+      window.addEventListener('resize', () => {
+        sizeCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
     })();
 
     const emailBtn     = document.getElementById('email-btn');
