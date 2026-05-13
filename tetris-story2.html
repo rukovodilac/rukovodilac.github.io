@@ -309,13 +309,11 @@
 
     .jelly-rive {
       grid-column: 1 / 3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     #rive-canvas {
       display: block;
+      width: 100%;
     }
 
     /* ── STORY-UI SECTION ── */
@@ -415,8 +413,8 @@
     }
 
     .jiggle-interactive-tag svg {
-      width: clamp(32px, 3.5vw, 52px);
-      height: clamp(32px, 3.5vw, 52px);
+      width: clamp(16px, 1.75vw, 26px);
+      height: clamp(16px, 1.75vw, 26px);
     }
 
     @media (max-width: 768px) {
@@ -627,11 +625,11 @@
 
     function applyProportionalSize() {
       if (artRatio === null) return;
-      const w = riveCanvas.parentElement.clientWidth;
+      const w = riveCanvas.offsetWidth;
+      if (!w) return;
       const h = Math.round(w * artRatio);
       riveCanvas.width = w;
       riveCanvas.height = h;
-      riveCanvas.style.width = w + 'px';
       riveCanvas.style.height = h + 'px';
       riveAnim.resizeDrawingSurfaceToCanvas();
     }
@@ -652,6 +650,9 @@
     });
 
     window.addEventListener('resize', applyProportionalSize);
+    if (window.ResizeObserver) {
+      new ResizeObserver(applyProportionalSize).observe(riveCanvas.parentElement);
+    }
 
     const storyUiCanvas = document.getElementById('story-ui-canvas');
     let storyUiRatio = null;
