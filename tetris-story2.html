@@ -232,7 +232,7 @@
     /* ── JELLY SECTION ── */
     #jelly-section {
       display: flex;
-      min-height: 75vh;
+      background: #fff;
     }
 
     .jelly-text {
@@ -247,8 +247,15 @@
     .jelly-title {
       font-size: clamp(28px, 3.5vw, 56px);
       font-weight: 500;
-      line-height: 1.1;
+      line-height: 1.2;
       color: #000;
+    }
+
+    .jelly-title span {
+      display: block;
+      width: fit-content;
+      background: #F4E9D5;
+      padding: 2px 10px;
     }
 
     .jelly-body {
@@ -264,13 +271,9 @@
 
     .jelly-rive {
       flex: 1;
-      position: relative;
-      overflow: hidden;
     }
 
     #rive-canvas {
-      width: 100%;
-      height: 100%;
       display: block;
     }
 
@@ -284,10 +287,6 @@
       }
       #jelly-section {
         flex-direction: column;
-        min-height: auto;
-      }
-      .jelly-rive {
-        height: 60vw;
       }
     }
 
@@ -359,16 +358,19 @@
   </div>
 
   <section id="jelly-section">
+    <div class="jelly-rive">
+      <canvas id="rive-canvas"></canvas>
+    </div>
     <div class="jelly-text">
-      <h2 class="jelly-title">Less Hard Drop,<br>More Soft Bop</h2>
+      <h2 class="jelly-title">
+        <span>Less Hard Drop,</span>
+        <span>More Soft Bop</span>
+      </h2>
       <div class="jelly-body">
         <p>The goal of this R&D initiative was to merge classic Tetris mechanics with the juicy, tactile elements of modern casual games.</p>
         <p>This brief triggered a complete &ldquo;jellification&rdquo; of all game elements.</p>
         <p>But how much jelly is enough?</p>
       </div>
-    </div>
-    <div class="jelly-rive">
-      <canvas id="rive-canvas"></canvas>
     </div>
   </section>
 
@@ -394,31 +396,35 @@
   <script src="https://player.vimeo.com/api/player.js"></script>
   <script>
     const riveCanvas = document.getElementById('rive-canvas');
+    let artRatio = null;
 
-    function syncCanvasSize() {
-      const container = riveCanvas.parentElement;
-      riveCanvas.width = container.clientWidth;
-      riveCanvas.height = container.clientHeight;
+    function applyProportionalSize() {
+      if (artRatio === null) return;
+      const w = riveCanvas.parentElement.clientWidth;
+      const h = Math.round(w * artRatio);
+      riveCanvas.width = w;
+      riveCanvas.height = h;
+      riveCanvas.style.width = w + 'px';
+      riveCanvas.style.height = h + 'px';
+      riveAnim.resizeDrawingSurfaceToCanvas();
     }
-    syncCanvasSize();
 
     const riveAnim = new rive.Rive({
       src: 'cube.riv',
       canvas: riveCanvas,
       autoplay: true,
       layout: new rive.Layout({
-        fit: rive.Fit.Cover,
+        fit: rive.Fit.Fill,
         alignment: rive.Alignment.Center,
       }),
       onLoad: () => {
-        riveAnim.resizeDrawingSurfaceToCanvas();
+        const b = riveAnim.bounds;
+        artRatio = (b.maxY - b.minY) / (b.maxX - b.minX);
+        applyProportionalSize();
       },
     });
 
-    window.addEventListener('resize', () => {
-      syncCanvasSize();
-      riveAnim.resizeDrawingSurfaceToCanvas();
-    });
+    window.addEventListener('resize', applyProportionalSize);
 
     const emailBtn     = document.getElementById('email-btn');
     const emailWrap    = document.getElementById('email-wrap');
