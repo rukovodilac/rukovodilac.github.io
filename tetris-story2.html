@@ -459,6 +459,22 @@
       height: 100%;
     }
 
+    #character-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      width: 0;
+      background: #E0EC8A;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    #character-progress.playing {
+      width: 100%;
+      transition: width 5s linear;
+    }
+
     /* ── Global link underline animation ── */
     a {
       position: relative;
@@ -619,6 +635,7 @@
 
   <section id="character-section">
     <canvas id="character-canvas"></canvas>
+    <div id="character-progress"></div>
   </section>
 
   <footer id="contact">
@@ -775,24 +792,58 @@
     })();
 
     (function() {
-      const section = document.getElementById('character-section');
-      const canvas  = document.getElementById('character-canvas');
+      const ANIM_DURATION_MS = 5000;
+
+      const section  = document.getElementById('character-section');
+      const canvas   = document.getElementById('character-canvas');
+      const progress = document.getElementById('character-progress');
       let riveInst = null;
-      let snapped = false;
+      let triggered = false;
+      let locked = false;
       let scrollTimer = null;
       let prevScrollY = window.scrollY;
+      let unlockTimer = null;
 
       function sizeCanvas() {
         canvas.width  = section.offsetWidth;
         canvas.height = section.offsetHeight;
       }
 
+      function preventScroll(e) { e.preventDefault(); }
+
+      function lockScroll() {
+        locked = true;
+        window.addEventListener('wheel',     preventScroll, { passive: false });
+        window.addEventListener('touchmove', preventScroll, { passive: false });
+        document.body.style.overflow = 'hidden';
+      }
+
+      function unlockScroll() {
+        if (!locked) return;
+        locked = false;
+        window.removeEventListener('wheel',     preventScroll);
+        window.removeEventListener('touchmove', preventScroll);
+        document.body.style.overflow = '';
+      }
+
+      function startProgress() {
+        progress.classList.remove('playing');
+        // Force reflow so transition restarts cleanly
+        void progress.offsetWidth;
+        progress.classList.add('playing');
+      }
+
+      function play() {
+        lockScroll();
+        startProgress();
+        try { riveInst.stop(); } catch(e) {}
+        riveInst.play();
+        clearTimeout(unlockTimer);
+        unlockTimer = setTimeout(unlockScroll, ANIM_DURATION_MS + 200);
+      }
+
       function initAndPlay() {
-        if (riveInst) {
-          try { riveInst.stop(); } catch(e) {}
-          riveInst.play();
-          return;
-        }
+        if (riveInst) { play(); return; }
         sizeCanvas();
         riveInst = new rive.Rive({
           src: 'story_character.riv',
@@ -805,9 +856,10 @@
           onLoad: () => {
             sizeCanvas();
             riveInst.resizeDrawingSurfaceToCanvas();
-            riveInst.play();
+            play();
           },
-          onLoadError: e => console.error('[character] load error:', e),
+          onStop: unlockScroll,
+          onLoadError: e => { console.error('[character] load error:', e); unlockScroll(); },
         });
       }
 
@@ -819,22 +871,18 @@
         const rect = section.getBoundingClientRect();
         const vh   = window.innerHeight;
 
-        // Section out of view — reset so it can snap again next time
         if (rect.bottom < 0 || rect.top > vh) {
-          snapped = false;
-          if (riveInst) riveInst.pause();
+          triggered = false;
           clearTimeout(scrollTimer);
           return;
         }
 
-        // Snap when scrolling down and the section top has crossed 60% of the viewport
-        if (!snapped && scrollingDown && rect.top <= vh * 0.6 && rect.top >= -vh * 0.2) {
+        if (!triggered && scrollingDown && rect.top <= vh * 0.6 && rect.top >= -vh * 0.2) {
           clearTimeout(scrollTimer);
           scrollTimer = setTimeout(() => {
-            if (snapped) return;
-            snapped = true;
+            if (triggered) return;
+            triggered = true;
             section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            // Play after smooth scroll settles
             setTimeout(initAndPlay, 600);
           }, 150);
         }
