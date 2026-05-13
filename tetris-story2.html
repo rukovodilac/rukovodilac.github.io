@@ -284,6 +284,27 @@
       display: block;
     }
 
+    /* ── STORY-UI SECTION ── */
+    #story-ui-section {
+      background: #FBABD2;
+      padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .story-ui-rive {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #story-ui-canvas {
+      display: block;
+    }
+
     @media (max-width: 768px) {
       #contact {
         flex-direction: column;
@@ -383,6 +404,12 @@
     </div>
   </section>
 
+  <section id="story-ui-section">
+    <div class="story-ui-rive">
+      <canvas id="story-ui-canvas"></canvas>
+    </div>
+  </section>
+
   <footer id="contact">
     <div class="contact-left">
       <p class="contact-tagline">
@@ -434,6 +461,37 @@
     });
 
     window.addEventListener('resize', applyProportionalSize);
+
+    const storyUiCanvas = document.getElementById('story-ui-canvas');
+    let storyUiRatio = null;
+
+    function applyStoryUiSize() {
+      if (storyUiRatio === null) return;
+      const w = storyUiCanvas.parentElement.clientWidth;
+      const h = Math.round(w * storyUiRatio);
+      storyUiCanvas.width = w;
+      storyUiCanvas.height = h;
+      storyUiCanvas.style.width = w + 'px';
+      storyUiCanvas.style.height = h + 'px';
+      storyUiAnim.resizeDrawingSurfaceToCanvas();
+    }
+
+    const storyUiAnim = new rive.Rive({
+      src: 'story-ui.riv',
+      canvas: storyUiCanvas,
+      autoplay: true,
+      layout: new rive.Layout({
+        fit: rive.Fit.Fill,
+        alignment: rive.Alignment.Center,
+      }),
+      onLoad: () => {
+        const b = storyUiAnim.bounds;
+        storyUiRatio = (b.maxY - b.minY) / (b.maxX - b.minX);
+        applyStoryUiSize();
+      },
+    });
+
+    window.addEventListener('resize', applyStoryUiSize);
 
     const emailBtn     = document.getElementById('email-btn');
     const emailWrap    = document.getElementById('email-wrap');
