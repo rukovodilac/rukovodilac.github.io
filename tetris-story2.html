@@ -310,9 +310,8 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       column-gap: 0;
-      align-items: center;
+      align-items: stretch;
       background: #F4E9D5;
-      padding: clamp(40px, 6vw, 80px) 0 clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
     }
 
     .jiggle-text {
@@ -320,7 +319,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      padding: 0 clamp(20px, 3vw, 48px) 0 0;
+      padding: clamp(40px, 6vw, 80px) clamp(24px, 3vw, 48px) clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
       gap: clamp(20px, 2.5vw, 36px);
     }
 
@@ -352,15 +351,15 @@
     .jiggle-rive {
       grid-column: 2;
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: hidden;
     }
 
     #jiggle-canvas {
       display: block;
+      width: 100%;
+      height: 100%;
       cursor: pointer;
+      touch-action: none;
     }
 
     .jiggle-interactive-tag {
@@ -393,9 +392,12 @@
       .jelly-text { grid-column: 1; }
       #jiggle-section {
         grid-template-columns: 1fr;
-        padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
       }
-      .jiggle-text { grid-column: 1; order: 2; padding: 0; }
+      .jiggle-text {
+        grid-column: 1;
+        order: 2;
+        padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
+      }
       .jiggle-rive { grid-column: 1; order: 1; }
     }
 
@@ -566,7 +568,7 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/@rive-app/canvas@2.21.6/rive.js"></script>
+  <script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
   <script src="https://player.vimeo.com/api/player.js"></script>
   <script>
     const riveCanvas = document.getElementById('rive-canvas');
@@ -636,56 +638,67 @@
 
     window.addEventListener('resize', applyStoryUiSize);
 
-    const jiggleCanvas = document.getElementById('jiggle-canvas');
-    let jiggleRatio = null;
+    (function() {
+      const JIGGLE_SM = 'Jiggle_SM';
+      const canvas = document.getElementById('jiggle-canvas');
+      let riveInst = null, buffer = null;
 
-    function applyJiggleSize() {
-      if (jiggleRatio === null) return;
-      const dpr = window.devicePixelRatio || 1;
-      const w = jiggleCanvas.parentElement.clientWidth;
-      const h = Math.round(w * jiggleRatio);
-      jiggleCanvas.style.width = w + 'px';
-      jiggleCanvas.style.height = h + 'px';
-      jiggleCanvas.width = Math.round(w * dpr);
-      jiggleCanvas.height = Math.round(h * dpr);
-      jiggleAnim.resizeDrawingSurfaceToCanvas();
-    }
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || cssW;
+        canvas.width        = Math.round(cssW * dpr);
+        canvas.height       = Math.round(cssH * dpr);
+        canvas.style.width  = cssW + 'px';
+        canvas.style.height = cssH + 'px';
+      }
 
-    const jiggleAnim = new rive.Rive({
-      src: 'jiggle.riv',
-      canvas: jiggleCanvas,
-      autoplay: true,
-      stateMachines: 'Jiggle_SM',
-      layout: new rive.Layout({
-        fit: rive.Fit.Contain,
-        alignment: rive.Alignment.Center,
-      }),
-      onLoad: () => {
-        const b = jiggleAnim.bounds;
-        jiggleRatio = (b.maxY - b.minY) / (b.maxX - b.minX);
-        applyJiggleSize();
-      },
-      onLoadError: (e) => console.error('[jiggle] load error:', e),
-    });
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0),
+          canvas,
+          stateMachines: JIGGLE_SM,
+          autoplay: true,
+          autoBind: true,
+          fit: rive.Fit.Cover,
+          alignment: rive.Alignment.Center,
+          onLoad: () => {
+            const b = riveInst.bounds;
+            const aw = b.maxX - b.minX, ah = b.maxY - b.minY;
+            canvas.parentElement.style.aspectRatio = `${aw} / ${ah}`;
+            sizeCanvas();
+            riveInst.resizeDrawingSurfaceToCanvas();
+            riveInst.play(JIGGLE_SM);
+          },
+          onLoadError: e => console.error('[jiggle] load error:', e),
+        });
+      }
 
-    window.addEventListener('resize', applyJiggleSize);
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        const ab = riveInst.artboard;
+        if (ab && ab[method]) ab[method](x, y);
+        else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
 
-    jiggleCanvas.addEventListener('mousemove', (e) => {
-      const rect = jiggleCanvas.getBoundingClientRect();
-      jiggleAnim.stateMachinePointerMove(e.clientX - rect.left, e.clientY - rect.top);
-    });
-    jiggleCanvas.addEventListener('mousedown', (e) => {
-      const rect = jiggleCanvas.getBoundingClientRect();
-      jiggleAnim.stateMachinePointerDown(e.clientX - rect.left, e.clientY - rect.top);
-    });
-    jiggleCanvas.addEventListener('mouseup', (e) => {
-      const rect = jiggleCanvas.getBoundingClientRect();
-      jiggleAnim.stateMachinePointerUp(e.clientX - rect.left, e.clientY - rect.top);
-    });
-    jiggleCanvas.addEventListener('mouseleave', (e) => {
-      const rect = jiggleCanvas.getBoundingClientRect();
-      jiggleAnim.stateMachinePointerMove(e.clientX - rect.left, e.clientY - rect.top);
-    });
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('jiggle.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+
+      window.addEventListener('resize', () => {
+        sizeCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
+    })();
 
     const emailBtn     = document.getElementById('email-btn');
     const emailWrap    = document.getElementById('email-wrap');
