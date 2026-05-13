@@ -697,12 +697,10 @@
 
       function sizeCanvas() {
         const p = canvas.parentElement;
-        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssW = p.offsetWidth  || window.innerWidth;
         const cssH = p.offsetHeight || cssW;
-        canvas.width        = cssW;
-        canvas.height       = cssH;
-        canvas.style.width  = cssW + 'px';
-        canvas.style.height = cssH + 'px';
+        canvas.width  = cssW;
+        canvas.height = cssH;
       }
 
       function start() {
@@ -746,6 +744,12 @@
         sizeCanvas();
         if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
       });
+      if (window.ResizeObserver) {
+        new ResizeObserver(() => {
+          sizeCanvas();
+          if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+        }).observe(canvas.parentElement);
+      }
     })();
 
     const emailBtn     = document.getElementById('email-btn');

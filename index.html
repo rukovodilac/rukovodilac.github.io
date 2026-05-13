@@ -301,6 +301,22 @@
 
     .done-it-wrapper {
       width: 40%;
+      position: relative;
+    }
+
+    .done-it-interactive-tag {
+      position: absolute;
+      top: clamp(10px, 1.5vw, 16px);
+      left: clamp(10px, 1.5vw, 16px);
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .done-it-interactive-tag svg {
+      width: clamp(16px, 1.75vw, 26px);
+      height: clamp(16px, 1.75vw, 26px);
     }
 
     @media (max-width: 768px) {
@@ -553,6 +569,9 @@
     <span class="about-highlight">You name it, I've done it!</span>
     <div class="done-it-wrapper">
       <canvas id="done-it-canvas"></canvas>
+      <div class="done-it-interactive-tag">
+        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      </div>
     </div>
   </section>
 

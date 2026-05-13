@@ -315,6 +315,21 @@
     .si-deco-3 { grid-column: 1 / 2; grid-row: 5; }
     .si-deco-4 { grid-column: 4 / 5; grid-row: 8; }
 
+    .rive-interactive-tag {
+      position: absolute;
+      top: clamp(10px, 1.5vw, 16px);
+      left: clamp(10px, 1.5vw, 16px);
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .rive-interactive-tag svg {
+      width: clamp(16px, 1.75vw, 26px);
+      height: clamp(16px, 1.75vw, 26px);
+    }
+
     @media (max-width: 768px) {
       #showcase {
         grid-template-columns: 1fr;
@@ -407,40 +422,50 @@
     <!-- Row 1: coin cols 1-2 -->
     <div class="showcase-item si-coin">
       <canvas id="coin-canvas"></canvas>
+      <div class="rive-interactive-tag"><svg aria-hidden="true"><use href="#icon-interactive"/></svg></div>
     </div>
     <!-- Row 2: knob col 3 -->
     <div class="showcase-item si-knob">
       <canvas id="knob-canvas"></canvas>
+      <div class="rive-interactive-tag"><svg aria-hidden="true"><use href="#icon-interactive"/></svg></div>
     </div>
     <!-- Row 3: progress cols 1-2 | soda col 3 | froggy col 4 -->
     <div class="showcase-item si-progress">
       <canvas id="progress-canvas"></canvas>
+      <div class="rive-interactive-tag"><svg aria-hidden="true"><use href="#icon-interactive"/></svg></div>
     </div>
     <div class="showcase-item si-soda">
       <canvas id="soda-canvas"></canvas>
+      <div class="rive-interactive-tag"><svg aria-hidden="true"><use href="#icon-interactive"/></svg></div>
     </div>
     <div class="showcase-item si-froggy">
       <canvas id="froggy-canvas"></canvas>
+      <div class="rive-interactive-tag"><svg aria-hidden="true"><use href="#icon-interactive"/></svg></div>
     </div>
     <!-- Row 4: battery cols 2-3 -->
     <div class="showcase-item si-battery">
       <canvas id="battery-canvas"></canvas>
+      <div class="rive-interactive-tag"><svg aria-hidden="true"><use href="#icon-interactive"/></svg></div>
     </div>
     <!-- Row 5: egg col 2 -->
     <div class="showcase-item si-egg">
       <canvas id="egg-canvas"></canvas>
+      <div class="rive-interactive-tag"><svg aria-hidden="true"><use href="#icon-interactive"/></svg></div>
     </div>
     <!-- Row 6: arrows cols 1-2 (4:1 ratio) -->
     <div class="showcase-item si-arrows">
       <canvas id="arrows-canvas"></canvas>
+      <div class="rive-interactive-tag"><svg aria-hidden="true"><use href="#icon-interactive"/></svg></div>
     </div>
     <!-- Row 7: illusion cols 2-3 -->
     <div class="showcase-item si-illusion">
       <canvas id="illusion-canvas"></canvas>
+      <div class="rive-interactive-tag"><svg aria-hidden="true"><use href="#icon-interactive"/></svg></div>
     </div>
     <!-- Row 8: box col 3 -->
     <div class="showcase-item si-box">
       <canvas id="box-canvas"></canvas>
+      <div class="rive-interactive-tag"><svg aria-hidden="true"><use href="#icon-interactive"/></svg></div>
     </div>
 
     <!-- Decorative shapes (desktop only) -->
