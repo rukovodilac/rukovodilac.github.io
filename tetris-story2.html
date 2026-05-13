@@ -486,10 +486,14 @@
         alignment: rive.Alignment.Center,
       }),
       onLoad: () => {
+        console.log('[story-ui] stateMachineNames:', storyUiAnim.stateMachineNames);
+        console.log('[story-ui] animationNames:', storyUiAnim.animationNames);
+        console.log('[story-ui] bounds:', storyUiAnim.bounds);
         const b = storyUiAnim.bounds;
         storyUiRatio = (b.maxY - b.minY) / (b.maxX - b.minX);
         applyStoryUiSize();
       },
+      onLoadError: (e) => console.error('[story-ui] load error:', e),
     });
 
     window.addEventListener('resize', applyStoryUiSize);
