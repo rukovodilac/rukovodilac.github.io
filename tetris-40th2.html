@@ -631,6 +631,32 @@
       .bwcn-title span { margin: 0 auto; }
     }
 
+    /* ── STATEMENT SECTION ── */
+    #statement-section {
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      padding: clamp(80px, 12vw, 160px) clamp(20px, 3.5vw, 48px);
+    }
+
+    .statement-text {
+      position: relative;
+      z-index: 1;
+      max-width: 880px;
+      font-size: clamp(28px, 4vw, 64px);
+      font-weight: 500;
+      line-height: 1.15;
+      color: #fff;
+      pointer-events: none;
+    }
+
+    #statement-rive-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
     /* ── GLITCH PIECES ── */
     .glitch-piece {
       position: fixed;
@@ -810,6 +836,11 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <section id="statement-section">
+    <p class="statement-text">This was a deeply collaborative, iterative effort across time zones and studios. At any hour of the day, someone, somewhere was working on Tetris.</p>
+    <div id="statement-rive-layer"></div>
   </section>
 
   <footer id="contact">
@@ -1202,6 +1233,89 @@
       }
 
       schedule();
+    })();
+
+    // ── STATEMENT SECTION RIVES ──
+    (function() {
+      const FILES = ['100.riv', '300.riv', '500.riv', '800.riv'];
+      const CONCURRENT = 5;
+      const SIZE_MIN = 80, SIZE_MAX = 180;
+
+      const layer   = document.getElementById('statement-rive-layer');
+      const section = document.getElementById('statement-section');
+      let buffers = null;
+      let active  = 0;
+      let visible = false;
+
+      async function loadBuffers() {
+        buffers = await Promise.all(FILES.map(f => fetch(f).then(r => r.arrayBuffer())));
+      }
+
+      function spawnOne() {
+        if (!visible || !buffers) return;
+        active++;
+
+        const buf  = buffers[Math.floor(Math.random() * buffers.length)];
+        const size = SIZE_MIN + Math.random() * (SIZE_MAX - SIZE_MIN);
+        const secW = section.offsetWidth;
+        const secH = section.offsetHeight;
+        const x = Math.random() * (secW - size);
+        const y = Math.random() * (secH - size);
+
+        const canvas = document.createElement('canvas');
+        canvas.width  = Math.round(size);
+        canvas.height = Math.round(size);
+        canvas.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:${size}px;height:${size}px;`;
+        layer.appendChild(canvas);
+
+        let done = false;
+        function finish() {
+          if (done) return;
+          done = true;
+          try { r.cleanup(); } catch(e) {}
+          canvas.remove();
+          active--;
+          if (visible) spawnOne();
+        }
+
+        const r = new rive.Rive({
+          buffer: buf.slice(0),
+          canvas,
+          autoplay: true,
+          layout: new rive.Layout({ fit: rive.Fit.Contain, alignment: rive.Alignment.Center }),
+          onLoad() {
+            r.resizeDrawingSurfaceToCanvas();
+            const sm = r.stateMachineNames;
+            if (sm && sm.length) r.play(sm);
+            else r.play();
+          },
+          onStop: finish,
+          onLoadError: finish,
+        });
+
+        // Fallback: kill after 10s max
+        setTimeout(finish, 10000);
+      }
+
+      function start() {
+        if (!buffers || visible) return;
+        visible = true;
+        const toStart = CONCURRENT - active;
+        for (let i = 0; i < toStart; i++) {
+          setTimeout(spawnOne, i * 300);
+        }
+      }
+
+      function stop() {
+        visible = false;
+      }
+
+      loadBuffers().then(() => {
+        new IntersectionObserver(entries => {
+          if (entries[0].isIntersecting) start();
+          else stop();
+        }, { threshold: 0.1 }).observe(section);
+      }).catch(e => console.warn('[statement rives]', e));
     })();
   </script>
 
