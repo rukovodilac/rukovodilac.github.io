@@ -21,6 +21,11 @@
       background: #F4E9D5;
     }
 
+    /* ── HERO ── */
+    #hero-section {
+      background: #50DAFE;
+    }
+
     /* ── HEADER ── */
     #header {
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
@@ -72,6 +77,7 @@
     /* ── VIDEO ── */
     #video-wrap {
       padding: 0 clamp(20px, 3.5vw, 48px);
+      background: #50DAFE;
     }
 
     .vimeo-container {
@@ -445,6 +451,12 @@
       }
       .jiggle-rive { grid-column: 1; order: 2; }
       .blockies-meta-wrap { margin-top: clamp(24px, 4vw, 40px); }
+      .success-text {
+        text-align: center;
+      }
+      .success-title span {
+        margin: 0 auto;
+      }
     }
 
     /* ── DEG45 SECTION ── */
@@ -456,17 +468,7 @@
       cursor: pointer;
     }
 
-    /* Side-edge vignette reinforces the "hole" depth */
-    #deg45-section::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      box-shadow: inset 60px 0 80px rgba(0,0,0,0.45), inset -60px 0 80px rgba(0,0,0,0.45);
-      pointer-events: none;
-      z-index: 4;
-    }
-
-    .deg45-inner {
+.deg45-inner {
       display: grid;
       grid-template-columns: 1fr;
       align-items: stretch;
@@ -627,7 +629,7 @@
     .blockies-meta-wrap {
       display: flex;
       justify-content: center;
-      padding-bottom: 0;
+      padding-bottom: clamp(40px, 6vw, 80px);
       margin-top: clamp(-50px, -5vw, -70px);
       position: relative;
       will-change: transform;
@@ -745,6 +747,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: clamp(24px, 3vw, 40px);
     }
 
     #tetrisco-canvas {
@@ -878,6 +881,7 @@
     </defs>
   </svg>
 
+  <div id="hero-section">
   <header id="header">
     <a href="/" id="logo">a–z</a>
   </header>
@@ -922,6 +926,7 @@
       </div>
     </div>
   </div>
+  </div><!-- /#hero-section -->
 
   <section id="jelly-section">
     <div class="jelly-rive">
@@ -1647,7 +1652,7 @@
       }, { threshold: 0.1 }).observe(document.getElementById('derisking-section'));
     })();
 
-    const emailBtn     = document.getElementById('email-btn');
+const emailBtn     = document.getElementById('email-btn');
     const emailWrap    = document.getElementById('email-wrap');
     const emailTooltip = document.getElementById('email-tooltip');
 
