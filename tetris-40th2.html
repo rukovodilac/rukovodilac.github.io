@@ -470,41 +470,6 @@
         canvas.style.height = h + 'px';
       }
 
-      function resolveFireFn() {
-        // 1. Classic SM inputs (works when trigScroll is a plain SM input)
-        var inputs = riveInst.stateMachineInputs(SM);
-        if (inputs && inputs.length) {
-          console.log('[primeintro] SM inputs:', inputs.map(function(i){ return i.name; }));
-          var t = inputs.find(function(i){ return i.name === 'trigScroll'; })
-               || inputs.find(function(i){ return typeof i.fire === 'function'; });
-          if (t) { console.log('[primeintro] trigger via SM input:', t.name); return function(){ t.fire(); }; }
-        }
-
-        // 2. ViewModel instance – trigScroll is a Data Binding trigger
-        var vmis = riveInst.viewModelInstances;
-        console.log('[primeintro] viewModelInstances:', vmis);
-        if (vmis && vmis.length) {
-          for (var vi = 0; vi < vmis.length; vi++) {
-            var vmi = vmis[vi];
-            // Official Rive data-binding API
-            if (typeof vmi.getViewModelInstanceTrigger === 'function') {
-              var trig = vmi.getViewModelInstanceTrigger('trigScroll');
-              if (trig) { console.log('[primeintro] trigger via getViewModelInstanceTrigger'); return function(){ trig.fire(); }; }
-            }
-            // Fallback accessor patterns
-            ['trigger','property','get'].forEach(function(m) {
-              if (!trig && typeof vmi[m] === 'function') {
-                try { var r2 = vmi[m]('trigScroll'); if (r2 && typeof r2.fire === 'function') trig = r2; } catch(e){}
-              }
-            });
-            if (trig) { console.log('[primeintro] trigger via ViewModel.' + m); return function(){ trig.fire(); }; }
-          }
-        }
-
-        console.warn('[primeintro] trigScroll NOT found — check console for VMI structure');
-        return null;
-      }
-
       sizeCanvas();
 
       riveInst = new rive.Rive({
@@ -520,7 +485,6 @@
         onLoad: function() {
           sizeCanvas();
           riveInst.resizeDrawingSurfaceToCanvas();
-          fireFn = resolveFireFn();
         },
         onLoadError: function(e) { console.error('[primeintro] load error:', e); },
       });
@@ -530,10 +494,17 @@
         if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
       });
 
-      // Click anywhere on the section also fires (handy for testing, matches existing Rive behaviour)
-      canvas.addEventListener('pointerdown', function() {
-        if (fireFn) { console.log('[primeintro] manual fire via pointerdown'); fireFn(); }
-      });
+      // Dispatch a synthetic pointer click at the canvas centre.
+      // Rive's own event handler picks this up and fires trigScroll internally —
+      // no need to touch the ViewModel API at all.
+      function syntheticClick() {
+        var r  = canvas.getBoundingClientRect();
+        var cx = r.left + r.width  / 2;
+        var cy = r.top  + r.height / 2;
+        var opts = { bubbles: false, cancelable: true, clientX: cx, clientY: cy, pointerId: 99, isPrimary: true };
+        canvas.dispatchEvent(new PointerEvent('pointerdown', opts));
+        canvas.dispatchEvent(new PointerEvent('pointerup',   opts));
+      }
 
       // Scroll trigger – fires every SCROLL_PER_TRIG px while the sticky section is pinned
       var SCROLL_PER_TRIG = 150;
@@ -545,16 +516,12 @@
         var dy   = newY - prevScrollY;
         prevScrollY = newY;
         if (dy <= 0) return;
-
-        var rect     = wrapper.getBoundingClientRect();
-        var isActive = rect.top <= 0 && rect.bottom >= window.innerHeight;
-        console.log('[primeintro scroll] dy=' + dy.toFixed(0) + ' rectTop=' + rect.top.toFixed(0) + ' rectBot=' + rect.bottom.toFixed(0) + ' vh=' + window.innerHeight + ' active=' + isActive + ' fireFn=' + !!fireFn);
-
-        if (!fireFn || !isActive) return;
+        var rect = wrapper.getBoundingClientRect();
+        if (rect.top > 0 || rect.bottom < window.innerHeight) return;
         scrollAccum += dy;
         while (scrollAccum >= SCROLL_PER_TRIG) {
           scrollAccum -= SCROLL_PER_TRIG;
-          fireFn();
+          syntheticClick();
         }
       }, { passive: true });
     })();
