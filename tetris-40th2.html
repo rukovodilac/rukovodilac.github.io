@@ -21,6 +21,30 @@
       background: #000;
     }
 
+    /* ── PAGE HEADER AREA (header + title + video + credits) ── */
+    #page-header-area {
+      position: relative;
+    }
+
+    #page-header-area::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url('TPattern.svg');
+      background-attachment: fixed;
+      background-repeat: repeat;
+      background-size: 600px 600px;
+      background-position: 0 0;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    #page-header-area > * {
+      position: relative;
+      z-index: 1;
+    }
+
     /* ── HEADER ── */
     #header {
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
@@ -812,6 +836,8 @@
     </defs>
   </svg>
 
+  <div id="page-header-area">
+
   <header id="header">
     <a href="/" id="logo">a–z</a>
   </header>
@@ -857,6 +883,8 @@
       </div>
     </div>
   </div>
+
+  </div><!-- /#page-header-area -->
 
   <section id="primeintro-section">
     <canvas id="primeintro-canvas"></canvas>
