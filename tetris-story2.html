@@ -844,15 +844,18 @@
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity 0.5s ease;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    #intro-overlay.visible {
+      opacity: 1;
     }
     #intro-overlay.fade-out {
       opacity: 0;
-      pointer-events: none;
     }
     #intro-canvas {
       display: block;
@@ -1700,10 +1703,14 @@ const emailBtn     = document.getElementById('email-btn');
       });
     });
 
-    // ── INTRO OVERLAY ──
+    // ── CHARACTER OVERLAY (triggers on "Less Hard Drop, More Soft Bop") ──
     (function () {
-      const overlay = document.getElementById('intro-overlay');
-      const canvas  = document.getElementById('intro-canvas');
+      const overlay   = document.getElementById('intro-overlay');
+      const canvas    = document.getElementById('intro-canvas');
+      const trigger   = document.getElementById('jelly-section');
+      let introAnim   = null;
+      let played      = false;
+      let fallback    = null;
 
       function sizeCanvas() {
         canvas.width  = window.innerWidth;
@@ -1714,32 +1721,44 @@ const emailBtn     = document.getElementById('email-btn');
       }
 
       function dismiss() {
+        clearTimeout(fallback);
+        overlay.classList.remove('visible');
         overlay.classList.add('fade-out');
-        overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
       }
 
-      let introAnim = new rive.Rive({
-        src: 'story_character.riv',
-        canvas,
-        autoplay: true,
-        layout: new rive.Layout({
-          fit: rive.Fit.Contain,
-          alignment: rive.Alignment.Center,
-        }),
-        onLoad: () => {
-          sizeCanvas();
-          const machines = introAnim.stateMachineNames;
-          introAnim.play(machines.length ? machines : introAnim.animationNames);
-        },
-        onStop: () => dismiss(),
-        onLoadError: () => dismiss(),
-      });
+      function play() {
+        if (played) return;
+        played = true;
 
-      sizeCanvas();
+        sizeCanvas();
+        overlay.classList.remove('fade-out');
+        overlay.classList.add('visible');
+
+        introAnim = new rive.Rive({
+          src: 'story_character.riv',
+          canvas,
+          autoplay: true,
+          layout: new rive.Layout({
+            fit: rive.Fit.Contain,
+            alignment: rive.Alignment.Center,
+          }),
+          onLoad: () => {
+            sizeCanvas();
+            const machines = introAnim.stateMachineNames;
+            introAnim.play(machines.length ? machines : introAnim.animationNames);
+          },
+          onStop: () => dismiss(),
+          onLoadError: () => dismiss(),
+        });
+
+        fallback = setTimeout(dismiss, 6000);
+      }
+
       window.addEventListener('resize', sizeCanvas);
 
-      // Safety fallback — dismiss after 6 s if the animation never fires onStop
-      setTimeout(dismiss, 6000);
+      new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) play();
+      }, { threshold: 0.3 }).observe(trigger);
     })();
   </script>
 
