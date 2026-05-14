@@ -455,7 +455,8 @@
 
     .story2-rive {
       width: 100%;
-      aspect-ratio: 16 / 9;
+      max-width: 840px;
+      aspect-ratio: 4 / 1;
       position: relative;
     }
 
@@ -509,8 +510,9 @@
       display: flex;
       justify-content: center;
       padding-bottom: clamp(80px, 10vw, 140px);
-      margin-top: clamp(-100px, -14vw, -160px);
+      margin-top: clamp(-180px, -24vw, -280px);
       position: relative;
+      will-change: transform;
     }
 
     #story-meta-canvas {
@@ -961,6 +963,22 @@
       }, { threshold: 0.1 }).observe(wrap);
 
       window.addEventListener('resize', applySize);
+    })();
+
+    // ── META PARALLAX ──
+    (function() {
+      const metaWrap = document.querySelector('.blockies-meta-wrap');
+      const section  = document.getElementById('blockies-section');
+      function updateParallax() {
+        const rect = section.getBoundingClientRect();
+        const vh   = window.innerHeight;
+        const progress = (vh - rect.top) / (vh + rect.height);
+        const shift = (0.5 - progress) * 100;
+        metaWrap.style.transform = 'translateY(' + shift + 'px)';
+      }
+      window.addEventListener('scroll', updateParallax, { passive: true });
+      window.addEventListener('resize', updateParallax);
+      updateParallax();
     })();
 
     const emailBtn     = document.getElementById('email-btn');
