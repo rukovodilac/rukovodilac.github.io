@@ -442,6 +442,7 @@
         padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
       }
       .jiggle-rive { grid-column: 1; order: 2; }
+      .blockies-meta-wrap { margin-top: clamp(24px, 4vw, 40px); }
     }
 
     /* ── STORY2 SECTION ── */
@@ -456,14 +457,10 @@
     .story2-rive {
       width: 100%;
       max-width: 840px;
-      aspect-ratio: 4 / 1;
-      position: relative;
     }
 
     #story2-canvas {
       display: block;
-      position: absolute;
-      inset: 0;
     }
 
     /* ── BLOCKIES SECTION ── */
@@ -509,8 +506,8 @@
     .blockies-meta-wrap {
       display: flex;
       justify-content: center;
-      padding-bottom: clamp(80px, 10vw, 140px);
-      margin-top: clamp(-180px, -24vw, -280px);
+      padding-bottom: 0;
+      margin-top: clamp(-50px, -5vw, -70px);
       position: relative;
       will-change: transform;
     }
@@ -800,11 +797,14 @@
     const story2Canvas = document.getElementById('story2-canvas');
     let story2Machines = [];
 
+    // Artboard is 1200×300. Give the canvas 60% extra vertical space so
+    // content that sits outside the artboard rect isn't clipped by the canvas edge.
+    const STORY2_ART_W = 1200, STORY2_ART_H = 300;
     function applyStory2Size() {
-      const parent = story2Canvas.parentElement;
-      const w = parent.clientWidth;
-      const h = parent.clientHeight;
-      if (!w || !h) return;
+      const w = story2Canvas.parentElement.clientWidth;
+      if (!w) return;
+      const scale = w / STORY2_ART_W;
+      const h = Math.round(STORY2_ART_H * scale * 1.6);
       story2Canvas.width = w;
       story2Canvas.height = h;
       story2Canvas.style.width = w + 'px';
@@ -973,7 +973,7 @@
         const rect = section.getBoundingClientRect();
         const vh   = window.innerHeight;
         const progress = (vh - rect.top) / (vh + rect.height);
-        const shift = (0.5 - progress) * 100;
+        const shift = (0.5 - progress) * 60;
         metaWrap.style.transform = 'translateY(' + shift + 'px)';
       }
       window.addEventListener('scroll', updateParallax, { passive: true });
