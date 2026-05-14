@@ -647,6 +647,66 @@
       line-height: 1.15;
       color: #fff;
       pointer-events: none;
+      text-align: center;
+    }
+
+    /* ── STATS SECTION ── */
+    #stats-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #000;
+    }
+
+    .stat-cell {
+      padding: clamp(48px, 7vw, 100px) clamp(24px, 4vw, 64px);
+      border-right: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(8px, 1vw, 14px);
+    }
+
+    .stat-cell:nth-child(even) { border-right: none; }
+    .stat-cell:nth-child(3),
+    .stat-cell:nth-child(4)   { border-bottom: none; }
+
+    .stat-number-wrap {
+      overflow: hidden;
+      line-height: 1;
+    }
+
+    .stat-number {
+      display: block;
+      font-size: clamp(52px, 7.5vw, 120px);
+      font-weight: 500;
+      line-height: 1;
+      color: #E0EC8A;
+      transform: translateY(110%);
+      transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .stat-cell.in-view .stat-number {
+      transform: translateY(0);
+    }
+
+    .stat-label {
+      font-size: clamp(14px, 1.4vw, 20px);
+      font-weight: 400;
+      line-height: 1.4;
+      color: rgba(255,255,255,0.5);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.5s 0.45s, transform 0.5s 0.45s;
+    }
+
+    .stat-cell.in-view .stat-label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      #stats-section { grid-template-columns: 1fr 1fr; }
+      .stat-cell:nth-child(even) { border-right: none; }
     }
 
     /* ── GLITCH PIECES ── */
@@ -831,7 +891,26 @@
   </section>
 
   <section id="statement-section">
-    <p class="statement-text">This was a deeply collaborative, iterative effort across time zones and studios. At any hour of the day, someone, somewhere was working on Tetris.</p>
+    <p class="statement-text">This was a deeply collaborative effort across time zones and studios. At any hour of the day, someone, somewhere was working on Tetris.</p>
+  </section>
+
+  <section id="stats-section">
+    <div class="stat-cell">
+      <div class="stat-number-wrap"><span class="stat-number">~690K</span></div>
+      <p class="stat-label">daily active users</p>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-number-wrap"><span class="stat-number">~24%</span></div>
+      <p class="stat-label">D1 retention</p>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-number-wrap"><span class="stat-number">6</span></div>
+      <p class="stat-label">studios</p>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-number-wrap"><span class="stat-number">40 years</span></div>
+      <p class="stat-label">of legacy</p>
+    </div>
   </section>
 
   <footer id="contact">
@@ -1224,6 +1303,18 @@
       }
 
       schedule();
+    })();
+
+    // ── STATS ROLL-UP ──
+    (function() {
+      const section = document.getElementById('stats-section');
+      const cells   = section.querySelectorAll('.stat-cell');
+      new IntersectionObserver(entries => {
+        if (!entries[0].isIntersecting) return;
+        cells.forEach((cell, i) => {
+          setTimeout(() => cell.classList.add('in-view'), i * 130);
+        });
+      }, { threshold: 0.25 }).observe(section);
     })();
 
   </script>
