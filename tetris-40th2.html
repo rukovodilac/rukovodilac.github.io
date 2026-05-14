@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tetris® 40th — Aleksandar Zdravković</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Host Grotesk", sans-serif;
+      background: #0C0C0C;
+    }
+
+    /* ── HEADER ── */
+    #header {
+      padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
+    }
+
+    #logo {
+      font-size: clamp(48px, 6.5vw, 96px);
+      font-weight: 500;
+      line-height: 1;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    /* ── TITLE + TAGLINE ── */
+    #project-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 0 clamp(20px, 3.5vw, 48px) clamp(32px, 4vw, 56px);
+    }
+
+    #project-title h1 {
+      font-size: clamp(32px, 5vw, 72px);
+      font-weight: 500;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    #project-title h1 span {
+      display: block;
+      width: fit-content;
+    }
+
+    #tagline {
+      font-size: clamp(24px, 3.5vw, 48px);
+      font-weight: 500;
+      line-height: 1;
+      color: #fff;
+      margin-top: clamp(8px, 1.5vw, 16px);
+    }
+
+    #tagline span {
+      display: block;
+      width: fit-content;
+      background: #E0EC8A;
+      color: #000;
+      padding: 2px 10px;
+    }
+
+    /* ── VIDEO ── */
+    #video-wrap {
+      padding: 0 clamp(20px, 3.5vw, 48px);
+    }
+
+    .vimeo-container {
+      padding: 56.25% 0 0 0;
+      position: relative;
+    }
+
+    .vimeo-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* ── CREDITS ── */
+    #credits {
+      padding: clamp(32px, 4vw, 56px) clamp(20px, 3.5vw, 48px) clamp(64px, 9vw, 120px);
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(24px, 3vw, 40px);
+    }
+
+    .credits-desc {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.75);
+      max-width: 620px;
+    }
+
+    .credits-meta {
+      display: flex;
+      gap: clamp(32px, 5vw, 80px);
+      flex-wrap: wrap;
+    }
+
+    .credits-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .credits-label {
+      font-size: clamp(10px, 0.9vw, 13px);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+
+    .credits-value {
+      font-size: clamp(14px, 1.3vw, 18px);
+      font-weight: 500;
+      line-height: 1.5;
+      color: #fff;
+    }
+
+    /* ── FOOTER / CONTACT ── */
+    #contact {
+      background: #E0EC8A;
+      padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: clamp(32px, 5vw, 64px);
+    }
+
+    .contact-tagline {
+      font-size: clamp(28px, 4vw, 56px);
+      font-weight: 500;
+      line-height: 1.15;
+      color: #000;
+      margin: 0;
+    }
+
+    .contact-linkedin {
+      display: inline-block;
+      background: #0957C3;
+      color: #fff;
+      padding: 0 10px 2px;
+      text-decoration: none;
+      line-height: inherit;
+    }
+
+    .contact-email-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    .contact-email-btn {
+      background: #000;
+      border: none;
+      padding: 0 10px 2px;
+      margin: 0;
+      font: inherit;
+      color: #E0EC8A;
+      cursor: pointer;
+      line-height: inherit;
+    }
+
+    .email-tooltip {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      background: #000;
+      color: #E0EC8A;
+      font-size: clamp(18px, 2vw, 28px);
+      font-weight: 500;
+      padding: 6px 14px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 10;
+    }
+
+    .email-tooltip::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 10px;
+      border: 7px solid transparent;
+      border-bottom-color: #000;
+    }
+
+    .contact-email-wrap:hover .email-tooltip,
+    .contact-email-wrap.copied .email-tooltip {
+      opacity: 1;
+    }
+
+    .contact-right {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: clamp(8px, 1.5vw, 16px);
+    }
+
+    #footer-logo {
+      font-size: clamp(48px, 6vw, 88px);
+      font-weight: 500;
+      line-height: 1;
+      color: #000;
+      text-decoration: none;
+    }
+
+    .contact-legal {
+      font-size: clamp(10px, 0.9vw, 13px);
+      color: rgba(0,0,0,0.45);
+      text-align: right;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      #contact {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .contact-right {
+        width: 100%;
+      }
+    }
+
+    /* ── Global link underline animation ── */
+    a {
+      position: relative;
+    }
+
+    a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: currentColor;
+      transition: width 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+      pointer-events: none;
+    }
+
+    @media (hover: hover) {
+      a:hover::after {
+        width: 100%;
+      }
+    }
+
+    /* ── GLITCH PIECES ── */
+    .glitch-piece {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      image-rendering: pixelated;
+    }
+  </style>
+</head>
+<body>
+<script>if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; window.scrollTo(0, 0);</script>
+
+  <header id="header">
+    <a href="/" id="logo">a–z</a>
+  </header>
+
+  <div id="project-header">
+    <div id="project-title">
+      <h1>
+        <span>Tetris® 40th</span>
+        <span>Mobile Game</span>
+      </h1>
+    </div>
+    <div id="tagline">
+      <span>Classic Tetris.</span>
+      <span>Amplified.</span>
+    </div>
+  </div>
+
+  <div id="video-wrap">
+    <div class="vimeo-container">
+      <iframe src="https://player.vimeo.com/video/1190632685?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        title="TP_Reel">
+      </iframe>
+    </div>
+  </div>
+
+  <div id="credits">
+    <p class="credits-desc">Creative revamp for its 40th anniversary. I guided the animation team in reimagining visuals, elevating motion design, and keeping the iconic brand fresh while honouring its legacy.</p>
+    <div class="credits-meta">
+      <div class="credits-col">
+        <span class="credits-label">Role</span>
+        <span class="credits-value">Animation Team Lead</span>
+      </div>
+      <div class="credits-col">
+        <span class="credits-label">Tech</span>
+        <span class="credits-value">Unity, Custom Game Engine<br>After Effects<br>Figma, Photoshop</span>
+      </div>
+    </div>
+  </div>
+
+  <footer id="contact">
+    <div class="contact-left">
+      <p class="contact-tagline">
+        Get in touch<br>
+        via <a class="contact-linkedin" href="https://www.linkedin.com/in/a-zdravkovic" target="_blank" rel="noopener">LinkedIn</a>
+        or
+        <span class="contact-email-wrap" id="email-wrap">
+          <button class="contact-email-btn" id="email-btn">e-mail</button>
+          <span class="email-tooltip" id="email-tooltip">Copy e-mail</span>
+        </span>
+      </p>
+    </div>
+    <div class="contact-right">
+      <a href="/" id="footer-logo">a–z</a>
+      <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials belong to their respective owners.</p>
+    </div>
+  </footer>
+
+  <script src="https://player.vimeo.com/api/player.js"></script>
+  <script>
+    const emailBtn     = document.getElementById('email-btn');
+    const emailWrap    = document.getElementById('email-wrap');
+    const emailTooltip = document.getElementById('email-tooltip');
+
+    emailBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
+        emailTooltip.textContent = 'Copied!';
+        emailWrap.classList.add('copied');
+        setTimeout(() => {
+          emailTooltip.textContent = 'Copy e-mail';
+          emailWrap.classList.remove('copied');
+        }, 2000);
+      }).catch(() => {
+        emailTooltip.textContent = 'Copy failed';
+        emailWrap.classList.add('copied');
+        setTimeout(() => {
+          emailTooltip.textContent = 'Copy e-mail';
+          emailWrap.classList.remove('copied');
+        }, 2000);
+      });
+    });
+
+    // ── GLITCH PIECES ──
+    (function() {
+      const PIECES = [
+        // J – orange
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#282828" d="M0 0h40v40H0z"/><path fill="#FF8100" transform="translate(10 5)" d="M-10-5h40v40h-40zM0 0v30h20V20H10V0z" fill-rule="evenodd"/></svg>',
+        // S – red/pink
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#282828" d="M0 0h40v40H0z"/><path fill="#FF0046" transform="translate(5 10)" d="M-5-10h40v40h-40zM0 0v10h10v10h20V10H20V0z" fill-rule="evenodd"/></svg>',
+        // Z – green
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#282828" d="M0 0h40v40H0z"/><path fill="#73E100" transform="translate(5 20)" d="M-5-20h40v40h-40zM0 0v10h20V0h10v-10H10v10z" fill-rule="evenodd"/></svg>',
+        // O – yellow
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#282828" d="M0 0h40v40H0z"/><path fill="#FFC400" transform="translate(10 10)" d="M-10-10h40v40h-40zM0 0v20h20V0z" fill-rule="evenodd"/></svg>',
+        // I – cyan
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#282828" d="M0 0h40v40H0z"/><path fill="#00DFEF" transform="translate(0 15)" d="M0-15h40v40H0zM0 0v10h40V0z" fill-rule="evenodd"/></svg>',
+        // L – blue
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#282828" d="M0 0h40v40H0z"/><path fill="#0081E7" transform="matrix(-1 0 0 1 30 5)" d="M-10-5h40v40h-40zM0 0v30h20V20H10V0z" fill-rule="evenodd"/></svg>',
+        // T – purple
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#282828" d="M0 0h40v40H0z"/><path fill="#B26AEC" transform="translate(15 10)" d="M-15-10h40v40h-40zM0 0v10h-10v10h30V10H10V0z" fill-rule="evenodd"/></svg>',
+      ];
+
+      const urls = PIECES.map(svg =>
+        'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
+      );
+
+      function spawnPiece() {
+        const url  = urls[Math.floor(Math.random() * urls.length)];
+        const size = Math.round(12 + Math.random() * 24);
+        const el   = document.createElement('img');
+        el.src = url;
+        el.className = 'glitch-piece';
+        el.style.width  = size + 'px';
+        el.style.height = size + 'px';
+        el.style.left   = (Math.random() * 98) + 'vw';
+        el.style.top    = (Math.random() * 96) + 'vh';
+        el.style.opacity = (0.35 + Math.random() * 0.65).toFixed(2);
+        el.style.transform = 'rotate(' + Math.round(Math.random() * 3) * 90 + 'deg)';
+        document.body.appendChild(el);
+
+        const life = 80 + Math.random() * 220;
+        setTimeout(() => el.remove(), life);
+      }
+
+      function burst() {
+        const count = Math.random() < 0.3 ? 2 + Math.floor(Math.random() * 3) : 1;
+        for (let i = 0; i < count; i++) {
+          setTimeout(spawnPiece, i * 60);
+        }
+      }
+
+      function schedule() {
+        const delay = 400 + Math.random() * 3200;
+        setTimeout(() => { burst(); schedule(); }, delay);
+      }
+
+      schedule();
+    })();
+  </script>
+
+</body>
+</html>
