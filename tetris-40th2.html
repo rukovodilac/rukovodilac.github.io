@@ -455,70 +455,80 @@
 
     // ── PRIMEINTRO ──
     (function() {
-      const wrapper = document.getElementById('primeintro-wrapper');
-      const canvas  = document.getElementById('primeintro-canvas');
-      let riveInst  = null;
-      let trigInput = null;
+      var SM      = 'State Machine 1';
+      var wrapper = document.getElementById('primeintro-wrapper');
+      var canvas  = document.getElementById('primeintro-canvas');
+      var riveInst = null;
+      var fireFn   = null;  // unified fire() for both SM-input and ViewModel triggers
 
       function sizeCanvas() {
-        const w = window.innerWidth;
-        const h = window.innerHeight;
+        var w = window.innerWidth;
+        var h = window.innerHeight;
         canvas.width        = w;
         canvas.height       = h;
         canvas.style.width  = w + 'px';
         canvas.style.height = h + 'px';
       }
 
-      function findTrigger(smName) {
-        const inputs = riveInst.stateMachineInputs(smName);
-        if (!inputs) return null;
-        console.log('[primeintro] SM "' + smName + '" inputs:', inputs.map(function(i) {
-          return i.name + (typeof i.fire === 'function' ? ' [trigger]' : '');
-        }));
-        // prefer an input whose name contains 'scroll' (case-insensitive), else first trigger
-        return inputs.find(function(i) {
-          return typeof i.fire === 'function' && i.name.toLowerCase().includes('scroll');
-        }) || inputs.find(function(i) {
-          return typeof i.fire === 'function';
-        });
-      }
-
-      function initRive() {
-        sizeCanvas();
-        riveInst = new rive.Rive({
-          src: 'primeintro.riv',
-          canvas,
-          autoplay: false,
-          layout: new rive.Layout({
-            fit: rive.Fit.Cover,
-            alignment: rive.Alignment.Center,
-          }),
-          onLoad: function() {
-            sizeCanvas();
-            riveInst.resizeDrawingSurfaceToCanvas();
-            const smNames   = riveInst.stateMachineNames  || [];
-            const animNames = riveInst.animationNames      || [];
-            console.log('[primeintro] SMs:', smNames, '| anims:', animNames);
-            if (smNames.length > 0) {
-              smNames.forEach(function(sm) { riveInst.play(sm); });
-              trigInput = findTrigger(smNames[0]);
-              console.log('[primeintro] trigInput:', trigInput ? trigInput.name : 'NOT FOUND');
-            } else if (animNames.length > 0) {
-              riveInst.play(animNames[0]);
+      function resolveFireFn() {
+        // 1. Classic SM inputs
+        var inputs = riveInst.stateMachineInputs(SM);
+        if (inputs && inputs.length) {
+          console.log('[primeintro] SM inputs:', inputs.map(function(i){ return i.name; }));
+          var t = inputs.find(function(i){ return i.name === 'trigScroll'; })
+               || inputs.find(function(i){ return typeof i.fire === 'function'; });
+          if (t) { console.log('[primeintro] trigger via SM input:', t.name); return function(){ t.fire(); }; }
+        }
+        // 2. ViewModel instance (newer Rive data-binding)
+        try {
+          var ab  = riveInst.artboard;
+          var vmi = ab && (ab.viewModelInstance || (ab.defaultViewModelInstance && ab.defaultViewModelInstance()));
+          if (!vmi && riveInst.viewModelInstances && riveInst.viewModelInstances.length) {
+            vmi = riveInst.viewModelInstances[0];
+          }
+          if (vmi) {
+            console.log('[primeintro] ViewModel instance found:', vmi);
+            // try common accessor patterns
+            var trig = (typeof vmi.trigger  === 'function' && vmi.trigger('trigScroll'))
+                    || (typeof vmi.property === 'function' && vmi.property('trigScroll'))
+                    || (typeof vmi.get      === 'function' && vmi.get('trigScroll'));
+            if (trig && typeof trig.fire === 'function') {
+              console.log('[primeintro] trigger via ViewModel');
+              return function(){ trig.fire(); };
             }
-          },
-          onLoadError: function(e) { console.error('[primeintro] load error:', e); },
-        });
+          }
+        } catch(e) { console.warn('[primeintro] ViewModel lookup error:', e); }
+
+        console.warn('[primeintro] trigScroll not found');
+        return null;
       }
 
-      requestAnimationFrame(function() { requestAnimationFrame(initRive); });
+      sizeCanvas();
+
+      riveInst = new rive.Rive({
+        src: 'primeintro.riv',
+        canvas: canvas,
+        stateMachines: SM,
+        autoplay: true,
+        autoBind: true,
+        layout: new rive.Layout({
+          fit: rive.Fit.Cover,
+          alignment: rive.Alignment.Center,
+        }),
+        onLoad: function() {
+          sizeCanvas();
+          riveInst.resizeDrawingSurfaceToCanvas();
+          fireFn = resolveFireFn();
+        },
+        onLoadError: function(e) { console.error('[primeintro] load error:', e); },
+      });
 
       window.addEventListener('resize', function() {
         sizeCanvas();
         if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
       });
 
-      // Fire trigger every SCROLL_PER_TRIG px while the section is pinned
+      // Scroll trigger – fires every SCROLL_PER_TRIG px while section is pinned
       var SCROLL_PER_TRIG = 150;
       var prevScrollY = window.scrollY;
       var scrollAccum = 0;
@@ -527,17 +537,13 @@
         var newY = window.scrollY;
         var dy   = newY - prevScrollY;
         prevScrollY = newY;
-
-        if (!trigInput || dy <= 0) return;
-
-        var rect     = wrapper.getBoundingClientRect();
-        var isActive = rect.top <= 0 && rect.bottom >= window.innerHeight;
-        if (!isActive) return;
-
+        if (!fireFn || dy <= 0) return;
+        var rect = wrapper.getBoundingClientRect();
+        if (rect.top > 0 || rect.bottom < window.innerHeight) return;
         scrollAccum += dy;
         while (scrollAccum >= SCROLL_PER_TRIG) {
           scrollAccum -= SCROLL_PER_TRIG;
-          trigInput.fire();
+          fireFn();
         }
       }, { passive: true });
     })();
