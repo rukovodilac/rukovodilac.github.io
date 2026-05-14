@@ -479,6 +479,74 @@
       .interp-title span { margin: 0 auto; }
     }
 
+    /* ── STUDIOS SECTION ── */
+    #studios-section {
+      position: relative;
+      z-index: 6;
+      background: #0068FF;
+      margin-top: -48px;
+      margin-bottom: -48px;
+      box-shadow: 0 -32px 80px rgba(0,0,0,0.32), 0 32px 80px rgba(0,0,0,0.32);
+      overflow: hidden;
+    }
+
+    .studios-ribbon-wrap {
+      overflow: hidden;
+      line-height: 0;
+      font-size: 0;
+    }
+
+    .studios-ribbon-track {
+      display: flex;
+      flex-wrap: nowrap;
+      animation: studios-scroll 8s linear infinite;
+      will-change: transform;
+    }
+
+    @keyframes studios-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-300px); }
+    }
+
+    .studios-inner {
+      padding: clamp(64px, 9vw, 112px) clamp(20px, 3.5vw, 48px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      will-change: transform;
+    }
+
+    .studios-text-inner {
+      max-width: 640px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 2.5vw, 36px);
+    }
+
+    .studios-title {
+      font-size: clamp(32px, 4.5vw, 72px);
+      font-weight: 500;
+      line-height: 1.15;
+      color: #fff;
+    }
+
+    .studios-title span {
+      display: block;
+      width: fit-content;
+      margin: 0 auto;
+    }
+
+    .studios-body {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.75);
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
     /* ── GLITCH PIECES ── */
     .glitch-piece {
       position: fixed;
@@ -617,6 +685,28 @@
     </div>
   </section>
 
+  <section id="studios-section">
+    <div class="studios-ribbon-wrap">
+      <div class="studios-ribbon-track" id="studios-ribbon-top"></div>
+    </div>
+    <div class="studios-inner">
+      <div class="studios-text-inner">
+        <h2 class="studios-title">
+          <span>One System,</span>
+          <span>Six Studios</span>
+        </h2>
+        <div class="studios-body">
+          <p>Coordinating a 4-year-old codebase across six global studios made misalignment a constant risk.</p>
+          <p>I led a centralized Unity motion library: reusable animation components any studio could implement independently.</p>
+          <p>Brand consistency at scale, without the bottleneck.</p>
+        </div>
+      </div>
+    </div>
+    <div class="studios-ribbon-wrap">
+      <div class="studios-ribbon-track" id="studios-ribbon-bot"></div>
+    </div>
+  </section>
+
   <footer id="contact">
     <div class="contact-left">
       <p class="contact-tagline">
@@ -638,6 +728,51 @@
   <script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
   <script src="https://player.vimeo.com/api/player.js"></script>
   <script>
+    // ── STUDIOS RIBBON ──
+    (function() {
+      var TILE_W    = 300;
+      var TILE_H    = 30;
+      var TILE_COUNT = 8;
+
+      function buildRibbon(trackId) {
+        var track = document.getElementById(trackId);
+        if (!track) return;
+        for (var i = 0; i < TILE_COUNT; i++) {
+          var c = document.createElement('canvas');
+          c.width  = TILE_W;
+          c.height = TILE_H;
+          c.style.cssText = 'flex-shrink:0;display:block;width:' + TILE_W + 'px;height:' + TILE_H + 'px;';
+          track.appendChild(c);
+          new rive.Rive({
+            src: 'line.riv',
+            canvas: c,
+            autoplay: true,
+            layout: new rive.Layout({ fit: rive.Fit.Fill, alignment: rive.Alignment.Center }),
+            onLoadError: function(e) { console.error('[line.riv]', e); },
+          });
+        }
+      }
+
+      buildRibbon('studios-ribbon-top');
+      buildRibbon('studios-ribbon-bot');
+    })();
+
+    // ── STUDIOS PARALLAX ──
+    (function() {
+      var sec   = document.getElementById('studios-section');
+      var inner = sec.querySelector('.studios-inner');
+      function update() {
+        var rect     = sec.getBoundingClientRect();
+        var vh       = window.innerHeight;
+        var progress = (vh - rect.top) / (vh + rect.height);
+        var clamped  = Math.max(0, Math.min(1, progress));
+        inner.style.transform = 'translateY(' + ((0.5 - clamped) * -120) + 'px)';
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    })();
+
     const emailBtn     = document.getElementById('email-btn');
     const emailWrap    = document.getElementById('email-wrap');
     const emailTooltip = document.getElementById('email-tooltip');
