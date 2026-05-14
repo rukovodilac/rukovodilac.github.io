@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Rive Inspector</title>
+<style>
+  body { font-family: monospace; background: #111; color: #eee; padding: 20px; font-size: 13px; }
+  h2 { color: #E0EC8A; }
+  .block { background: #222; margin: 8px 0; padding: 10px; border-left: 3px solid #155BFE; }
+  .kf { color: #0f0; margin-left: 20px; }
+  .name { color: #ff0; }
+  pre { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h2>Rive Animation Inspector</h2>
+<div id="out"></div>
+<canvas id="c" width="1" height="1" style="display:none"></canvas>
+<script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
+<script>
+const FILES = ['100.riv','300.riv','500.riv','800.riv'];
+const out = document.getElementById('out');
+
+function log(html) {
+  out.innerHTML += html + '<br>';
+}
+
+FILES.forEach(file => {
+  fetch(file)
+    .then(r => r.arrayBuffer())
+    .then(buf => {
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = 1;
+
+      const r = new rive.Rive({
+        buffer: buf,
+        canvas,
+        autoplay: false,
+        onLoad() {
+          log(`<h2>${file}</h2>`);
+
+          // Artboard size
+          try {
+            const ab = r.artboard;
+            if (ab) log(`<b>Artboard:</b> ${ab.width} × ${ab.height}`);
+          } catch(e) {}
+
+          // Animation names + details
+          const anims = r.animationNames || [];
+          log(`<b>Animations:</b> ${JSON.stringify(anims)}`);
+
+          // State machines
+          const sms = r.stateMachineNames || [];
+          log(`<b>State Machines:</b> ${JSON.stringify(sms)}`);
+
+          // Deep-dive each animation via the runtime
+          anims.forEach(name => {
+            try {
+              const inst = new rive.LinearAnimationInstance(
+                r.file.artboardByIndex(0).animationByName(name),
+                r.file.artboardByIndex(0)
+              );
+              log(`<div class="block"><span class="name">Animation: ${name}</span>`);
+              log(`  duration: ${inst.duration}s  fps: ${inst.fps}  loop: ${inst.loop}`);
+              log(`</div>`);
+            } catch(e) {
+              log(`  (could not read animation details: ${e.message})`);
+            }
+          });
+
+          // Try to inspect via internal file object
+          try {
+            const file = r.file;
+            const ab = file.artboardByIndex(0);
+            log(`<div class="block"><b>Artboard children count:</b> ${ab.componentCount || 'N/A'}</div>`);
+
+            for (let ai = 0; ai < (ab.animationCount || 0); ai++) {
+              const anim = ab.animationByIndex(ai);
+              log(`<div class="block">`);
+              log(`<span class="name">Anim[${ai}] name=${anim.name} dur=${anim.duration} fps=${anim.fps}</span>`);
+
+              // Try to read keyed objects
+              for (let ki = 0; ki < (anim.keyedObjectCount || 0); ki++) {
+                const ko = anim.keyedObjectByIndex(ki);
+                log(`  KeyedObject[${ki}] id=${ko.objectId}`);
+                for (let pi = 0; pi < (ko.keyedPropertyCount || 0); pi++) {
+                  const kp = ko.keyedPropertyByIndex(pi);
+                  log(`    Property key=${kp.propertyKey}`);
+                  for (let fi = 0; fi < (kp.keyframeCount || 0); fi++) {
+                    const kf = kp.keyframeByIndex(fi);
+                    log(`<span class="kf">      frame=${kf.frame} value=${kf.value} interp=${kf.interpolationType} cx1=${kf.cubicValue1} cy1=${kf.cubicValue2} cx2=${kf.cubicValue3} cy2=${kf.cubicValue4}</span>`);
+                  }
+                }
+              }
+              log(`</div>`);
+            }
+          } catch(e) {
+            log(`<i>Deep inspection error: ${e.message}</i>`);
+          }
+        },
+        onLoadError(e) { log(`ERROR loading ${file}: ${e}`); }
+      });
+    })
+    .catch(e => log(`FETCH ERROR ${file}: ${e}`));
+});
+</script>
+</body>
+</html>
