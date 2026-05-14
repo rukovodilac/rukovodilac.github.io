@@ -444,6 +444,27 @@
       .jiggle-rive { grid-column: 1; order: 2; }
     }
 
+    /* ── STORY2 SECTION ── */
+    #story2-section {
+      background: #0068FF;
+      padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .story2-rive {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #story2-canvas {
+      display: block;
+    }
+
     /* ── BLOCKIES SECTION ── */
     #blockies-section {
       background: #fff;
@@ -488,6 +509,8 @@
       display: flex;
       justify-content: center;
       padding-bottom: clamp(80px, 10vw, 140px);
+      margin-top: clamp(-50px, -6vw, -70px);
+      position: relative;
     }
 
     #story-meta-canvas {
@@ -653,6 +676,12 @@
     </div>
   </section>
 
+  <section id="story2-section">
+    <div class="story2-rive">
+      <canvas id="story2-canvas"></canvas>
+    </div>
+  </section>
+
   <section id="blockies-section">
     <div class="blockies-text-wrap">
       <h2 class="blockies-title">
@@ -766,6 +795,41 @@
       entries.forEach(e => e.isIntersecting ? storyUiAnim.play() : storyUiAnim.pause());
     }, { threshold: 0.05 }).observe(storyUiCanvas.parentElement);
 
+    const story2Canvas = document.getElementById('story2-canvas');
+    let story2Ratio = null;
+
+    function applyStory2Size() {
+      if (story2Ratio === null) return;
+      const w = story2Canvas.parentElement.clientWidth;
+      const h = Math.round(w * story2Ratio);
+      story2Canvas.width = w;
+      story2Canvas.height = h;
+      story2Canvas.style.width = w + 'px';
+      story2Canvas.style.height = h + 'px';
+      story2Anim.resizeDrawingSurfaceToCanvas();
+    }
+
+    const story2Anim = new rive.Rive({
+      src: 'blockies.riv',
+      canvas: story2Canvas,
+      autoplay: true,
+      layout: new rive.Layout({
+        fit: rive.Fit.Fill,
+        alignment: rive.Alignment.Center,
+      }),
+      onLoad: () => {
+        const b = story2Anim.bounds;
+        story2Ratio = (b.maxY - b.minY) / (b.maxX - b.minX);
+        applyStory2Size();
+      },
+      onLoadError: (e) => console.error('[story2] load error:', e),
+    });
+
+    window.addEventListener('resize', applyStory2Size);
+    new IntersectionObserver(entries => {
+      entries.forEach(e => e.isIntersecting ? story2Anim.play() : story2Anim.pause());
+    }, { threshold: 0.05 }).observe(story2Canvas.parentElement);
+
     (function() {
       const JIGGLE_SM = 'Jiggle_SM';
       const canvas = document.getElementById('jiggle-canvas');
@@ -841,7 +905,7 @@
       const ARTBOARD_W = 850;
       const ARTBOARD_H = 460;
       const RATIO      = ARTBOARD_H / ARTBOARD_W;
-      const MAX_W      = 640; // ~2 column width
+      const MAX_W      = 960; // ~3 column width
 
       const wrap   = document.querySelector('.blockies-meta-wrap');
       const canvas = document.getElementById('story-meta-canvas');
