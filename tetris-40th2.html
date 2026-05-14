@@ -670,12 +670,7 @@
     .stat-cell.bg-blue  { background: #155BFE; }
 
     .stat-number-wrap {
-      overflow: hidden;
       line-height: 1;
-      padding-top: 0.12em;
-      margin-top: -0.12em;
-      padding-bottom: 0.12em;
-      margin-bottom: -0.12em;
     }
 
     .stat-number {
@@ -683,8 +678,9 @@
       font-size: clamp(40px, 6vw, 96px);
       font-weight: 500;
       line-height: 1;
-      transform: translateY(110%);
-      transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .stat-cell.bg-black .stat-number { color: #E0EC8A; }
@@ -693,17 +689,13 @@
     .stat-cell.bg-blue  .stat-number { color: #E0EC8A; }
 
     .stat-cell.in-view .stat-number {
+      opacity: 1;
       transform: translateY(0);
     }
 
     .stat-label-wrap {
-      overflow: hidden;
       line-height: 1.1;
       margin-top: 0.1em;
-      padding-top: 0.12em;
-      margin-top: calc(0.1em - 0.12em);
-      padding-bottom: 0.15em;
-      margin-bottom: -0.15em;
     }
 
     .stat-label {
@@ -711,8 +703,9 @@
       font-size: clamp(40px, 6vw, 96px);
       font-weight: 500;
       line-height: 1.1;
-      transform: translateY(110%);
-      transition: transform 0.85s 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s 0.12s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s 0.12s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .stat-cell.bg-black .stat-label { color: rgba(255,255,255,0.45); }
@@ -721,6 +714,7 @@
     .stat-cell.bg-blue  .stat-label { color: rgba(255,255,255,0.45); }
 
     .stat-cell.in-view .stat-label {
+      opacity: 1;
       transform: translateY(0);
     }
 
