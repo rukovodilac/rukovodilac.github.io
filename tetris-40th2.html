@@ -493,19 +493,6 @@
       height: 100px;
     }
 
-    .studios-ribbon-track {
-      display: flex;
-      flex-wrap: nowrap;
-      width: max-content;
-      animation: studios-scroll 12s linear infinite;
-      will-change: transform;
-    }
-
-    @keyframes studios-scroll {
-      from { transform: translateX(-1000px); }
-      to   { transform: translateX(0); }
-    }
-
     .studios-inner {
       padding: clamp(64px, 9vw, 112px) clamp(20px, 3.5vw, 48px);
       display: flex;
@@ -778,7 +765,7 @@
 
   <section id="studios-section">
     <div class="studios-ribbon-wrap">
-      <div class="studios-ribbon-track" id="studios-ribbon-top"></div>
+      <canvas id="studios-ribbon-top"></canvas>
     </div>
     <div class="studios-inner">
       <div class="studios-text-inner">
@@ -794,7 +781,7 @@
       </div>
     </div>
     <div class="studios-ribbon-wrap">
-      <div class="studios-ribbon-track" id="studios-ribbon-bot"></div>
+      <canvas id="studios-ribbon-bot"></canvas>
     </div>
   </section>
 
@@ -863,7 +850,8 @@
           stateMachines: smNames || undefined,
           autoplay: true,
           autoBind: true,
-          layout: new rive.Layout({ fit: rive.Fit.Cover, alignment: rive.Alignment.Center }),
+          fit: rive.Fit.Cover,
+          alignment: rive.Alignment.Center,
           onLoad: () => {
             if (!smNames) {
               const detected = riveInst.stateMachineNames;
@@ -921,34 +909,58 @@
 
     // ── STUDIOS RIBBON ──
     (function() {
-      var TILE_W    = 1000;
-      var TILE_H    = 100;
-      var TILE_COUNT = 6;
+      var TILE_W = 1000;  // line.riv is 400×40; at 100px display height → 1000px wide (10:1 ratio)
+      var TILE_H = 100;
+      var SPEED  = 1.2;   // px per frame, left-to-right
 
-      function buildRibbon(trackId) {
-        var track = document.getElementById(trackId);
-        if (!track) return;
-        for (var i = 0; i < TILE_COUNT; i++) {
-          var c = document.createElement('canvas');
-          c.width  = TILE_W;
-          c.height = TILE_H;
-          c.style.cssText = 'flex-shrink:0;display:block;width:' + TILE_W + 'px;height:' + TILE_H + 'px;';
-          track.appendChild(c);
-          (function(canvas) {
-            var r = new rive.Rive({
-              src: 'line.riv',
-              canvas: canvas,
-              autoplay: true,
-              layout: new rive.Layout({ fit: rive.Fit.Fill, alignment: rive.Alignment.Center }),
-              onLoad: function() { r.resizeDrawingSurfaceToCanvas(); },
-              onLoadError: function(e) { console.error('[line.riv]', e); },
-            });
-          })(c);
+      var topCanvas = document.getElementById('studios-ribbon-top');
+      var botCanvas = document.getElementById('studios-ribbon-bot');
+
+      function sizeDisplay(c) {
+        c.width  = window.innerWidth;
+        c.height = TILE_H;
+        c.style.width  = c.width + 'px';
+        c.style.height = TILE_H + 'px';
+      }
+      sizeDisplay(topCanvas);
+      sizeDisplay(botCanvas);
+      window.addEventListener('resize', function() { sizeDisplay(topCanvas); sizeDisplay(botCanvas); });
+
+      // Single off-screen source canvas — one Rive instance, no phase mismatch between tiles
+      var src = document.createElement('canvas');
+      src.width  = TILE_W;
+      src.height = TILE_H;
+      src.style.cssText = 'position:absolute;left:-9999px;top:0;pointer-events:none;';
+      document.body.appendChild(src);
+
+      var offset = 0;
+
+      function drawRibbon(c) {
+        var ctx = c.getContext('2d');
+        var w   = c.width;
+        ctx.clearRect(0, 0, w, TILE_H);
+        var ox = offset % TILE_W;
+        for (var x = -ox; x < w; x += TILE_W) {
+          ctx.drawImage(src, 0, 0, TILE_W, TILE_H, Math.round(x), 0, TILE_W, TILE_H);
         }
       }
 
-      buildRibbon('studios-ribbon-top');
-      buildRibbon('studios-ribbon-bot');
+      var ribbonRive = new rive.Rive({
+        src: 'line.riv',
+        canvas: src,
+        autoplay: true,
+        layout: new rive.Layout({ fit: rive.Fit.Fill, alignment: rive.Alignment.Center }),
+        onLoad: function() {
+          ribbonRive.resizeDrawingSurfaceToCanvas();
+          (function tick() {
+            offset += SPEED;
+            drawRibbon(topCanvas);
+            drawRibbon(botCanvas);
+            requestAnimationFrame(tick);
+          })();
+        },
+        onLoadError: function(e) { console.error('[line.riv]', e); },
+      });
     })();
 
     const emailBtn     = document.getElementById('email-btn');
