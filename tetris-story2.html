@@ -443,6 +443,109 @@
       }
       .jiggle-rive { grid-column: 1; order: 2; }
       .blockies-meta-wrap { margin-top: clamp(24px, 4vw, 40px); }
+      #deg45-section { grid-template-columns: 1fr; }
+      .deg45-rive { grid-column: 1; order: 1; }
+      .deg45-text {
+        grid-column: 1;
+        order: 2;
+        padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
+      }
+    }
+
+    /* ── DEG45 SECTION ── */
+    #deg45-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: stretch;
+      background: #000;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .deg45-rive {
+      grid-column: 1;
+      position: relative;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+    }
+
+    #deg45-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+      cursor: pointer;
+    }
+
+    .deg45-interactive-tag {
+      position: absolute;
+      top: clamp(14px, 2vw, 24px);
+      left: clamp(14px, 2vw, 24px);
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .deg45-interactive-tag svg {
+      width: clamp(16px, 1.75vw, 26px);
+      height: clamp(16px, 1.75vw, 26px);
+    }
+
+    .deg45-text {
+      grid-column: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px) clamp(40px, 6vw, 80px) clamp(24px, 3vw, 48px);
+    }
+
+    .deg45-text-inner {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 2.5vw, 36px);
+      max-width: 480px;
+      width: 100%;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .deg45-text-inner.visible {
+      opacity: 1;
+    }
+
+    .deg45-title {
+      font-size: clamp(28px, 3.5vw, 56px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: #fff;
+    }
+
+    .deg45-title span {
+      display: block;
+      width: fit-content;
+      background: #E0EC8A;
+      padding: 2px 10px;
+      color: #000;
+    }
+
+    .deg45-body {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.75);
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    #deg45-vfx-canvas {
+      position: absolute;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.15s;
     }
 
     /* ── STORY2 SECTION ── */
@@ -675,6 +778,27 @@
     </div>
   </section>
 
+  <section id="deg45-section">
+    <div class="deg45-rive">
+      <canvas id="deg45-canvas"></canvas>
+      <div class="deg45-interactive-tag">
+        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      </div>
+    </div>
+    <div class="deg45-text">
+      <div class="deg45-text-inner">
+        <h2 class="deg45-title">
+          <span>The 45-Degree</span>
+        </h2>
+        <div class="deg45-body">
+          <p>We built our particle system using the exact DNA of the game: the square mino. By simply rotating the classic square 45 degrees, we transformed it into a diamond.</p>
+          <p>A flat square is a heavy, rigid brick, but a rotated square is a dynamic, lightweight sparkle.</p>
+        </div>
+      </div>
+    </div>
+    <canvas id="deg45-vfx-canvas"></canvas>
+  </section>
+
   <section id="blockies-section">
     <div class="blockies-text-wrap">
       <h2 class="blockies-title">
@@ -894,6 +1018,129 @@
       requestAnimationFrame(() => requestAnimationFrame(async () => {
         sizeCanvas();
         buffer = await fetch('jiggle.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+
+      window.addEventListener('resize', () => {
+        sizeCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
+      if (window.ResizeObserver) {
+        new ResizeObserver(() => {
+          sizeCanvas();
+          if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+        }).observe(canvas.parentElement);
+      }
+    })();
+
+    // ── DEG45 ──
+    (function() {
+      const SM = '45';
+      const VFX_SM = 'vfx';
+      const VFX_SIZE = 250;
+
+      const section   = document.getElementById('deg45-section');
+      const canvas    = document.getElementById('deg45-canvas');
+      const vfxCanvas = document.getElementById('deg45-vfx-canvas');
+      const textInner = document.querySelector('.deg45-text-inner');
+
+      let riveInst = null, buffer = null;
+      let vfxInst  = null, vfxBuffer = null, vfxTimeout = null;
+
+      function sizeCanvas() {
+        const p    = canvas.parentElement;
+        const cssW = p.offsetWidth || window.innerWidth / 2;
+        canvas.width  = cssW;
+        canvas.height = cssW;
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0),
+          canvas,
+          stateMachines: SM,
+          autoplay: true,
+          autoBind: true,
+          layout: new rive.Layout({ fit: rive.Fit.Cover, alignment: rive.Alignment.Center }),
+          onLoad: () => {
+            sizeCanvas();
+            riveInst.resizeDrawingSurfaceToCanvas();
+            riveInst.play(SM);
+            riveInst.on(rive.EventType.StateChange, function(e) {
+              const states = e.data || [];
+              if (states.some(s => typeof s === 'string' && s.toLowerCase() === 'idle')) {
+                textInner.classList.add('visible');
+              }
+            });
+          },
+          onLoadError: e => console.error('[45] load error:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        const ab = riveInst.artboard;
+        if (ab && ab[method]) ab[method](x, y);
+        else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      function triggerVfx(clientX, clientY) {
+        if (!vfxBuffer) return;
+        const sr = section.getBoundingClientRect();
+        const lx = clientX - sr.left - VFX_SIZE / 2;
+        const ly = clientY - sr.top  - VFX_SIZE / 2;
+        vfxCanvas.width  = VFX_SIZE;
+        vfxCanvas.height = VFX_SIZE;
+        vfxCanvas.style.width  = VFX_SIZE + 'px';
+        vfxCanvas.style.height = VFX_SIZE + 'px';
+        vfxCanvas.style.left   = lx + 'px';
+        vfxCanvas.style.top    = ly + 'px';
+        vfxCanvas.style.opacity = '1';
+        if (vfxInst) { try { vfxInst.cleanup(); } catch(e){} vfxInst = null; }
+        vfxInst = new rive.Rive({
+          buffer: vfxBuffer.slice(0),
+          canvas: vfxCanvas,
+          stateMachines: VFX_SM,
+          autoplay: true,
+          layout: new rive.Layout({ fit: rive.Fit.Contain, alignment: rive.Alignment.Center }),
+          onLoad: () => {
+            vfxInst.resizeDrawingSurfaceToCanvas();
+            vfxInst.play(VFX_SM);
+          },
+          onLoadError: e => console.error('[45-vfx] load error:', e),
+        });
+        clearTimeout(vfxTimeout);
+        vfxTimeout = setTimeout(() => {
+          vfxCanvas.style.opacity = '0';
+          setTimeout(() => { if (vfxInst) { try { vfxInst.cleanup(); } catch(e){} vfxInst = null; } }, 150);
+        }, 2000);
+      }
+
+      section.addEventListener('click', e => triggerVfx(e.clientX, e.clientY));
+      section.addEventListener('touchend', e => {
+        const t = e.changedTouches[0];
+        triggerVfx(t.clientX, t.clientY);
+      }, { passive: true });
+
+      new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!riveInst) return;
+          if (e.isIntersecting) riveInst.play(SM); else riveInst.pause();
+        });
+      }, { threshold: 0.05 }).observe(canvas.parentElement);
+
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        [buffer, vfxBuffer] = await Promise.all([
+          fetch('45.riv').then(r => r.arrayBuffer()),
+          fetch('45_vfx.riv').then(r => r.arrayBuffer()),
+        ]);
         start();
       }));
 
