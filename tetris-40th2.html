@@ -551,11 +551,11 @@
     #bwcn-section {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      height: 50vw;
     }
 
     .bwcn-rive {
       grid-column: 1;
-      aspect-ratio: 1 / 1;
       position: relative;
       overflow: hidden;
       background: #000;
@@ -586,7 +586,6 @@
 
     .bwcn-text {
       grid-column: 2;
-      aspect-ratio: 1 / 1;
       background: #fff;
       display: flex;
       align-items: center;
@@ -627,12 +626,11 @@
     }
 
     @media (max-width: 768px) {
-      #bwcn-section { grid-template-columns: 1fr; }
-      .bwcn-rive { grid-column: 1; order: 1; }
+      #bwcn-section { grid-template-columns: 1fr; height: auto; }
+      .bwcn-rive { grid-column: 1; order: 1; aspect-ratio: 1 / 1; }
       .bwcn-text {
         grid-column: 1;
         order: 2;
-        aspect-ratio: auto;
         padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
       }
       .bwcn-text-inner { text-align: center; }
