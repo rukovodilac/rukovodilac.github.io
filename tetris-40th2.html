@@ -289,6 +289,27 @@
       color: #000;
     }
 
+    /* ── PRIMEINTRO SECTION ── */
+    #primeintro-wrapper {
+      position: relative;
+      height: calc(100vh + 1400px);
+    }
+
+    #primeintro-section {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #primeintro-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
     /* ── GLITCH PIECES ── */
     .glitch-piece {
       position: fixed;
@@ -383,6 +404,12 @@
     </div>
   </div>
 
+  <div id="primeintro-wrapper">
+    <section id="primeintro-section">
+      <canvas id="primeintro-canvas"></canvas>
+    </section>
+  </div>
+
   <footer id="contact">
     <div class="contact-left">
       <p class="contact-tagline">
@@ -401,6 +428,7 @@
     </div>
   </footer>
 
+  <script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
   <script src="https://player.vimeo.com/api/player.js"></script>
   <script>
     const emailBtn     = document.getElementById('email-btn');
@@ -424,6 +452,76 @@
         }, 2000);
       });
     });
+
+    // ── PRIMEINTRO ──
+    (function() {
+      const wrapper = document.getElementById('primeintro-wrapper');
+      const canvas  = document.getElementById('primeintro-canvas');
+      let riveInst  = null;
+      let trigInput = null;
+
+      function sizeCanvas() {
+        canvas.width  = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+      }
+
+      riveInst = new rive.Rive({
+        src: 'primeintro.riv',
+        canvas,
+        autoplay: true,
+        autoBind: true,
+        layout: new rive.Layout({
+          fit: rive.Fit.Cover,
+          alignment: rive.Alignment.Center,
+        }),
+        onLoad: () => {
+          sizeCanvas();
+          riveInst.resizeDrawingSurfaceToCanvas();
+          const smNames = riveInst.stateMachineNames;
+          if (smNames && smNames.length > 0) {
+            riveInst.play(smNames[0]);
+            const inputs = riveInst.stateMachineInputs(smNames[0]);
+            if (inputs) trigInput = inputs.find(i => i.name === 'trigScroll');
+          }
+          console.log('[primeintro] SMs:', riveInst.stateMachineNames, 'trigInput:', trigInput);
+        },
+        onLoadError: e => console.error('[primeintro] load error:', e),
+      });
+
+      window.addEventListener('resize', () => {
+        sizeCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
+      if (window.ResizeObserver) {
+        new ResizeObserver(() => {
+          sizeCanvas();
+          if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+        }).observe(canvas);
+      }
+
+      // Fire trigScroll based on scroll progress through the sticky wrapper
+      const SCROLL_PER_TRIG = 150;
+      let prevScrollY = window.scrollY;
+      let scrollAccum = 0;
+
+      window.addEventListener('scroll', () => {
+        const newY = window.scrollY;
+        const dy   = newY - prevScrollY;
+        prevScrollY = newY;
+
+        if (!trigInput || dy <= 0) return;
+
+        const rect = wrapper.getBoundingClientRect();
+        const isActive = rect.top <= 0 && rect.bottom >= window.innerHeight;
+        if (!isActive) return;
+
+        scrollAccum += dy;
+        while (scrollAccum >= SCROLL_PER_TRIG) {
+          scrollAccum -= SCROLL_PER_TRIG;
+          trigInput.fire();
+        }
+      }, { passive: true });
+    })();
 
     // ── GLITCH PIECES ──
     (function() {
@@ -478,7 +576,7 @@
         el.style.height  = size + 'px';
         el.style.left    = x + 'vw';
         el.style.top     = y + 'vh';
-        el.style.opacity = (0.35 + Math.random() * 0.65).toFixed(2);
+        el.style.opacity = '1';
         el.style.transform = 'rotate(' + Math.round(Math.random() * 3) * 90 + 'deg)';
         document.body.appendChild(el);
 
