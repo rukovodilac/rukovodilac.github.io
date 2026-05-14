@@ -21,30 +21,6 @@
       background: #000;
     }
 
-    /* ── PAGE HEADER AREA (header + title + video + credits) ── */
-    #page-header-area {
-      position: relative;
-    }
-
-    #page-header-area::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200'%3E%3Crect fill='%23B26BED' x='147.5' y='142.5' width='5' height='10'/%3E%3Crect fill='%23B26BED' x='142.5' y='147.5' width='15' height='5'/%3E%3Crect fill='%23B26BED' x='447.5' y='142.5' width='5' height='15'/%3E%3Crect fill='%23B26BED' x='447.5' y='147.5' width='10' height='5'/%3E%3Crect fill='%23B26BED' x='747.5' y='147.5' width='5' height='10'/%3E%3Crect fill='%23B26BED' x='742.5' y='147.5' width='15' height='5'/%3E%3Crect fill='%23B26BED' x='1047.5' y='142.5' width='5' height='15'/%3E%3Crect fill='%23B26BED' x='1042.5' y='147.5' width='10' height='5'/%3E%3Crect fill='%23B26BED' x='147.5' y='442.5' width='5' height='15'/%3E%3Crect fill='%23B26BED' x='147.5' y='447.5' width='10' height='5'/%3E%3Crect fill='%23B26BED' x='447.5' y='447.5' width='5' height='10'/%3E%3Crect fill='%23B26BED' x='442.5' y='447.5' width='15' height='5'/%3E%3Crect fill='%23B26BED' x='747.5' y='442.5' width='5' height='15'/%3E%3Crect fill='%23B26BED' x='742.5' y='447.5' width='10' height='5'/%3E%3Crect fill='%23B26BED' x='1047.5' y='442.5' width='5' height='10'/%3E%3Crect fill='%23B26BED' x='1042.5' y='447.5' width='15' height='5'/%3E%3Crect fill='%23B26BED' x='147.5' y='747.5' width='5' height='10'/%3E%3Crect fill='%23B26BED' x='142.5' y='747.5' width='15' height='5'/%3E%3Crect fill='%23B26BED' x='447.5' y='742.5' width='5' height='15'/%3E%3Crect fill='%23B26BED' x='442.5' y='747.5' width='10' height='5'/%3E%3Crect fill='%23B26BED' x='747.5' y='742.5' width='5' height='10'/%3E%3Crect fill='%23B26BED' x='742.5' y='747.5' width='15' height='5'/%3E%3Crect fill='%23B26BED' x='1047.5' y='742.5' width='5' height='15'/%3E%3Crect fill='%23B26BED' x='1047.5' y='747.5' width='10' height='5'/%3E%3Crect fill='%23B26BED' x='147.5' y='1042.5' width='5' height='15'/%3E%3Crect fill='%23B26BED' x='142.5' y='1047.5' width='10' height='5'/%3E%3Crect fill='%23B26BED' x='447.5' y='1042.5' width='5' height='10'/%3E%3Crect fill='%23B26BED' x='442.5' y='1047.5' width='15' height='5'/%3E%3Crect fill='%23B26BED' x='747.5' y='1042.5' width='5' height='15'/%3E%3Crect fill='%23B26BED' x='747.5' y='1047.5' width='10' height='5'/%3E%3Crect fill='%23B26BED' x='1047.5' y='1047.5' width='5' height='10'/%3E%3Crect fill='%23B26BED' x='1042.5' y='1047.5' width='15' height='5'/%3E%3C/svg%3E");
-      background-attachment: fixed;
-      background-repeat: repeat;
-      background-size: 1200px 1200px;
-      background-position: 0 0;
-      opacity: 0.5;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    #page-header-area > * {
-      position: relative;
-      z-index: 1;
-    }
-
     /* ── HEADER ── */
     #header {
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
@@ -836,8 +812,6 @@
     </defs>
   </svg>
 
-  <div id="page-header-area">
-
   <header id="header">
     <a href="/" id="logo">a–z</a>
   </header>
@@ -883,8 +857,6 @@
       </div>
     </div>
   </div>
-
-  </div><!-- /#page-header-area -->
 
   <section id="primeintro-section">
     <canvas id="primeintro-canvas"></canvas>
