@@ -1610,6 +1610,7 @@
       const ROCKET_ART_W = 1200, ROCKET_ART_H = 300;
       const canvas = document.getElementById('rocket-canvas');
       let rocketAnim = null;
+      let rocketFirstPlay = true;
 
       function applyRocketSize() {
         const w = canvas.parentElement.clientWidth;
@@ -1642,10 +1643,25 @@
 
       new IntersectionObserver(entries => {
         entries.forEach(e => {
-          if (e.isIntersecting) rocketAnim.play();
-          else rocketAnim.pause();
+          if (e.isIntersecting) {
+            if (rocketFirstPlay) {
+              rocketFirstPlay = false;
+              rocketAnim.stop();
+            }
+            rocketAnim.play();
+          } else {
+            rocketAnim.pause();
+          }
         });
       }, { threshold: 0.35 }).observe(document.getElementById('derisking-section'));
+
+      // On bfcache restore (browser back/forward), reset so the loop starts from the beginning
+      window.addEventListener('pageshow', e => {
+        if (e.persisted) {
+          rocketFirstPlay = true;
+          rocketAnim.stop();
+        }
+      });
     })();
 
 const emailBtn     = document.getElementById('email-btn');
