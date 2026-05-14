@@ -1163,14 +1163,15 @@
     const story2Canvas = document.getElementById('story2-canvas');
     let story2Machines = [];
 
-    // Artboard is 1200×300. Give the canvas 60% extra vertical space so
-    // content that sits outside the artboard rect isn't clipped by the canvas edge.
-    const STORY2_ART_W = 1200, STORY2_ART_H = 300;
+    // Artboard is 1200×300; content extends ~150px above the artboard top.
+    // Canvas height = (artboard + overflow) × scale so nothing is clipped.
+    // BottomCenter alignment pins the artboard to the bottom, overflow shows above.
+    const STORY2_ART_W = 1200, STORY2_ART_H = 300, STORY2_OVERFLOW_TOP = 150;
     function applyStory2Size() {
       const w = story2Canvas.parentElement.clientWidth;
       if (!w) return;
       const scale = w / STORY2_ART_W;
-      const h = Math.round(STORY2_ART_H * scale * 1.2);
+      const h = Math.round((STORY2_ART_H + STORY2_OVERFLOW_TOP) * scale);
       story2Canvas.width = w;
       story2Canvas.height = h;
       story2Canvas.style.width = w + 'px';
@@ -1184,7 +1185,7 @@
       autoplay: false,
       layout: new rive.Layout({
         fit: rive.Fit.Contain,
-        alignment: rive.Alignment.Center,
+        alignment: rive.Alignment.BottomCenter,
       }),
       onLoad: () => {
         applyStory2Size();
