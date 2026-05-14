@@ -238,6 +238,17 @@
       .contact-right {
         width: 100%;
       }
+      #interp-section {
+        grid-template-columns: 1fr;
+      }
+      .interp-text {
+        grid-column: 1;
+        order: 1;
+        padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
+      }
+      .interp-rive { grid-column: 1; order: 2; }
+      .interp-text-inner { text-align: center; max-width: 100%; }
+      .interp-title span { margin: 0 auto; }
     }
 
     /* ── Global link underline animation ── */
@@ -383,6 +394,88 @@
       .tetris40-text-inner { max-width: 100%; }
     }
 
+    /* ── INTERP SECTION ── */
+    #interp-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 0;
+      align-items: stretch;
+    }
+
+    .interp-text {
+      grid-column: 1;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(40px, 6vw, 80px) clamp(24px, 3vw, 48px) clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
+    }
+
+    .interp-text-inner {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 2.5vw, 36px);
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .interp-title {
+      font-size: clamp(28px, 3.5vw, 56px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: #000;
+    }
+
+    .interp-title span {
+      display: block;
+      width: fit-content;
+      background: #155BFE;
+      color: #fff;
+      padding: 2px 10px;
+    }
+
+    .interp-body {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    .interp-rive {
+      grid-column: 2;
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      background: #000;
+    }
+
+    #interp-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    .interp-interactive-tag {
+      position: absolute;
+      top: clamp(14px, 2vw, 24px);
+      left: clamp(14px, 2vw, 24px);
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .interp-interactive-tag svg {
+      width: clamp(16px, 1.75vw, 26px);
+      height: clamp(16px, 1.75vw, 26px);
+    }
+
     /* ── GLITCH PIECES ── */
     .glitch-piece {
       position: fixed;
@@ -495,6 +588,28 @@
           <p>The brief was a full modernisation of the core mobile experience for the 40th anniversary.</p>
           <p>Built to last another decade of live-ops, iteration, and global scale.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="interp-section">
+    <div class="interp-text">
+      <div class="interp-text-inner">
+        <h2 class="interp-title">
+          <span>Interaction Over</span>
+          <span>Interpolation</span>
+        </h2>
+        <div class="interp-body">
+          <p>Stripping the visual language back to its core geometry forced an uncomfortable question: how much motion is too much?</p>
+          <p>Early explorations leaned toward heavier visual feedback, but A/B testing consistently showed that speed and clarity outperformed complex animation.</p>
+          <p>Sometimes less animation creates the best interaction.</p>
+        </div>
+      </div>
+    </div>
+    <div class="interp-rive">
+      <canvas id="interp-canvas"></canvas>
+      <div class="interp-interactive-tag">
+        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
       </div>
     </div>
   </section>
@@ -619,6 +734,77 @@
       });
       if (window.ResizeObserver) {
         new ResizeObserver(function() {
+          sizeCanvas();
+          if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+        }).observe(canvas.parentElement);
+      }
+    })();
+
+    // ── INTERP ──
+    (function() {
+      const canvas = document.getElementById('interp-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const cssW = p.offsetWidth  || window.innerWidth;
+        const cssH = p.offsetHeight || cssW;
+        canvas.width  = cssW;
+        canvas.height = cssH;
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0),
+          canvas,
+          autoplay: true,
+          autoBind: true,
+          fit: rive.Fit.Cover,
+          alignment: rive.Alignment.Center,
+          onLoad: () => {
+            sizeCanvas();
+            riveInst.resizeDrawingSurfaceToCanvas();
+            const machines = riveInst.stateMachineNames;
+            if (machines && machines.length) riveInst.play(machines[0]);
+            else riveInst.play();
+          },
+          onLoadError: e => console.error('[interp] load error:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        const ab = riveInst.artboard;
+        if (ab && ab[method]) ab[method](x, y);
+        else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!riveInst) return;
+          if (e.isIntersecting) riveInst.play();
+          else riveInst.pause();
+        });
+      }, { threshold: 0.05 }).observe(canvas.parentElement);
+
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('interactionoverinterpolation.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+
+      window.addEventListener('resize', () => {
+        sizeCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
+      if (window.ResizeObserver) {
+        new ResizeObserver(() => {
           sizeCanvas();
           if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
         }).observe(canvas.parentElement);
