@@ -319,28 +319,29 @@
     #tetris40-section {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      align-items: center;
-      background: #0D0D0D;
-      padding: clamp(60px, 8vw, 120px) clamp(20px, 3.5vw, 48px);
-      gap: clamp(40px, 6vw, 80px);
+      align-items: stretch;
     }
 
     .tetris40-rive {
+      background: #000;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: clamp(48px, 7vw, 100px) clamp(20px, 3.5vw, 48px);
     }
 
     #tetris40-canvas {
       display: block;
-      width: clamp(160px, 30vw, 420px);
+      width: clamp(160px, 28vw, 400px);
       aspect-ratio: 1 / 1;
     }
 
     .tetris40-text {
+      background: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: clamp(48px, 7vw, 100px) clamp(20px, 3.5vw, 48px);
     }
 
     .tetris40-text-inner {
@@ -355,7 +356,7 @@
       font-size: clamp(28px, 3.5vw, 56px);
       font-weight: 500;
       line-height: 1.2;
-      color: #fff;
+      color: #000;
     }
 
     .tetris40-title span {
@@ -370,18 +371,15 @@
       font-size: clamp(15px, 1.5vw, 20px);
       font-weight: 400;
       line-height: 1.6;
-      color: rgba(255,255,255,0.75);
+      color: rgba(0,0,0,0.65);
       display: flex;
       flex-direction: column;
       gap: 1em;
     }
 
     @media (max-width: 768px) {
-      #tetris40-section {
-        grid-template-columns: 1fr;
-        padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
-      }
-      #tetris40-canvas { width: clamp(160px, 60vw, 320px); }
+      #tetris40-section { grid-template-columns: 1fr; }
+      #tetris40-canvas { width: clamp(160px, 55vw, 300px); }
       .tetris40-text-inner { max-width: 100%; }
     }
 
@@ -585,16 +583,14 @@
     // ── TETRIS40 SCROLL SCRUB ──
     (function() {
       var canvas   = document.getElementById('tetris40-canvas');
+      var section  = document.getElementById('tetris40-section');
       var riveInst = null;
-      var artboard = null;
       var animInst = null;
       var animDuration = 0;
-      var pendingRender = false;
 
       function sizeCanvas() {
-        var p = canvas.parentElement;
-        canvas.width  = p.offsetWidth  || 1;
-        canvas.height = p.offsetHeight || 1;
+        canvas.width  = canvas.offsetWidth  || 1;
+        canvas.height = canvas.offsetHeight || 1;
       }
 
       sizeCanvas();
@@ -610,55 +606,38 @@
         onLoad: function() {
           sizeCanvas();
           riveInst.resizeDrawingSurfaceToCanvas();
-          console.log('[tetris40] anims:', riveInst.animationNames, 'SMs:', riveInst.stateMachineNames);
 
           try {
-            artboard = riveInst.artboard;
-            var animName = riveInst.animationNames[0];
-            var anim = artboard.animationByName(animName);
-            animInst = new rive.LinearAnimationInstance(anim, artboard);
-            animDuration = animInst.animation.duration;
-            renderAt(0);
+            var ab   = riveInst.artboard;
+            var anim = ab.animationByName('Shine');
+            animInst     = new rive.LinearAnimationInstance(anim, ab);
+            // duration is in frames; fps converts to seconds
+            animDuration = anim.duration / anim.fps;
+            animInst.time = 0;
+            animInst.apply(1);
+            ab.advance(0);
           } catch(e) {
-            console.warn('[tetris40] scrub setup failed, using autoplay:', e);
-            riveInst.play();
+            console.error('[tetris40] Shine setup failed:', e);
           }
 
-          // Mobile: autoplay when visible instead of scrubbing
-          if (window.matchMedia('(max-width: 768px)').matches) {
-            new IntersectionObserver(function(entries) {
-              entries.forEach(function(e) {
-                if (e.isIntersecting) riveInst.play();
-                else riveInst.pause();
-              });
-            }, { threshold: 0.1 }).observe(canvas.parentElement);
-          }
+          // Keep render loop running so scroll changes are visible immediately
+          riveInst.startRendering();
         },
         onLoadError: function(e) { console.error('[tetris40] load error:', e); },
       });
 
       function renderAt(progress) {
-        if (!animInst || !artboard || animDuration === 0) return;
+        if (!animInst || animDuration === 0) return;
+        var ab = riveInst.artboard;
+        if (!ab) return;
         animInst.time = Math.max(0, Math.min(1, progress)) * animDuration;
         animInst.apply(1);
-        artboard.advance(0);
-        if (!pendingRender) {
-          pendingRender = true;
-          riveInst.play();
-          requestAnimationFrame(function() {
-            riveInst.pause();
-            pendingRender = false;
-          });
-        }
+        ab.advance(0);
       }
 
-      // Parallax scroll — progress 0→1 as section passes through the viewport.
-      // No scroll lock: user scrolls freely, animation just reacts.
-      var section = document.getElementById('tetris40-section');
       function updateScroll() {
         var rect = section.getBoundingClientRect();
         var vh   = window.innerHeight;
-        // 0 when section bottom enters from below, 1 when section top exits above
         var progress = (vh - rect.top) / (vh + rect.height);
         renderAt(progress);
       }
