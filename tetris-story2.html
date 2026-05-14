@@ -848,19 +848,16 @@
       align-items: center;
       justify-content: center;
       pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-    #intro-overlay.visible {
+      overflow: hidden;
       opacity: 1;
+      transition: opacity 0.5s ease;
     }
     #intro-overlay.fade-out {
       opacity: 0;
     }
     #intro-canvas {
       display: block;
-      width: 100%;
-      height: 100%;
+      flex-shrink: 0;
     }
   </style>
 </head>
@@ -1703,62 +1700,52 @@ const emailBtn     = document.getElementById('email-btn');
       });
     });
 
-    // ── CHARACTER OVERLAY (triggers on "Less Hard Drop, More Soft Bop") ──
+    // ── CHARACTER OVERLAY (page load) ──
     (function () {
-      const overlay   = document.getElementById('intro-overlay');
-      const canvas    = document.getElementById('intro-canvas');
-      const trigger   = document.getElementById('jelly-section');
-      let introAnim   = null;
-      let played      = false;
-      let fallback    = null;
+      const overlay = document.getElementById('intro-overlay');
+      const canvas  = document.getElementById('intro-canvas');
+      const SCALE   = 1.4;
+      let introAnim = null;
+      let fallback  = null;
 
       function sizeCanvas() {
-        canvas.width  = window.innerWidth;
-        canvas.height = window.innerHeight;
-        canvas.style.width  = window.innerWidth  + 'px';
-        canvas.style.height = window.innerHeight + 'px';
+        const w = Math.round(window.innerWidth  * SCALE);
+        const h = Math.round(window.innerHeight * SCALE);
+        canvas.width  = w;
+        canvas.height = h;
+        canvas.style.width  = w + 'px';
+        canvas.style.height = h + 'px';
         if (introAnim) introAnim.resizeDrawingSurfaceToCanvas();
       }
 
       function dismiss() {
         clearTimeout(fallback);
-        overlay.classList.remove('visible');
         overlay.classList.add('fade-out');
+        overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
       }
 
-      function play() {
-        if (played) return;
-        played = true;
+      overlay.classList.add('visible');
 
-        sizeCanvas();
-        overlay.classList.remove('fade-out');
-        overlay.classList.add('visible');
+      introAnim = new rive.Rive({
+        src: 'story_character.riv',
+        canvas,
+        autoplay: true,
+        layout: new rive.Layout({
+          fit: rive.Fit.Contain,
+          alignment: rive.Alignment.Center,
+        }),
+        onLoad: () => {
+          sizeCanvas();
+          const machines = introAnim.stateMachineNames;
+          introAnim.play(machines.length ? machines : introAnim.animationNames);
+        },
+        onStop: () => dismiss(),
+        onLoadError: () => dismiss(),
+      });
 
-        introAnim = new rive.Rive({
-          src: 'story_character.riv',
-          canvas,
-          autoplay: true,
-          layout: new rive.Layout({
-            fit: rive.Fit.Contain,
-            alignment: rive.Alignment.Center,
-          }),
-          onLoad: () => {
-            sizeCanvas();
-            const machines = introAnim.stateMachineNames;
-            introAnim.play(machines.length ? machines : introAnim.animationNames);
-          },
-          onStop: () => dismiss(),
-          onLoadError: () => dismiss(),
-        });
-
-        fallback = setTimeout(dismiss, 6000);
-      }
-
+      sizeCanvas();
       window.addEventListener('resize', sizeCanvas);
-
-      new IntersectionObserver(entries => {
-        if (entries[0].isIntersecting) play();
-      }, { threshold: 0.3 }).observe(trigger);
+      fallback = setTimeout(dismiss, 6000);
     })();
   </script>
 
