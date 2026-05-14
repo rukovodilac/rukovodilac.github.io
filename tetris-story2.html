@@ -624,7 +624,7 @@
     .blockies-meta-wrap {
       display: flex;
       justify-content: center;
-      padding-bottom: 0;
+      padding-bottom: clamp(40px, 6vw, 80px);
       margin-top: clamp(-50px, -5vw, -70px);
       position: relative;
       will-change: transform;
@@ -1645,22 +1645,7 @@
       }, { threshold: 0.1 }).observe(document.getElementById('derisking-section'));
     })();
 
-    // ── SYNC BLOCKIES HEIGHT TO STORY-UI HEIGHT ──
-    (function() {
-      const storyUiSection  = document.getElementById('story-ui-section');
-      const blockiesSection = document.getElementById('blockies-section');
-      function sync() {
-        const h = storyUiSection.offsetHeight;
-        if (h) blockiesSection.style.minHeight = h + 'px';
-      }
-      if (window.ResizeObserver) {
-        new ResizeObserver(sync).observe(storyUiSection);
-      }
-      window.addEventListener('resize', sync);
-      requestAnimationFrame(() => requestAnimationFrame(sync));
-    })();
-
-    const emailBtn     = document.getElementById('email-btn');
+const emailBtn     = document.getElementById('email-btn');
     const emailWrap    = document.getElementById('email-wrap');
     const emailTooltip = document.getElementById('email-tooltip');
 
