@@ -891,7 +891,7 @@
 
       requestAnimationFrame(() => requestAnimationFrame(async () => {
         sizeCanvas();
-        buffer = await fetch('builtforwhatcomenext.riv').then(r => r.arrayBuffer());
+        buffer = await fetch('builtforwhatcomesnext.riv').then(r => r.arrayBuffer());
         start();
       }));
 
@@ -932,6 +932,7 @@
       src.height = TILE_H;
       src.style.cssText = 'position:absolute;left:-9999px;top:0;pointer-events:none;';
       document.body.appendChild(src);
+      src.getContext('webgl2', { preserveDrawingBuffer: true });
 
       var offset = 0;
 
