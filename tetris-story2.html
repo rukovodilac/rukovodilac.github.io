@@ -446,9 +446,10 @@
       .jiggle-rive { grid-column: 1; order: 2; }
       .blockies-meta-wrap { margin-top: clamp(24px, 4vw, 40px); }
       .deg45-inner { grid-template-columns: 1fr; }
-      .deg45-rive  { grid-column: 1; order: 1; }
+      .deg45-rive  { grid-column: 1; grid-row: 1; order: 1; }
       .deg45-text  {
         grid-column: 1;
+        grid-row: 2;
         order: 2;
         padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
       }
@@ -1250,11 +1251,15 @@
       var sec   = document.getElementById('deg45-section');
       var inner = sec.querySelector('.deg45-inner');
       function update() {
+        if (window.innerWidth <= 768) {
+          inner.style.transform = '';
+          return;
+        }
         var rect     = sec.getBoundingClientRect();
         var vh       = window.innerHeight;
         var progress = (vh - rect.top) / (vh + rect.height);
         progress = Math.max(0, Math.min(1, progress));
-        inner.style.transform = 'translateY(' + ((0.5 - progress) * 130) + 'px)';
+        inner.style.transform = 'translateY(' + ((0.5 - progress) * 300) + 'px)';
       }
       window.addEventListener('scroll', update, { passive: true });
       window.addEventListener('resize', update);
