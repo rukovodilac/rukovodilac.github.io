@@ -481,13 +481,7 @@
 
     /* ── STUDIOS SECTION ── */
     #studios-section {
-      position: relative;
-      z-index: 6;
       background: #0068FF;
-      margin-top: -48px;
-      margin-bottom: -48px;
-      box-shadow: 0 -32px 80px rgba(0,0,0,0.32), 0 32px 80px rgba(0,0,0,0.32);
-      overflow: hidden;
     }
 
     .studios-ribbon-wrap {
@@ -496,17 +490,19 @@
       font-size: 0;
       width: 100%;
       display: block;
+      height: 100px;
     }
 
     .studios-ribbon-track {
       display: flex;
       flex-wrap: nowrap;
-      animation: studios-scroll 10s linear infinite;
+      width: max-content;
+      animation: studios-scroll 12s linear infinite;
       will-change: transform;
     }
 
     @keyframes studios-scroll {
-      from { transform: translateX(-600px); }
+      from { transform: translateX(-1000px); }
       to   { transform: translateX(0); }
     }
 
@@ -515,7 +511,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      will-change: transform;
     }
 
     .studios-text-inner {
@@ -781,27 +776,6 @@
     </div>
   </section>
 
-  <section id="bwcn-section">
-    <div class="bwcn-rive">
-      <canvas id="bwcn-canvas"></canvas>
-      <div class="bwcn-interactive-tag">
-        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
-      </div>
-    </div>
-    <div class="bwcn-text">
-      <div class="bwcn-text-inner">
-        <h2 class="bwcn-title">
-          <span>Built for What</span>
-          <span>Comes Next</span>
-        </h2>
-        <div class="bwcn-body">
-          <p>The framework I designed had live-ops and continuous iteration built in from the start.</p>
-          <p>Future teams can build on the core brand-consistent motion language without breaking it.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <section id="studios-section">
     <div class="studios-ribbon-wrap">
       <div class="studios-ribbon-track" id="studios-ribbon-top"></div>
@@ -821,6 +795,27 @@
     </div>
     <div class="studios-ribbon-wrap">
       <div class="studios-ribbon-track" id="studios-ribbon-bot"></div>
+    </div>
+  </section>
+
+  <section id="bwcn-section">
+    <div class="bwcn-rive">
+      <canvas id="bwcn-canvas"></canvas>
+      <div class="bwcn-interactive-tag">
+        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      </div>
+    </div>
+    <div class="bwcn-text">
+      <div class="bwcn-text-inner">
+        <h2 class="bwcn-title">
+          <span>Built for What</span>
+          <span>Comes Next</span>
+        </h2>
+        <div class="bwcn-body">
+          <p>The framework I designed had live-ops and continuous iteration built in from the start.</p>
+          <p>Future teams can build on the core brand-consistent motion language without breaking it.</p>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -856,6 +851,8 @@
         const cssH = p.offsetHeight || cssW;
         canvas.width  = cssW;
         canvas.height = cssH;
+        canvas.style.width  = cssW + 'px';
+        canvas.style.height = cssH + 'px';
       }
 
       function start() {
@@ -866,8 +863,7 @@
           stateMachines: smNames || undefined,
           autoplay: true,
           autoBind: true,
-          fit: rive.Fit.Cover,
-          alignment: rive.Alignment.Center,
+          layout: new rive.Layout({ fit: rive.Fit.Cover, alignment: rive.Alignment.Center }),
           onLoad: () => {
             if (!smNames) {
               const detected = riveInst.stateMachineNames;
@@ -925,9 +921,9 @@
 
     // ── STUDIOS RIBBON ──
     (function() {
-      var TILE_W    = 600;
-      var TILE_H    = 60;
-      var TILE_COUNT = 8;
+      var TILE_W    = 1000;
+      var TILE_H    = 100;
+      var TILE_COUNT = 6;
 
       function buildRibbon(trackId) {
         var track = document.getElementById(trackId);
@@ -938,34 +934,21 @@
           c.height = TILE_H;
           c.style.cssText = 'flex-shrink:0;display:block;width:' + TILE_W + 'px;height:' + TILE_H + 'px;';
           track.appendChild(c);
-          new rive.Rive({
-            src: 'line.riv',
-            canvas: c,
-            autoplay: true,
-            layout: new rive.Layout({ fit: rive.Fit.Fill, alignment: rive.Alignment.Center }),
-            onLoadError: function(e) { console.error('[line.riv]', e); },
-          });
+          (function(canvas) {
+            var r = new rive.Rive({
+              src: 'line.riv',
+              canvas: canvas,
+              autoplay: true,
+              layout: new rive.Layout({ fit: rive.Fit.Fill, alignment: rive.Alignment.Center }),
+              onLoad: function() { r.resizeDrawingSurfaceToCanvas(); },
+              onLoadError: function(e) { console.error('[line.riv]', e); },
+            });
+          })(c);
         }
       }
 
       buildRibbon('studios-ribbon-top');
       buildRibbon('studios-ribbon-bot');
-    })();
-
-    // ── STUDIOS PARALLAX ──
-    (function() {
-      var sec   = document.getElementById('studios-section');
-      var inner = sec.querySelector('.studios-inner');
-      function update() {
-        var rect     = sec.getBoundingClientRect();
-        var vh       = window.innerHeight;
-        var progress = (vh - rect.top) / (vh + rect.height);
-        var clamped  = Math.max(0, Math.min(1, progress));
-        inner.style.transform = 'translateY(' + ((0.5 - clamped) * -120) + 'px)';
-      }
-      window.addEventListener('scroll', update, { passive: true });
-      window.addEventListener('resize', update);
-      update();
     })();
 
     const emailBtn     = document.getElementById('email-btn');
