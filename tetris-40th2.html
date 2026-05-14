@@ -461,45 +461,53 @@
       let trigInput = null;
 
       function sizeCanvas() {
-        canvas.width  = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        canvas.width        = w;
+        canvas.height       = h;
+        canvas.style.width  = w + 'px';
+        canvas.style.height = h + 'px';
       }
 
-      riveInst = new rive.Rive({
-        src: 'primeintro.riv',
-        canvas,
-        autoplay: true,
-        autoBind: true,
-        layout: new rive.Layout({
-          fit: rive.Fit.Cover,
-          alignment: rive.Alignment.Center,
-        }),
-        onLoad: () => {
-          sizeCanvas();
-          riveInst.resizeDrawingSurfaceToCanvas();
-          const smNames = riveInst.stateMachineNames;
-          if (smNames && smNames.length > 0) {
-            riveInst.play(smNames[0]);
-            const inputs = riveInst.stateMachineInputs(smNames[0]);
-            if (inputs) trigInput = inputs.find(i => i.name === 'trigScroll');
-          }
-          console.log('[primeintro] SMs:', riveInst.stateMachineNames, 'trigInput:', trigInput);
-        },
-        onLoadError: e => console.error('[primeintro] load error:', e),
-      });
+      function initRive() {
+        sizeCanvas();
+        riveInst = new rive.Rive({
+          src: 'primeintro.riv',
+          canvas,
+          autoplay: true,
+          autoBind: true,
+          layout: new rive.Layout({
+            fit: rive.Fit.Cover,
+            alignment: rive.Alignment.Center,
+          }),
+          onLoad: () => {
+            sizeCanvas();
+            riveInst.resizeDrawingSurfaceToCanvas();
+            const smNames = riveInst.stateMachineNames;
+            const animNames = riveInst.animationNames;
+            console.log('[primeintro] SMs:', smNames, 'anims:', animNames);
+            if (smNames && smNames.length > 0) {
+              riveInst.play(smNames[0]);
+              const inputs = riveInst.stateMachineInputs(smNames[0]);
+              console.log('[primeintro] inputs:', inputs && inputs.map(i => i.name));
+              if (inputs) trigInput = inputs.find(i => i.name === 'trigScroll');
+            } else if (animNames && animNames.length > 0) {
+              riveInst.play(animNames[0]);
+            }
+          },
+          onLoadError: e => console.error('[primeintro] load error:', e),
+        });
+      }
+
+      // Wait for layout to settle before creating the Rive instance
+      requestAnimationFrame(() => requestAnimationFrame(initRive));
 
       window.addEventListener('resize', () => {
         sizeCanvas();
         if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
       });
-      if (window.ResizeObserver) {
-        new ResizeObserver(() => {
-          sizeCanvas();
-          if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
-        }).observe(canvas);
-      }
 
-      // Fire trigScroll based on scroll progress through the sticky wrapper
+      // Scroll trigger
       const SCROLL_PER_TRIG = 150;
       let prevScrollY = window.scrollY;
       let scrollAccum = 0;
