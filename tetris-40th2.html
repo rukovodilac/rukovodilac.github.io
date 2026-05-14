@@ -309,8 +309,9 @@
 
     #primeintro-canvas {
       display: block;
-      width: clamp(300px, 65vmin, 900px);
-      height: clamp(300px, 65vmin, 900px);
+      /* Scale 1020×600 proportionally, 40px padding on all sides */
+      width: min(calc(100vw - 80px), calc((100vh - 80px) * 1020 / 600));
+      aspect-ratio: 1020 / 600;
     }
 
     /* ── GLITCH PIECES ── */
@@ -484,15 +485,11 @@
         onLoad: function() {
           sizeCanvas();
           riveInst.resizeDrawingSurfaceToCanvas();
-          // Try to fire SM triggers directly — more reliable than synthetic pointer events
-          var inputs = riveInst.stateMachineInputs(SM);
-          if (inputs) {
-            var triggers = inputs.filter(function(i) { return typeof i.fire === 'function'; });
-            if (triggers.length) {
-              fireFn = function() { triggers.forEach(function(t) { t.fire(); }); };
-            }
+          var vmInst = riveInst.viewModelInstance;
+          if (vmInst) {
+            var trig = vmInst.trigger('trigScroll');
+            if (trig) fireFn = function() { trig.trigger(); };
           }
-          if (!fireFn) fireFn = syntheticClick;
         },
         onLoadError: function(e) { console.error('[primeintro] load error:', e); },
       });
@@ -501,18 +498,6 @@
         sizeCanvas();
         if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
       });
-
-      // Dispatch a synthetic pointer click at the canvas centre.
-      // Rive's own event handler picks this up and fires trigScroll internally —
-      // no need to touch the ViewModel API at all.
-      function syntheticClick() {
-        var r  = canvas.getBoundingClientRect();
-        var cx = r.left + r.width  / 2;
-        var cy = r.top  + r.height / 2;
-        var opts = { bubbles: false, cancelable: true, clientX: cx, clientY: cy, pointerId: 99, isPrimary: true };
-        canvas.dispatchEvent(new PointerEvent('pointerdown', opts));
-        canvas.dispatchEvent(new PointerEvent('pointerup',   opts));
-      }
 
       // Scroll trigger – fires every SCROLL_PER_TRIG px while the sticky section is pinned
       var SCROLL_PER_TRIG = 150;
