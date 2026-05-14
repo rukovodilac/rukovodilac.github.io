@@ -672,6 +672,8 @@
     .stat-number-wrap {
       overflow: hidden;
       line-height: 1;
+      padding-bottom: 0.12em;
+      margin-bottom: -0.12em;
     }
 
     .stat-number {
@@ -696,6 +698,8 @@
       overflow: hidden;
       line-height: 1.1;
       margin-top: 0.1em;
+      padding-bottom: 0.15em;
+      margin-bottom: -0.15em;
     }
 
     .stat-label {
@@ -718,6 +722,7 @@
 
     @media (max-width: 768px) {
       #stats-section { grid-template-columns: 1fr; }
+      .stat-cell { text-align: center; }
     }
 
     /* ── COLOPHON SECTION ── */
