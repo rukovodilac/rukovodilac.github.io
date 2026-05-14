@@ -1610,7 +1610,6 @@
       const ROCKET_ART_W = 1200, ROCKET_ART_H = 300;
       const canvas = document.getElementById('rocket-canvas');
       let rocketAnim = null;
-      let rocketFirstPlay = true;
 
       function applyRocketSize() {
         const w = canvas.parentElement.clientWidth;
@@ -1623,18 +1622,22 @@
         if (rocketAnim) rocketAnim.resizeDrawingSurfaceToCanvas();
       }
 
-      rocketAnim = new rive.Rive({
-        src: 'rocket.riv',
-        canvas,
-        autoplay: false,
-        layout: new rive.Layout({
-          fit: rive.Fit.Fill,
-          alignment: rive.Alignment.Center,
-        }),
-        onLoad: () => { applyRocketSize(); },
-        onLoadError: e => console.error('[rocket] load error:', e),
-      });
+      function makeRocket() {
+        if (rocketAnim) { try { rocketAnim.cleanup(); } catch(e) {} }
+        rocketAnim = new rive.Rive({
+          src: 'rocket.riv',
+          canvas,
+          autoplay: false,
+          layout: new rive.Layout({
+            fit: rive.Fit.Fill,
+            alignment: rive.Alignment.Center,
+          }),
+          onLoad: () => { applyRocketSize(); },
+          onLoadError: e => console.error('[rocket] load error:', e),
+        });
+      }
 
+      makeRocket();
       applyRocketSize();
       window.addEventListener('resize', applyRocketSize);
       if (window.ResizeObserver) {
@@ -1643,24 +1646,15 @@
 
       new IntersectionObserver(entries => {
         entries.forEach(e => {
-          if (e.isIntersecting) {
-            if (rocketFirstPlay) {
-              rocketFirstPlay = false;
-              rocketAnim.stop();
-            }
-            rocketAnim.play();
-          } else {
-            rocketAnim.pause();
-          }
+          if (e.isIntersecting) rocketAnim.play();
+          else rocketAnim.pause();
         });
       }, { threshold: 0.35 }).observe(document.getElementById('derisking-section'));
 
-      // On bfcache restore (browser back/forward), reset so the loop starts from the beginning
+      // On bfcache restore (browser back/forward), recreate the instance so
+      // the animation starts from frame 0 again on next scroll-in
       window.addEventListener('pageshow', e => {
-        if (e.persisted) {
-          rocketFirstPlay = true;
-          rocketAnim.stop();
-        }
+        if (e.persisted) makeRocket();
       });
     })();
 
