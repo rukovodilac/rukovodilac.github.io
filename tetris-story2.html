@@ -443,13 +443,23 @@
       }
       .jiggle-rive { grid-column: 1; order: 2; }
       .blockies-meta-wrap { margin-top: clamp(24px, 4vw, 40px); }
-      #deg45-section { grid-template-columns: 1fr; }
-      .deg45-rive { grid-column: 1; order: 1; }
+      #deg45-section {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+      .deg45-rive {
+        grid-column: 1;
+        grid-row: 1;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+      }
       .deg45-text {
         grid-column: 1;
-        order: 2;
+        grid-row: 2;
         padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
+        align-items: flex-start;
       }
+      .deg45-text-inner { max-width: 100%; }
     }
 
     /* ── DEG45 SECTION ── */
@@ -1027,7 +1037,7 @@
     // ── DEG45 ──
     (function() {
       const SM       = '45';
-      const VFX_SIZE = 200;
+      const VFX_SIZE = 400;
 
       const section   = document.getElementById('deg45-section');
       const canvas    = document.getElementById('deg45-canvas');
@@ -1161,23 +1171,53 @@
         }());
       }
 
-      section.addEventListener('click', function(e) { spawnVfx(e.clientX, e.clientY); });
-      section.addEventListener('touchend', function(e) {
-        var t = e.changedTouches[0];
-        spawnVfx(t.clientX, t.clientY);
-      }, { passive: true });
+      var isDragging = false, lastSpawnX = 0, lastSpawnY = 0;
+      var SPAWN_DIST = 50;
+
+      section.addEventListener('pointerdown', function(e) {
+        isDragging = true;
+        spawnVfx(e.clientX, e.clientY);
+        lastSpawnX = e.clientX;
+        lastSpawnY = e.clientY;
+      });
+      section.addEventListener('pointermove', function(e) {
+        if (!isDragging || !e.buttons) return;
+        var dx = e.clientX - lastSpawnX;
+        var dy = e.clientY - lastSpawnY;
+        if (dx * dx + dy * dy >= SPAWN_DIST * SPAWN_DIST) {
+          spawnVfx(e.clientX, e.clientY);
+          lastSpawnX = e.clientX;
+          lastSpawnY = e.clientY;
+        }
+      });
+      section.addEventListener('pointerup',     function() { isDragging = false; });
+      section.addEventListener('pointercancel', function() { isDragging = false; });
+      section.addEventListener('pointerleave',  function() { isDragging = false; });
+
+      var bufferReady = false, shouldStart = false, started = false;
+
+      function tryStart() {
+        if (started || !bufferReady || !shouldStart) return;
+        started = true;
+        start();
+      }
 
       new IntersectionObserver(function(entries) {
         entries.forEach(function(e) {
-          if (!riveInst) return;
-          if (e.isIntersecting) riveInst.play(SM); else riveInst.pause();
+          if (e.isIntersecting) {
+            if (!started) { shouldStart = true; tryStart(); }
+            else if (riveInst) riveInst.play(SM);
+          } else {
+            if (riveInst) riveInst.pause();
+          }
         });
       }, { threshold: 0.05 }).observe(canvas.parentElement);
 
       requestAnimationFrame(function() { requestAnimationFrame(async function() {
         sizeCanvas();
         buffer = await fetch('45.riv').then(function(r) { return r.arrayBuffer(); });
-        start();
+        bufferReady = true;
+        tryStart();
       }); });
 
       window.addEventListener('resize', function() {
