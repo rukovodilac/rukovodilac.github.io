@@ -582,11 +582,11 @@
 
     // ── TETRIS40 SCROLL SCRUB ──
     (function() {
+      var DURATION = 2; // Shine animation is 2 s at 60 fps
       var canvas   = document.getElementById('tetris40-canvas');
       var section  = document.getElementById('tetris40-section');
       var riveInst = null;
-      var animInst = null;
-      var animDuration = 0;
+      var ready    = false;
 
       function sizeCanvas() {
         canvas.width  = canvas.offsetWidth  || 1;
@@ -606,41 +606,24 @@
         onLoad: function() {
           sizeCanvas();
           riveInst.resizeDrawingSurfaceToCanvas();
-
-          try {
-            var ab   = riveInst.artboard;
-            var anim = ab.animationByName('Shine');
-            animInst     = new rive.LinearAnimationInstance(anim, ab);
-            // duration is in frames; fps converts to seconds
-            animDuration = anim.duration / anim.fps;
-            animInst.time = 0;
-            animInst.apply(1);
-            ab.advance(0);
-          } catch(e) {
-            console.error('[tetris40] Shine setup failed:', e);
-          }
-
-          // Keep render loop running so scroll changes are visible immediately
-          riveInst.startRendering();
+          // Add Shine to the active animation list then pause — scrub() needs it active
+          riveInst.play('Shine');
+          riveInst.pause('Shine');
+          ready = true;
+          updateScroll(); // apply current scroll position immediately
         },
         onLoadError: function(e) { console.error('[tetris40] load error:', e); },
       });
 
-      function renderAt(progress) {
-        if (!animInst || animDuration === 0) return;
-        var ab = riveInst.artboard;
-        if (!ab) return;
-        animInst.time = Math.max(0, Math.min(1, progress)) * animDuration;
-        animInst.apply(1);
-        ab.advance(0);
+      function updateScroll() {
+        if (!ready) return;
+        var rect     = section.getBoundingClientRect();
+        var vh       = window.innerHeight;
+        var progress = (vh - rect.top) / (vh + rect.height);
+        progress = Math.max(0, Math.min(1, progress));
+        riveInst.scrub('Shine', progress * DURATION);
       }
 
-      function updateScroll() {
-        var rect = section.getBoundingClientRect();
-        var vh   = window.innerHeight;
-        var progress = (vh - rect.top) / (vh + rect.height);
-        renderAt(progress);
-      }
       window.addEventListener('scroll', updateScroll, { passive: true });
       updateScroll();
 
