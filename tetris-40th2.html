@@ -238,17 +238,6 @@
       .contact-right {
         width: 100%;
       }
-      #interp-section {
-        grid-template-columns: 1fr;
-      }
-      .interp-rive { grid-column: 1; order: 1; }
-      .interp-text {
-        grid-column: 1;
-        order: 2;
-        padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
-      }
-      .interp-text-inner { text-align: center; max-width: 100%; }
-      .interp-title span { margin: 0 auto; }
     }
 
     /* ── Global link underline animation ── */
@@ -476,6 +465,18 @@
     .interp-interactive-tag svg {
       width: clamp(16px, 1.75vw, 26px);
       height: clamp(16px, 1.75vw, 26px);
+    }
+
+    @media (max-width: 768px) {
+      #interp-section { grid-template-columns: 1fr; }
+      .interp-rive { grid-column: 1; order: 1; }
+      .interp-text {
+        grid-column: 1;
+        order: 2;
+        padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
+      }
+      .interp-text-inner { text-align: center; max-width: 100%; }
+      .interp-title span { margin: 0 auto; }
     }
 
     /* ── GLITCH PIECES ── */
