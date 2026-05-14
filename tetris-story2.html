@@ -768,7 +768,7 @@
 
     /* ── COLOPHON SECTION ── */
     #colophon-section {
-      background: #fff;
+      background: #F4E9D5;
       padding: clamp(60px, 8vw, 100px) clamp(20px, 3.5vw, 48px) clamp(80px, 10vw, 120px);
     }
 
@@ -1560,14 +1560,17 @@
     // ── TETRISCO ──
     (function() {
       const canvas = document.getElementById('tetrisco-canvas');
+      let tetriscoRatio = null;
 
       function applyTetriscoSize() {
+        if (tetriscoRatio === null) return;
         const w = canvas.parentElement.clientWidth;
         if (!w) return;
+        const h = Math.round(w * tetriscoRatio);
         canvas.width = w;
-        canvas.height = w;
+        canvas.height = h;
         canvas.style.width = w + 'px';
-        canvas.style.height = w + 'px';
+        canvas.style.height = h + 'px';
         tetriscoAnim.resizeDrawingSurfaceToCanvas();
       }
 
@@ -1576,10 +1579,14 @@
         canvas,
         autoplay: true,
         layout: new rive.Layout({
-          fit: rive.Fit.Cover,
+          fit: rive.Fit.Fill,
           alignment: rive.Alignment.Center,
         }),
-        onLoad: () => { applyTetriscoSize(); },
+        onLoad: () => {
+          const b = tetriscoAnim.bounds;
+          tetriscoRatio = (b.maxY - b.minY) / (b.maxX - b.minX);
+          applyTetriscoSize();
+        },
       });
 
       window.addEventListener('resize', applyTetriscoSize);
