@@ -642,7 +642,7 @@
     #derisking-section {
       position: relative;
       background: #F4E9D5;
-      padding: clamp(48px, 8vw, 80px) clamp(20px, 3.5vw, 48px);
+      padding: clamp(100px, 14vw, 200px) clamp(20px, 3.5vw, 48px);
       overflow: hidden;
     }
 
@@ -689,11 +689,12 @@
     }
 
     .derisking-rocket {
-      position: relative;
-      width: 100%;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: auto;
       z-index: 2;
       pointer-events: none;
-      margin-bottom: -40px;
     }
 
     #rocket-canvas {
@@ -751,20 +752,12 @@
     }
 
     @media (min-width: 769px) {
-      #derisking-section {
-        padding: clamp(100px, 14vw, 200px) clamp(20px, 3.5vw, 48px);
-      }
       .derisking-text {
         position: static;
       }
       .derisking-rocket {
-        position: absolute;
-        left: 0;
-        right: 0;
         top: 50%;
         transform: translateY(-50%);
-        width: auto;
-        margin-bottom: 0;
       }
       #success-section {
         flex-direction: row;
