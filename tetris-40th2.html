@@ -746,15 +746,13 @@
     }
 
     .colophon-logo {
-      width: clamp(100px, 12vw, 160px);
       height: auto;
       display: block;
       filter: brightness(0) invert(1);
     }
 
-    .colophon-logos img + img {
-      width: clamp(72px, 8.5vw, 118px);
-    }
+    .colophon-logos img:nth-child(1) { width: clamp(72px, 8.5vw, 118px); }
+    .colophon-logos img:nth-child(2) { width: clamp(100px, 12vw, 160px); }
 
     .colophon-copy {
       font-size: clamp(10px, 0.9vw, 13px);
