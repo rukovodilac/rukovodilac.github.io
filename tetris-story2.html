@@ -786,6 +786,12 @@
     </div>
   </section>
 
+  <section id="story2-section">
+    <div class="story2-rive">
+      <canvas id="story2-canvas"></canvas>
+    </div>
+  </section>
+
   <section id="deg45-section">
     <div class="deg45-rive">
       <canvas id="deg45-canvas"></canvas>
@@ -803,12 +809,6 @@
           <p>A flat square is a heavy, rigid brick, but a rotated square is a dynamic, lightweight sparkle.</p>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section id="story2-section">
-    <div class="story2-rive">
-      <canvas id="story2-canvas"></canvas>
     </div>
   </section>
 
@@ -1026,18 +1026,70 @@
 
     // ── DEG45 ──
     (function() {
-      const SM      = '45';
-      const VFX_SM  = 'vfx';
-      const VFX_SIZE = 250;
+      const SM       = '45';
+      const VFX_SIZE = 200;
 
       const section   = document.getElementById('deg45-section');
       const canvas    = document.getElementById('deg45-canvas');
       const textInner = document.querySelector('.deg45-text-inner');
 
-      let riveInst = null, buffer = null, vfxBuffer = null;
+      // ── VFX frames inlined (00-14, 60fps, 600x600 source) ──
+      // Shared diamond path, reused across frames
+      var DP = 'M-19.0919 -113.844C-8.54773 -124.388 8.54773 -124.388 19.0919 -113.844L113.844 -19.0919C124.388 -8.54773 124.388 8.54773 113.844 19.0919L19.0919 113.844C8.54773 124.388 -8.54773 124.388 -19.0919 113.844L-113.844 19.0919C-124.388 8.54773 -124.388 -8.54773 -113.844 -19.0919L-19.0919 -113.844Z';
+      function fs(mx, my, sw, rd) {
+        return '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">'
+          + (mx !== null ? '<path fill="white" transform="matrix(' + mx + ' 0 0 ' + my + ' 300 300)" d="' + DP + '"/>' : '')
+          + '<path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="' + sw + '" d="' + rd + '"/>'
+          + '</svg>';
+      }
+      var VFX_SVG = [
+        fs(0.09,      1.37,     8,    'M300 257.72C303.775 257.72 307.433 258.218 310.914 259.152M310.196 341.034C306.931 341.848 303.516 342.28 300 342.28C293.478 342.28 287.301 340.793 281.789 338.139M272.602 332.125C263.578 324.371 257.86 312.855 257.86 300C257.86 276.649 276.727 257.72 300 257.72C302.919 257.72 305.769 258.018 308.522 258.585'),
+        fs(0.0913806, 1.32051,  7.45, 'M300 208.466C303.749 208.466 307.445 208.693 311.075 209.134M388.77 278.793C390.379 285.599 391.231 292.7 391.231 300C391.231 302.613 391.122 305.201 390.908 307.759M389.351 318.574C381.7 355.818 351.5 384.796 313.702 390.508M284.663 390.246C281.009 389.625 277.429 388.787 273.937 387.744M208.968 306.083C208.836 304.072 208.769 302.044 208.769 300C208.769 292.113 209.764 284.459 211.633 277.157M214.998 266.69C228.275 232.608 261.328 208.466 300 208.466'),
+        fs(0.0957162, 1.16466,  6.91, 'M300 191.376C303.74 191.376 307.436 191.566 311.079 191.938M397.783 253.313C401.884 261.946 404.884 271.206 406.599 280.913M407.958 291.761C408.161 294.481 408.265 297.228 408.265 300C408.265 336.366 390.453 368.558 363.105 388.274M337.559 401.91C334.151 403.175 330.661 404.272 327.101 405.193M224.362 377.718C217.466 370.96 211.465 363.286 206.556 354.892M201.5 345.146C195.23 331.397 191.735 316.108 191.735 300C191.735 277.426 198.598 256.461 210.345 239.09M229.59 217.483C232.369 215.094 235.269 212.844 238.28 210.744'),
+        fs(0.103118,  0.912098, 6.36, 'M300 179.568C303.733 179.568 307.426 179.739 311.073 180.073M402.057 236.572C407.108 244.736 411.213 253.551 414.218 262.862M417.106 273.443C419.022 281.987 420.034 290.875 420.034 300C420.034 329.603 409.388 356.712 391.728 377.682M370.563 397.436C367.607 399.594 364.55 401.621 361.398 403.507M254.478 411.47C245.47 407.763 237.01 402.988 229.256 397.303M220.683 390.395C195.717 368.326 179.966 336.008 179.966 300C179.966 296.973 180.078 293.972 180.296 291.002M185.851 262.65C186.992 259.135 188.291 255.691 189.738 252.327M271.418 183.003C280.578 180.758 290.15 179.568 300 179.568'),
+        fs(0.113232,  0.617902, 5.82, 'M300 170.489C303.733 170.489 307.429 170.648 311.082 170.959M404.642 224.153C410.265 231.949 415.044 240.398 418.844 249.365M422.711 259.701C426.846 272.385 429.083 285.93 429.083 300C429.083 324.442 422.334 347.302 410.605 366.807M393.013 389.801C390.473 392.448 387.823 394.988 385.068 397.411M281.84 428.24C272.105 426.864 262.719 424.4 253.807 420.972M243.722 416.587C210.353 400.342 185.008 370.1 175.269 333.467M171.069 293.679C170.968 295.774 170.917 297.881 170.917 300M220.443 198.004C228.014 192.05 236.265 186.927 245.06 182.771M255.205 178.499C269.16 173.319 284.25 170.489 300 170.489C322.726 170.489 344.081 176.381 362.628 186.727'),
+        fs(0.125,     0.365339, 5.27, 'M300 163.15C303.733 163.15 307.431 163.301 311.089 163.596M406.382 214.345C412.405 221.866 417.653 230.04 422.003 238.743M426.513 248.758C432.887 264.585 436.397 281.881 436.397 300C436.397 320.306 431.989 339.58 424.08 356.909M409.342 381.823C407.147 384.771 404.836 387.627 402.417 390.385M300 436.85C291.781 436.85 283.731 436.12 275.912 434.723M265.13 432.337C228.55 422.66 197.984 398.121 180.237 365.545M169.163 338.8C168.134 335.3 167.24 331.742 166.488 328.132M187.842 222.101C193.356 214.125 199.693 206.765 206.73 200.146M215.042 192.932C238.349 174.291 267.878 163.15 300 163.15'),
+        fs(0.136768,  0.209494, 4.73, 'M300 157.045C303.733 157.045 307.433 157.189 311.094 157.472M407.642 206.336C413.952 213.63 419.538 221.572 424.288 230.048M429.288 239.839C437.755 258.126 442.482 278.509 442.482 300C442.482 316.892 439.562 333.099 434.201 348.142M421.744 374.309C419.838 377.446 417.815 380.504 415.681 383.476M300 442.955C298.291 442.955 296.59 442.925 294.896 442.865M283.905 442.053C245.704 437.744 212.075 418.281 189.128 389.796M173.321 365.501C171.651 362.257 170.102 358.942 168.679 355.559M167.581 247.127C171.176 238.07 175.668 229.469 180.946 221.434M187.331 212.482C209.741 183.482 243.027 163.368 281.05 158.298'),
+        fs(0.146882,  0.16,     4.18, 'M300 151.871C303.727 151.871 307.422 152.009 311.08 152.282M408.586 199.635C415.114 206.741 420.957 214.489 426.012 222.774M431.389 232.371C441.776 252.645 447.639 275.636 447.639 300C447.639 314.012 445.7 327.569 442.076 340.417M431.508 367.395C429.838 370.67 428.049 373.875 426.148 377.003M311.341 447.699C321.134 446.952 330.66 445.248 339.826 442.677M180.216 386.614C178.077 383.64 176.044 380.583 174.125 377.45M155.287 270.508C157.22 260.91 160.077 251.649 163.762 242.822M168.373 232.839C185.233 199.642 214.202 173.671 249.441 160.784M277.535 153.574C281.115 153.026 284.738 152.607 288.397 152.321'),
+        fs(0.154284,  0.16,     3.64, 'M300 147.431C303.727 147.431 307.423 147.566 311.083 147.831M409.333 193.963C416.035 200.917 422.083 208.509 427.379 216.639M433.04 226.053C445.161 247.958 452.063 273.17 452.063 300C452.063 311.589 450.776 322.876 448.336 333.725M439.323 361.229C437.848 364.601 436.256 367.91 434.55 371.15M325.109 450.498C334.783 448.886 344.149 446.357 353.114 443.003M188.045 403.248C185.569 400.546 183.188 397.754 180.909 394.878M148.187 291.179C148.744 281.362 150.227 271.793 152.549 262.559M155.611 252.012C167.426 216.207 192.101 186.281 224.145 167.74M250.494 155.699C253.946 154.507 257.454 153.437 261.013 152.492'),
+        fs(0.158619,  0.16,     3.09, 'M300 143.59C303.727 143.59 307.424 143.722 311.086 143.98M409.932 189.101C416.769 195.924 422.979 203.379 428.467 211.372M434.369 220.649C448.045 243.912 455.892 271.037 455.892 300C455.892 309.492 455.049 318.788 453.434 327.814M445.7 355.744C444.396 359.173 442.975 362.544 441.442 365.853M336.948 451.99C346.433 449.677 355.579 446.494 364.296 442.529M196.035 416.55C193.306 414.097 190.663 411.55 188.112 408.912M145.332 280.311C144.524 286.76 144.108 293.331 144.108 300C144.108 303.158 144.202 306.295 144.386 309.407M147.084 269.433C154.469 232.033 175.144 199.43 203.964 176.785M228.307 161.076C231.553 159.386 234.866 157.807 238.241 156.345'),
+        fs(0.16,      0.16,     2.55, 'M300 140.248C303.727 140.248 307.425 140.376 311.088 140.629M410.419 184.903C417.368 191.615 423.711 198.955 429.356 206.832M435.457 215.992C450.525 240.399 459.223 269.18 459.223 300C459.223 307.677 458.684 315.227 457.64 322.615M450.99 350.841C449.822 354.335 448.537 357.776 447.139 361.157M347.03 452.669C356.356 449.78 365.316 446.055 373.823 441.581M203.753 427.273C200.836 425.049 197.997 422.726 195.242 420.309M141.473 284.963C145.041 246.617 162.117 212.207 187.88 186.571M210.183 168.072C213.201 166 216.294 164.029 219.456 162.165'),
+        fs(0.16,      0.16,     2,    'M300 137.328C303.727 137.328 307.425 137.454 311.09 137.702M410.822 181.26C417.864 187.878 424.316 195.12 430.092 202.897M436.358 211.958C452.669 237.335 462.134 267.558 462.134 300C462.134 306.126 461.796 312.173 461.139 318.124M455.419 346.48C454.368 350.023 453.2 353.515 451.919 356.953M355.767 452.794C364.907 449.435 373.662 445.274 381.946 440.396M211.008 436C207.94 433.975 204.944 431.848 202.026 429.624M138.159 309.853C138.743 319.659 140.192 329.231 142.432 338.493M137.871 298.744C138.164 259.844 152.066 224.195 175.035 196.349M195.382 175.719C198.178 173.348 201.054 171.07 204.007 168.89'),
+        fs(0.16,      0.16,     1.5,  'M300 134.772C303.727 134.772 307.426 134.896 311.091 135.14M411.158 178.089C418.277 184.627 424.822 191.784 430.707 199.475M437.106 208.44C454.527 234.649 464.681 266.135 464.681 300C464.681 304.769 464.48 309.491 464.085 314.157M459.136 342.673C458.191 346.231 457.13 349.742 455.958 353.201M363.268 452.595C372.24 448.846 380.81 444.324 388.896 439.111M217.667 443.128C214.493 441.286 211.386 439.341 208.35 437.297M136.736 321.772C138.011 331.49 140.128 340.943 143.011 350.054M135.319 300C135.319 303.653 135.437 307.278 135.67 310.872M135.319 300C135.319 264.95 146.196 232.449 164.749 205.709M183.286 183.434C185.87 180.83 188.54 178.311 191.292 175.883'),
+        // 13 – diamond gone, ghost ring
+        '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><path fill="none" stroke="white" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" d="M300 132.533C303.727 132.533 307.426 132.655 311.093 132.897M411.44 175.324C418.625 181.792 425.247 188.877 431.225 196.495M437.733 205.375C456.142 232.296 466.913 264.886 466.913 300C466.913 303.58 466.801 307.134 466.58 310.658M462.292 339.297C461.437 342.865 460.468 346.389 459.389 349.865M394.883 437.796C386.966 443.294 378.553 448.123 369.724 452.201M359.616 456.47C341.102 463.575 321.004 467.467 300 467.467C282.79 467.467 266.188 464.854 250.568 460.001M223.736 449.004C220.47 447.318 217.267 445.527 214.13 443.635M144.139 360.05C140.714 351.108 138.032 341.798 136.168 332.193M134.426 321.312C133.542 314.333 133.087 307.22 133.087 300C133.087 268.735 141.627 239.47 156.493 214.427M173.376 190.885C175.765 188.098 178.243 185.39 180.807 182.766M278.263 133.94C285.378 133.011 292.633 132.533 300 132.533"/></svg>',
+        // 14 – ghost ring fading out
+        '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><path fill="none" stroke="white" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round" d="M300 130.572C303.727 130.572 307.426 130.693 311.094 130.932M411.679 172.912C418.919 179.322 425.607 186.344 431.662 193.899M438.264 202.705C457.547 230.238 468.867 263.793 468.867 300C468.867 302.539 468.811 305.065 468.701 307.577M464.98 336.311C464.199 339.899 463.305 343.444 462.301 346.942M400.033 436.515C392.279 442.244 384.019 447.325 375.333 451.676M365.348 456.275C345.248 464.746 323.169 469.428 300 469.428C284.934 469.428 270.329 467.448 256.429 463.734M229.213 453.868C225.87 452.318 222.587 450.661 219.367 448.902M145.545 368.594C141.673 359.831 138.521 350.676 136.162 341.205M133.85 330.434C132.065 320.56 131.133 310.389 131.133 300C131.133 272.038 137.884 245.659 149.84 222.413M165.25 197.87C167.459 194.941 169.76 192.086 172.15 189.309M266.109 133.985C275.451 132.076 285.072 130.94 294.905 130.648"/></svg>',
+      ];
+
+      // Prerender to offscreen canvases once — zero SVG work at click time
+      var vfxFrames = new Array(VFX_SVG.length).fill(null);
+      var vfxReady  = false;
+
+      requestAnimationFrame(function() {
+        var remaining = VFX_SVG.length;
+        VFX_SVG.forEach(function(svgStr, i) {
+          var off  = document.createElement('canvas');
+          off.width = off.height = VFX_SIZE;
+          var blob = new Blob([svgStr], { type: 'image/svg+xml' });
+          var url  = URL.createObjectURL(blob);
+          var img  = new Image();
+          img.onload = function() {
+            off.getContext('2d').drawImage(img, 0, 0, VFX_SIZE, VFX_SIZE);
+            URL.revokeObjectURL(url);
+            vfxFrames[i] = off;
+            if (!--remaining) vfxReady = true;
+          };
+          img.onerror = function() { URL.revokeObjectURL(url); if (!--remaining) vfxReady = true; };
+          img.src = url;
+        });
+      });
+
+      // ── Main 45.riv ──
+      var riveInst = null, buffer = null;
 
       function sizeCanvas() {
-        const cssW = canvas.parentElement.offsetWidth || window.innerWidth / 2;
+        var cssW = canvas.parentElement.offsetWidth || window.innerWidth / 2;
         canvas.width  = cssW;
         canvas.height = cssW;
       }
@@ -1046,99 +1098,94 @@
         if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
         riveInst = new rive.Rive({
           buffer: buffer.slice(0),
-          canvas,
+          canvas: canvas,
           stateMachines: SM,
-          autoplay: true,
+          autoplay: false,
           autoBind: true,
           layout: new rive.Layout({ fit: rive.Fit.Cover, alignment: rive.Alignment.Center }),
-          onLoad: () => {
+          onLoad: function() {
+            console.log('[45] SMs:', riveInst.stateMachineNames, 'anims:', riveInst.animationNames);
             sizeCanvas();
             riveInst.resizeDrawingSurfaceToCanvas();
-            riveInst.play(SM);
             riveInst.on(rive.EventType.StateChange, function(e) {
-              const states = e.data || [];
-              if (states.some(s => typeof s === 'string' && s.toLowerCase() === 'idle')) {
+              console.log('[45] StateChange:', e.data);
+              var states = e.data || [];
+              if (states.some(function(s) { return typeof s === 'string' && s.toLowerCase() === 'idle'; })) {
                 textInner.classList.add('visible');
               }
             });
+            riveInst.play(SM);
           },
-          onLoadError: e => console.error('[45] load error:', e),
+          onLoadError: function(e) { console.error('[45] load error:', e); },
         });
       }
 
       function fwd(e, method) {
         if (!riveInst) return;
-        const r = canvas.getBoundingClientRect();
-        const x = e.clientX - r.left, y = e.clientY - r.top;
-        const ab = riveInst.artboard;
+        var r = canvas.getBoundingClientRect();
+        var x = e.clientX - r.left, y = e.clientY - r.top;
+        var ab = riveInst.artboard;
         if (ab && ab[method]) ab[method](x, y);
         else if (riveInst[method]) riveInst[method](x, y);
       }
-      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
-      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
-      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+      canvas.addEventListener('pointermove', function(e) { fwd(e, 'pointerMove'); });
+      canvas.addEventListener('pointerdown', function(e) { fwd(e, 'pointerDown'); });
+      canvas.addEventListener('pointerup',   function(e) { fwd(e, 'pointerUp'); });
 
+      // ── VFX spawn ──
       function spawnVfx(clientX, clientY) {
-        if (!vfxBuffer) return;
-        const sr = section.getBoundingClientRect();
-        const lx = clientX - sr.left - VFX_SIZE / 2;
-        const ly = clientY - sr.top  - VFX_SIZE / 2;
+        if (!vfxReady) return;
+        var sr = section.getBoundingClientRect();
+        var lx = clientX - sr.left - VFX_SIZE / 2;
+        var ly = clientY - sr.top  - VFX_SIZE / 2;
 
-        const c = document.createElement('canvas');
-        c.width  = VFX_SIZE;
-        c.height = VFX_SIZE;
+        var c   = document.createElement('canvas');
+        c.width = c.height = VFX_SIZE;
         c.style.cssText = 'position:absolute;pointer-events:none;z-index:10;'
           + 'width:' + VFX_SIZE + 'px;height:' + VFX_SIZE + 'px;'
           + 'left:' + lx + 'px;top:' + ly + 'px;';
         section.appendChild(c);
 
-        const inst = new rive.Rive({
-          buffer: vfxBuffer.slice(0),
-          canvas: c,
-          stateMachines: VFX_SM,
-          autoplay: true,
-          layout: new rive.Layout({ fit: rive.Fit.Contain, alignment: rive.Alignment.Center }),
-          onLoad: () => {
-            inst.resizeDrawingSurfaceToCanvas();
-            inst.play(VFX_SM);
-          },
-          onLoadError: e => console.error('[45-vfx] load error:', e),
-        });
+        var ctx   = c.getContext('2d');
+        var frame = 0;
 
-        setTimeout(() => {
-          try { inst.cleanup(); } catch(e) {}
-          if (c.parentNode) c.parentNode.removeChild(c);
-        }, 2500);
+        (function tick() {
+          if (frame >= vfxFrames.length) {
+            if (c.parentNode) c.parentNode.removeChild(c);
+            return;
+          }
+          ctx.clearRect(0, 0, VFX_SIZE, VFX_SIZE);
+          if (vfxFrames[frame]) ctx.drawImage(vfxFrames[frame], 0, 0);
+          frame++;
+          requestAnimationFrame(tick);
+        }());
       }
 
-      section.addEventListener('click', e => spawnVfx(e.clientX, e.clientY));
-      section.addEventListener('touchend', e => {
-        const t = e.changedTouches[0];
+      section.addEventListener('click', function(e) { spawnVfx(e.clientX, e.clientY); });
+      section.addEventListener('touchend', function(e) {
+        var t = e.changedTouches[0];
         spawnVfx(t.clientX, t.clientY);
       }, { passive: true });
 
-      new IntersectionObserver(entries => {
-        entries.forEach(e => {
+      new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
           if (!riveInst) return;
           if (e.isIntersecting) riveInst.play(SM); else riveInst.pause();
         });
       }, { threshold: 0.05 }).observe(canvas.parentElement);
 
-      requestAnimationFrame(() => requestAnimationFrame(async () => {
+      requestAnimationFrame(function() { requestAnimationFrame(async function() {
         sizeCanvas();
-        [buffer, vfxBuffer] = await Promise.all([
-          fetch('45.riv').then(r => r.arrayBuffer()),
-          fetch('45_vfx.riv').then(r => r.arrayBuffer()),
-        ]);
+        buffer = await fetch('45.riv').then(function(r) { return r.arrayBuffer(); });
         start();
-      }));
+      }); });
 
-      window.addEventListener('resize', () => {
+      window.addEventListener('resize', function() {
         sizeCanvas();
         if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
       });
       if (window.ResizeObserver) {
-        new ResizeObserver(() => {
+        new ResizeObserver(function() {
           sizeCanvas();
           if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
         }).observe(canvas.parentElement);
