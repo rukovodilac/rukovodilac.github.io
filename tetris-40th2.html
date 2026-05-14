@@ -263,6 +263,32 @@
       }
     }
 
+    /* ── PROJECT TAG ── */
+    .project-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      font-size: clamp(13px, 1.2vw, 17px);
+      font-weight: 500;
+      line-height: 1;
+      margin-top: clamp(12px, 1.5vw, 20px);
+    }
+
+    .project-tag svg {
+      width: 1.7em;
+      height: 1.7em;
+      flex-shrink: 0;
+    }
+
+    .project-tag span {
+      height: 1.7em;
+      display: flex;
+      align-items: center;
+      padding: 0 9px;
+      background: #E0EC8A;
+      color: #000;
+    }
+
     /* ── GLITCH PIECES ── */
     .glitch-piece {
       position: fixed;
@@ -274,6 +300,42 @@
 </head>
 <body>
 <script>if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; window.scrollTo(0, 0);</script>
+
+  <svg aria-hidden="true" focusable="false" style="display:none;position:absolute;width:0;height:0">
+    <defs>
+      <symbol id="icon-interactive" viewBox="0 0 77 77" style="fill-rule:evenodd;clip-rule:evenodd;">
+        <g transform="matrix(1,0,0,1,-2149.604938,-1183.484688)">
+          <g transform="matrix(1,0,0,1,-149,91.368069)">
+            <circle cx="2337.105" cy="1130.617" r="38.5" fill="rgb(224,236,138)"/>
+          </g>
+          <g transform="matrix(0.157025,0,0,0.157025,1855.447913,1025.917434)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0,0.157025,-0.157025,0,2384.172192,889.327663)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(-0.157025,0,0,-0.157025,2520.761963,1418.051942)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0,-0.157025,0.157025,0,1992.037685,1554.641713)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0.111033,-0.111033,0.111033,0.111033,1814.240416,1318.568241)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(0.111033,0.111033,-0.111033,0.111033,2091.521385,848.120165)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(-0.111033,0.111033,-0.111033,-0.111033,2561.969461,1125.401134)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(-0.111033,-0.111033,0.111033,-0.111033,2284.688492,1595.849211)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
 
   <header id="header">
     <a href="/" id="logo">a–z</a>
@@ -289,6 +351,10 @@
     <div id="tagline">
       <span>Classic Tetris.</span>
       <span>Amplified.</span>
+    </div>
+    <div class="project-tag">
+      <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      <span>Some elements on this page are interactive.<br>Feel free to explore.</span>
     </div>
   </div>
 
@@ -382,21 +448,41 @@
         'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
       );
 
+      const videoWrap = document.getElementById('video-wrap');
+
+      function overlapsVideo(xVw, yVh, size) {
+        const r = videoWrap.getBoundingClientRect();
+        const vw = window.innerWidth, vh = window.innerHeight;
+        const px = xVw / 100 * vw;
+        const py = yVh / 100 * vh;
+        const pad = 16;
+        return px + size > r.left - pad && px < r.right + pad &&
+               py + size > r.top  - pad && py < r.bottom + pad;
+      }
+
       function spawnPiece() {
         const url  = urls[Math.floor(Math.random() * urls.length)];
         const size = Math.round(12 + Math.random() * 24);
-        const el   = document.createElement('img');
+        let x, y, tries = 0;
+        do {
+          x = Math.random() * 96;
+          y = Math.random() * 94;
+          tries++;
+        } while (overlapsVideo(x, y, size) && tries < 10);
+        if (tries >= 10) return;
+
+        const el = document.createElement('img');
         el.src = url;
         el.className = 'glitch-piece';
-        el.style.width  = size + 'px';
-        el.style.height = size + 'px';
-        el.style.left   = (Math.random() * 98) + 'vw';
-        el.style.top    = (Math.random() * 96) + 'vh';
+        el.style.width   = size + 'px';
+        el.style.height  = size + 'px';
+        el.style.left    = x + 'vw';
+        el.style.top     = y + 'vh';
         el.style.opacity = (0.35 + Math.random() * 0.65).toFixed(2);
         el.style.transform = 'rotate(' + Math.round(Math.random() * 3) * 90 + 'deg)';
         document.body.appendChild(el);
 
-        const life = 80 + Math.random() * 220;
+        const life = 300 + Math.random() * 700;
         setTimeout(() => el.remove(), life);
       }
 
