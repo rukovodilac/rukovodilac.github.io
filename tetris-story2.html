@@ -134,6 +134,8 @@
 
     /* ── FOOTER / CONTACT ── */
     #contact {
+      position: relative;
+      z-index: 2;
       background: #E0EC8A;
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
       display: flex;
@@ -443,33 +445,39 @@
       }
       .jiggle-rive { grid-column: 1; order: 2; }
       .blockies-meta-wrap { margin-top: clamp(24px, 4vw, 40px); }
-      #deg45-section {
-        grid-template-columns: 1fr;
-        align-items: start;
-      }
-      .deg45-rive {
+      .deg45-inner { grid-template-columns: 1fr; }
+      .deg45-rive  { grid-column: 1; order: 1; }
+      .deg45-text  {
         grid-column: 1;
-        grid-row: 1;
-        width: 100%;
-        aspect-ratio: 1 / 1;
-      }
-      .deg45-text {
-        grid-column: 1;
-        grid-row: 2;
+        order: 2;
         padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
-        align-items: flex-start;
       }
       .deg45-text-inner { max-width: 100%; }
     }
 
     /* ── DEG45 SECTION ── */
     #deg45-section {
+      position: relative;
+      z-index: 1;
+      background: #000;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    /* Side-edge vignette reinforces the "hole" depth */
+    #deg45-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 60px 0 80px rgba(0,0,0,0.45), inset -60px 0 80px rgba(0,0,0,0.45);
+      pointer-events: none;
+      z-index: 4;
+    }
+
+    .deg45-inner {
       display: grid;
       grid-template-columns: 1fr 1fr;
       align-items: stretch;
-      background: #000;
-      position: relative;
-      cursor: pointer;
     }
 
     .deg45-rive {
@@ -557,6 +565,9 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.95);
     }
 
     .story2-rive {
@@ -803,20 +814,22 @@
   </section>
 
   <section id="deg45-section">
-    <div class="deg45-rive">
-      <canvas id="deg45-canvas"></canvas>
-      <div class="deg45-interactive-tag">
-        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+    <div class="deg45-inner">
+      <div class="deg45-rive">
+        <canvas id="deg45-canvas"></canvas>
+        <div class="deg45-interactive-tag">
+          <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+        </div>
       </div>
-    </div>
-    <div class="deg45-text">
-      <div class="deg45-text-inner">
-        <h2 class="deg45-title">
-          <span>The 45-Degree</span>
-        </h2>
-        <div class="deg45-body">
-          <p>We built our particle system using the exact DNA of the game: the square mino. By simply rotating the classic square 45 degrees, we transformed it into a diamond.</p>
-          <p>A flat square is a heavy, rigid brick, but a rotated square is a dynamic, lightweight sparkle.</p>
+      <div class="deg45-text">
+        <div class="deg45-text-inner">
+          <h2 class="deg45-title">
+            <span>The 45-Degree</span>
+          </h2>
+          <div class="deg45-body">
+            <p>We built our particle system using the exact DNA of the game: the square mino. By simply rotating the classic square 45 degrees, we transformed it into a diamond.</p>
+            <p>A flat square is a heavy, rigid brick, but a rotated square is a dynamic, lightweight sparkle.</p>
+          </div>
         </div>
       </div>
     </div>
@@ -1211,7 +1224,7 @@
             if (riveInst) riveInst.pause();
           }
         });
-      }, { threshold: 0.05 }).observe(canvas.parentElement);
+      }, { threshold: 0.2 }).observe(canvas.parentElement);
 
       requestAnimationFrame(function() { requestAnimationFrame(async function() {
         sizeCanvas();
@@ -1230,6 +1243,22 @@
           if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
         }).observe(canvas.parentElement);
       }
+    })();
+
+    // ── DEG45 PARALLAX ──
+    (function() {
+      var sec   = document.getElementById('deg45-section');
+      var inner = sec.querySelector('.deg45-inner');
+      function update() {
+        var rect     = sec.getBoundingClientRect();
+        var vh       = window.innerHeight;
+        var progress = (vh - rect.top) / (vh + rect.height);
+        progress = Math.max(0, Math.min(1, progress));
+        inner.style.transform = 'translateY(' + ((0.5 - progress) * 130) + 'px)';
+      }
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
     })();
 
     // ── STORY META ──
