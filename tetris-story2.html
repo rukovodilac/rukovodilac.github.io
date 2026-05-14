@@ -455,14 +455,14 @@
 
     .story2-rive {
       width: 100%;
-      max-width: 900px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      aspect-ratio: 16 / 9;
+      position: relative;
     }
 
     #story2-canvas {
       display: block;
+      position: absolute;
+      inset: 0;
     }
 
     /* ── BLOCKIES SECTION ── */
@@ -509,7 +509,7 @@
       display: flex;
       justify-content: center;
       padding-bottom: clamp(80px, 10vw, 140px);
-      margin-top: clamp(-50px, -6vw, -70px);
+      margin-top: clamp(-100px, -14vw, -160px);
       position: relative;
     }
 
@@ -676,12 +676,6 @@
     </div>
   </section>
 
-  <section id="story2-section">
-    <div class="story2-rive">
-      <canvas id="story2-canvas"></canvas>
-    </div>
-  </section>
-
   <section id="blockies-section">
     <div class="blockies-text-wrap">
       <h2 class="blockies-title">
@@ -695,6 +689,12 @@
     </div>
     <div class="blockies-meta-wrap">
       <canvas id="story-meta-canvas"></canvas>
+    </div>
+  </section>
+
+  <section id="story2-section">
+    <div class="story2-rive">
+      <canvas id="story2-canvas"></canvas>
     </div>
   </section>
 
@@ -796,38 +796,45 @@
     }, { threshold: 0.05 }).observe(storyUiCanvas.parentElement);
 
     const story2Canvas = document.getElementById('story2-canvas');
-    let story2Ratio = null;
+    let story2Machines = [];
 
     function applyStory2Size() {
-      if (story2Ratio === null) return;
-      const w = story2Canvas.parentElement.clientWidth;
-      const h = Math.round(w * story2Ratio);
+      const parent = story2Canvas.parentElement;
+      const w = parent.clientWidth;
+      const h = parent.clientHeight;
+      if (!w || !h) return;
       story2Canvas.width = w;
       story2Canvas.height = h;
       story2Canvas.style.width = w + 'px';
       story2Canvas.style.height = h + 'px';
-      story2Anim.resizeDrawingSurfaceToCanvas();
+      if (story2Anim) story2Anim.resizeDrawingSurfaceToCanvas();
     }
 
     const story2Anim = new rive.Rive({
       src: 'blockies.riv',
       canvas: story2Canvas,
-      autoplay: true,
+      autoplay: false,
       layout: new rive.Layout({
-        fit: rive.Fit.Fill,
+        fit: rive.Fit.Contain,
         alignment: rive.Alignment.Center,
       }),
       onLoad: () => {
-        const b = story2Anim.bounds;
-        story2Ratio = (b.maxY - b.minY) / (b.maxX - b.minX);
         applyStory2Size();
+        story2Machines = story2Anim.stateMachineNames || [];
+        story2Anim.play(story2Machines.length ? story2Machines : story2Anim.animationNames);
       },
       onLoadError: (e) => console.error('[story2] load error:', e),
     });
 
     window.addEventListener('resize', applyStory2Size);
+    if (window.ResizeObserver) {
+      new ResizeObserver(applyStory2Size).observe(story2Canvas.parentElement);
+    }
     new IntersectionObserver(entries => {
-      entries.forEach(e => e.isIntersecting ? story2Anim.play() : story2Anim.pause());
+      entries.forEach(e => {
+        if (e.isIntersecting) story2Anim.play(story2Machines.length ? story2Machines : undefined);
+        else story2Anim.pause();
+      });
     }, { threshold: 0.05 }).observe(story2Canvas.parentElement);
 
     (function() {
