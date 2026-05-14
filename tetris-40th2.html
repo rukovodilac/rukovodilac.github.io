@@ -290,17 +290,9 @@
     }
 
     /* ── PRIMEINTRO SECTION ── */
-    #primeintro-wrapper {
-      position: relative;
-      height: calc(100vh + 1400px);
-    }
-
     #primeintro-section {
-      position: sticky;
-      top: 0;
       width: 100%;
       height: 100vh;
-      overflow: hidden;
       background: #155BFE;
       display: flex;
       align-items: center;
@@ -309,7 +301,6 @@
 
     #primeintro-canvas {
       display: block;
-      /* Scale 1020×600 proportionally, 40px padding on all sides */
       width: min(calc(100vw * 0.70), calc(100vh * 0.70 * 1020 / 600));
       aspect-ratio: 1020 / 600;
     }
@@ -408,11 +399,9 @@
     </div>
   </div>
 
-  <div id="primeintro-wrapper">
-    <section id="primeintro-section">
-      <canvas id="primeintro-canvas"></canvas>
-    </section>
-  </div>
+  <section id="primeintro-section">
+    <canvas id="primeintro-canvas"></canvas>
+  </section>
 
   <footer id="contact">
     <div class="contact-left">
@@ -459,11 +448,9 @@
 
     // ── PRIMEINTRO ──
     (function() {
-      var SM      = 'State Machine 1';
-      var wrapper = document.getElementById('primeintro-wrapper');
       var canvas  = document.getElementById('primeintro-canvas');
+      var section = document.getElementById('primeintro-section');
       var riveInst = null;
-      var fireFn   = null;  // unified fire() for both SM-input and ViewModel triggers
 
       function sizeCanvas() {
         canvas.width  = canvas.offsetWidth;
@@ -475,21 +462,14 @@
       riveInst = new rive.Rive({
         src: 'primeintro.riv',
         canvas: canvas,
-        stateMachines: SM,
-        autoplay: true,
-        autoBind: true,
+        autoplay: false,
         layout: new rive.Layout({
-          fit: rive.Fit.Cover,
+          fit: rive.Fit.Contain,
           alignment: rive.Alignment.Center,
         }),
         onLoad: function() {
           sizeCanvas();
           riveInst.resizeDrawingSurfaceToCanvas();
-          var vmInst = riveInst.viewModelInstance;
-          if (vmInst) {
-            var trig = vmInst.trigger('trigScroll');
-            if (trig) fireFn = function() { trig.trigger(); };
-          }
         },
         onLoadError: function(e) { console.error('[primeintro] load error:', e); },
       });
@@ -499,24 +479,9 @@
         if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
       });
 
-      // Scroll trigger – fires every SCROLL_PER_TRIG px while the sticky section is pinned
-      var SCROLL_PER_TRIG = 280;
-      var prevScrollY = window.scrollY;
-      var scrollAccum = 0;
-
-      window.addEventListener('scroll', function() {
-        var newY = window.scrollY;
-        var dy   = newY - prevScrollY;
-        prevScrollY = newY;
-        if (dy === 0) return;
-        var rect = wrapper.getBoundingClientRect();
-        if (rect.top > 0 || rect.bottom < window.innerHeight) return;
-        scrollAccum += Math.abs(dy);
-        while (scrollAccum >= SCROLL_PER_TRIG) {
-          scrollAccum -= SCROLL_PER_TRIG;
-          if (fireFn) fireFn();
-        }
-      }, { passive: true });
+      new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) riveInst.play();
+      }, { threshold: 0.3 }).observe(section);
     })();
 
     // ── GLITCH PIECES ──
