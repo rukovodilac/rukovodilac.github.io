@@ -486,10 +486,25 @@
 
     .studios-ribbon-wrap {
       overflow: hidden;
-      line-height: 0;
-      font-size: 0;
-      width: 100%;
+      height: 100px;
+    }
+
+    .ribbon-track {
+      display: flex;
+      height: 100px;
+      will-change: transform;
+      animation: ribbon-scroll 42s linear infinite;
+    }
+
+    @keyframes ribbon-scroll {
+      from { transform: translateX(-3000px); }
+      to   { transform: translateX(0); }
+    }
+
+    .ribbon-tile {
       display: block;
+      flex-shrink: 0;
+      width: 1000px;
       height: 100px;
     }
 
@@ -615,7 +630,7 @@
 
     @media (max-width: 768px) {
       #bwcn-section { grid-template-columns: 1fr; }
-      .bwcn-rive { grid-column: 1; order: 1; }
+      .bwcn-rive { grid-column: 1; order: 1; aspect-ratio: 1 / 1; }
       .bwcn-text {
         grid-column: 1;
         order: 2;
@@ -765,7 +780,7 @@
 
   <section id="studios-section">
     <div class="studios-ribbon-wrap">
-      <canvas id="studios-ribbon-top"></canvas>
+      <div class="ribbon-track ribbon-track-top"></div>
     </div>
     <div class="studios-inner">
       <div class="studios-text-inner">
@@ -781,17 +796,11 @@
       </div>
     </div>
     <div class="studios-ribbon-wrap">
-      <canvas id="studios-ribbon-bot"></canvas>
+      <div class="ribbon-track ribbon-track-bot"></div>
     </div>
   </section>
 
   <section id="bwcn-section">
-    <div class="bwcn-rive">
-      <canvas id="bwcn-canvas"></canvas>
-      <div class="bwcn-interactive-tag">
-        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
-      </div>
-    </div>
     <div class="bwcn-text">
       <div class="bwcn-text-inner">
         <h2 class="bwcn-title">
@@ -800,8 +809,14 @@
         </h2>
         <div class="bwcn-body">
           <p>The framework I designed had live-ops and continuous iteration built in from the start.</p>
-          <p>Future teams can build on the core brand-consistent motion language without breaking it.</p>
+          <p>Future teams can build on the core brand consistent motion language without breaking it.</p>
         </div>
+      </div>
+    </div>
+    <div class="bwcn-rive">
+      <canvas id="bwcn-canvas"></canvas>
+      <div class="bwcn-interactive-tag">
+        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
       </div>
     </div>
   </section>
@@ -838,8 +853,6 @@
         const cssH = p.offsetHeight || cssW;
         canvas.width  = cssW;
         canvas.height = cssH;
-        canvas.style.width  = cssW + 'px';
-        canvas.style.height = cssH + 'px';
       }
 
       function start() {
@@ -909,59 +922,36 @@
 
     // ── STUDIOS RIBBON ──
     (function() {
-      var TILE_W = 1000;  // line.riv is 400×40; at 100px display height → 1000px wide (10:1 ratio)
-      var TILE_H = 100;
-      var SPEED  = 1.2;   // px per frame, left-to-right
+      var TILE_W = 1000, TILE_H = 100, TILE_COUNT = 6;
+      var tracks = [
+        document.querySelector('.ribbon-track-top'),
+        document.querySelector('.ribbon-track-bot'),
+      ];
 
-      var topCanvas = document.getElementById('studios-ribbon-top');
-      var botCanvas = document.getElementById('studios-ribbon-bot');
-
-      function sizeDisplay(c) {
-        c.width  = window.innerWidth;
-        c.height = TILE_H;
-        c.style.width  = c.width + 'px';
-        c.style.height = TILE_H + 'px';
-      }
-      sizeDisplay(topCanvas);
-      sizeDisplay(botCanvas);
-      window.addEventListener('resize', function() { sizeDisplay(topCanvas); sizeDisplay(botCanvas); });
-
-      // Single off-screen source canvas — one Rive instance, no phase mismatch between tiles
-      var src = document.createElement('canvas');
-      src.width  = TILE_W;
-      src.height = TILE_H;
-      src.style.cssText = 'position:absolute;left:-9999px;top:0;pointer-events:none;';
-      document.body.appendChild(src);
-      src.getContext('webgl2', { preserveDrawingBuffer: true });
-
-      var offset = 0;
-
-      function drawRibbon(c) {
-        var ctx = c.getContext('2d');
-        var w   = c.width;
-        ctx.clearRect(0, 0, w, TILE_H);
-        var ox = offset % TILE_W;
-        for (var x = -ox; x < w; x += TILE_W) {
-          ctx.drawImage(src, 0, 0, TILE_W, TILE_H, Math.round(x), 0, TILE_W, TILE_H);
-        }
-      }
-
-      var ribbonRive = new rive.Rive({
-        src: 'line.riv',
-        canvas: src,
-        autoplay: true,
-        layout: new rive.Layout({ fit: rive.Fit.Fill, alignment: rive.Alignment.Center }),
-        onLoad: function() {
-          ribbonRive.resizeDrawingSurfaceToCanvas();
-          (function tick() {
-            offset += SPEED;
-            drawRibbon(topCanvas);
-            drawRibbon(botCanvas);
-            requestAnimationFrame(tick);
-          })();
-        },
-        onLoadError: function(e) { console.error('[line.riv]', e); },
-      });
+      fetch('line.riv')
+        .then(function(r) { return r.arrayBuffer(); })
+        .then(function(buf) {
+          tracks.forEach(function(track) {
+            for (var i = 0; i < TILE_COUNT; i++) {
+              var canvas = document.createElement('canvas');
+              canvas.className = 'ribbon-tile';
+              canvas.width  = TILE_W;
+              canvas.height = TILE_H;
+              track.appendChild(canvas);
+              (function(c) {
+                var r = new rive.Rive({
+                  buffer: buf.slice(0),
+                  canvas: c,
+                  autoplay: true,
+                  layout: new rive.Layout({ fit: rive.Fit.Fill, alignment: rive.Alignment.Center }),
+                  onLoad: function() { r.resizeDrawingSurfaceToCanvas(); },
+                  onLoadError: function(e) { console.error('[ribbon]', e); },
+                });
+              })(canvas);
+            }
+          });
+        })
+        .catch(function(e) { console.error('[ribbon fetch]', e); });
     })();
 
     const emailBtn     = document.getElementById('email-btn');
