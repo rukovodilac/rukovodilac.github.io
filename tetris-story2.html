@@ -638,6 +638,58 @@
       flex-shrink: 0;
     }
 
+    /* ── DERISKING SECTION ── */
+    #derisking-section {
+      position: relative;
+      background: #F4E9D5;
+      padding: clamp(100px, 14vw, 200px) clamp(20px, 3.5vw, 48px);
+      overflow: hidden;
+    }
+
+    .derisking-text {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(24px, 3vw, 40px);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .derisking-title {
+      font-size: clamp(28px, 3.5vw, 56px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: #000;
+    }
+
+    .derisking-body {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    .derisking-rocket {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    #rocket-canvas {
+      display: block;
+      width: 100%;
+    }
+
     /* ── Global link underline animation ── */
     a {
       position: relative;
@@ -836,6 +888,20 @@
             <p>A flat square is a heavy, rigid brick, but a rotated square is a dynamic, lightweight sparkle.</p>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="derisking-section">
+    <div class="derisking-rocket">
+      <canvas id="rocket-canvas"></canvas>
+    </div>
+    <div class="derisking-text">
+      <h2 class="derisking-title">De-risking the Production</h2>
+      <div class="derisking-body">
+        <p>My approach focused on validating ideas early, reducing technical uncertainty, and keeping production moving in parallel.</p>
+        <p><strong>Proxy-first workflow:</strong> I built a proxy pipeline to validate animation timing before final assets existed, cutting delivery time by 40%.</p>
+        <p><strong>Prototype before it costs you:</strong> By prototyping in After Effects before engine implementation, we aligned stakeholders early and reduced technical rework by 80%.</p>
       </div>
     </div>
   </section>
@@ -1340,6 +1406,49 @@
       window.addEventListener('scroll', updateParallax, { passive: true });
       window.addEventListener('resize', updateParallax);
       updateParallax();
+    })();
+
+    // ── ROCKET ──
+    (function() {
+      const ROCKET_ART_W = 1200, ROCKET_ART_H = 300;
+      const canvas = document.getElementById('rocket-canvas');
+      let rocketAnim = null;
+
+      function applyRocketSize() {
+        const w = canvas.parentElement.clientWidth;
+        if (!w) return;
+        const h = Math.round(ROCKET_ART_H * w / ROCKET_ART_W);
+        canvas.width = w;
+        canvas.height = h;
+        canvas.style.width = w + 'px';
+        canvas.style.height = h + 'px';
+        if (rocketAnim) rocketAnim.resizeDrawingSurfaceToCanvas();
+      }
+
+      rocketAnim = new rive.Rive({
+        src: 'rocket.riv',
+        canvas,
+        autoplay: false,
+        layout: new rive.Layout({
+          fit: rive.Fit.Fill,
+          alignment: rive.Alignment.Center,
+        }),
+        onLoad: () => { applyRocketSize(); },
+        onLoadError: e => console.error('[rocket] load error:', e),
+      });
+
+      applyRocketSize();
+      window.addEventListener('resize', applyRocketSize);
+      if (window.ResizeObserver) {
+        new ResizeObserver(applyRocketSize).observe(canvas.parentElement);
+      }
+
+      new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) rocketAnim.play();
+          else rocketAnim.pause();
+        });
+      }, { threshold: 0.1 }).observe(document.getElementById('derisking-section'));
     })();
 
     const emailBtn     = document.getElementById('email-btn');
