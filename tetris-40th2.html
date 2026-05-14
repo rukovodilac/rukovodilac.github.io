@@ -652,24 +652,37 @@
 
     /* ── STATS SECTION ── */
     #stats-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2px;
-      background: #000;
+      overflow: hidden;
+    }
+
+    .stats-track {
+      display: flex;
+      animation: stats-marquee 32s linear infinite;
+    }
+
+    .stats-track:hover {
+      animation-play-state: paused;
+    }
+
+    @keyframes stats-marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
     }
 
     .stat-cell {
-      padding: clamp(40px, 6vw, 88px) clamp(24px, 4vw, 64px);
+      flex: 0 0 clamp(260px, 36vw, 500px);
+      min-height: clamp(220px, 32vw, 460px);
+      padding: clamp(32px, 4vw, 64px) clamp(24px, 3vw, 48px);
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       gap: 0;
     }
 
-    .stat-cell:nth-child(1) { background: #155BFE; }
-    .stat-cell:nth-child(2) { background: #E0EC8A; }
-    .stat-cell:nth-child(3) { background: #000; }
-    .stat-cell:nth-child(4) { background: #fff; }
+    .stat-cell.bg-black { background: #000; }
+    .stat-cell.bg-lime  { background: #E0EC8A; }
+    .stat-cell.bg-white { background: #fff; }
+    .stat-cell.bg-blue  { background: #155BFE; }
 
     .stat-number-wrap {
       overflow: hidden;
@@ -678,21 +691,15 @@
 
     .stat-number {
       display: block;
-      font-size: clamp(40px, 6vw, 96px);
+      font-size: clamp(36px, 5.5vw, 88px);
       font-weight: 500;
       line-height: 1;
-      transform: translateY(110%);
-      transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .stat-cell:nth-child(1) .stat-number { color: #E0EC8A; }
-    .stat-cell:nth-child(2) .stat-number { color: #000; }
-    .stat-cell:nth-child(3) .stat-number { color: #E0EC8A; }
-    .stat-cell:nth-child(4) .stat-number { color: #000; }
-
-    .stat-cell.in-view .stat-number {
-      transform: translateY(0);
-    }
+    .stat-cell.bg-black .stat-number { color: #E0EC8A; }
+    .stat-cell.bg-lime  .stat-number { color: #000; }
+    .stat-cell.bg-white .stat-number { color: #000; }
+    .stat-cell.bg-blue  .stat-number { color: #E0EC8A; }
 
     .stat-label-wrap {
       overflow: hidden;
@@ -702,25 +709,15 @@
 
     .stat-label {
       display: block;
-      font-size: clamp(40px, 6vw, 96px);
+      font-size: clamp(36px, 5.5vw, 88px);
       font-weight: 500;
       line-height: 1.1;
-      transform: translateY(110%);
-      transition: transform 0.85s 0.1s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .stat-cell:nth-child(1) .stat-label { color: rgba(255,255,255,0.45); }
-    .stat-cell:nth-child(2) .stat-label { color: rgba(0,0,0,0.45); }
-    .stat-cell:nth-child(3) .stat-label { color: rgba(255,255,255,0.45); }
-    .stat-cell:nth-child(4) .stat-label { color: rgba(0,0,0,0.45); }
-
-    .stat-cell.in-view .stat-label {
-      transform: translateY(0);
-    }
-
-    @media (max-width: 768px) {
-      #stats-section { grid-template-columns: 1fr 1fr; gap: 2px; }
-    }
+    .stat-cell.bg-black .stat-label { color: rgba(255,255,255,0.45); }
+    .stat-cell.bg-lime  .stat-label { color: #fff; }
+    .stat-cell.bg-white .stat-label { color: rgba(0,0,0,0.45); }
+    .stat-cell.bg-blue  .stat-label { color: rgba(255,255,255,0.45); }
 
     /* ── COLOPHON SECTION ── */
     #colophon-section {
@@ -950,21 +947,40 @@
   </section>
 
   <section id="stats-section">
-    <div class="stat-cell">
-      <div class="stat-number-wrap"><span class="stat-number">~690K daily</span></div>
-      <div class="stat-label-wrap"><span class="stat-label">active users</span></div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-number-wrap"><span class="stat-number">~24%</span></div>
-      <div class="stat-label-wrap"><span class="stat-label">D1 retention</span></div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-number-wrap"><span class="stat-number">6 studios</span></div>
-      <div class="stat-label-wrap"><span class="stat-label">worldwide</span></div>
-    </div>
-    <div class="stat-cell">
-      <div class="stat-number-wrap"><span class="stat-number">40 years</span></div>
-      <div class="stat-label-wrap"><span class="stat-label">of legacy</span></div>
+    <div class="stats-track">
+      <div class="stat-cell bg-black">
+        <div class="stat-number-wrap"><span class="stat-number">~690K daily</span></div>
+        <div class="stat-label-wrap"><span class="stat-label">active users</span></div>
+      </div>
+      <div class="stat-cell bg-lime">
+        <div class="stat-number-wrap"><span class="stat-number">~24% D1</span></div>
+        <div class="stat-label-wrap"><span class="stat-label">retention</span></div>
+      </div>
+      <div class="stat-cell bg-white">
+        <div class="stat-number-wrap"><span class="stat-number">6 studios</span></div>
+        <div class="stat-label-wrap"><span class="stat-label">worldwide</span></div>
+      </div>
+      <div class="stat-cell bg-blue">
+        <div class="stat-number-wrap"><span class="stat-number">40 years</span></div>
+        <div class="stat-label-wrap"><span class="stat-label">of legacy</span></div>
+      </div>
+      <!-- duplicate set for seamless loop -->
+      <div class="stat-cell bg-black" aria-hidden="true">
+        <div class="stat-number-wrap"><span class="stat-number">~690K daily</span></div>
+        <div class="stat-label-wrap"><span class="stat-label">active users</span></div>
+      </div>
+      <div class="stat-cell bg-lime" aria-hidden="true">
+        <div class="stat-number-wrap"><span class="stat-number">~24% D1</span></div>
+        <div class="stat-label-wrap"><span class="stat-label">retention</span></div>
+      </div>
+      <div class="stat-cell bg-white" aria-hidden="true">
+        <div class="stat-number-wrap"><span class="stat-number">6 studios</span></div>
+        <div class="stat-label-wrap"><span class="stat-label">worldwide</span></div>
+      </div>
+      <div class="stat-cell bg-blue" aria-hidden="true">
+        <div class="stat-number-wrap"><span class="stat-number">40 years</span></div>
+        <div class="stat-label-wrap"><span class="stat-label">of legacy</span></div>
+      </div>
     </div>
   </section>
 
@@ -1372,17 +1388,6 @@
       schedule();
     })();
 
-    // ── STATS ROLL-UP ──
-    (function() {
-      const section = document.getElementById('stats-section');
-      const cells   = section.querySelectorAll('.stat-cell');
-      new IntersectionObserver(entries => {
-        if (!entries[0].isIntersecting) return;
-        cells.forEach((cell, i) => {
-          setTimeout(() => cell.classList.add('in-view'), i * 130);
-        });
-      }, { threshold: 0.25 }).observe(section);
-    })();
 
   </script>
 
