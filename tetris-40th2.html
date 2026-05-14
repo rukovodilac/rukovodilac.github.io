@@ -301,13 +301,16 @@
       width: 100%;
       height: 100vh;
       overflow: hidden;
-      background: #000;
+      background: #155BFE;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #primeintro-canvas {
       display: block;
-      width: 100%;
-      height: 100%;
+      width: clamp(300px, 65vmin, 900px);
+      height: clamp(300px, 65vmin, 900px);
     }
 
     /* ── GLITCH PIECES ── */
@@ -462,12 +465,8 @@
       var fireFn   = null;  // unified fire() for both SM-input and ViewModel triggers
 
       function sizeCanvas() {
-        var w = window.innerWidth;
-        var h = window.innerHeight;
-        canvas.width        = w;
-        canvas.height       = h;
-        canvas.style.width  = w + 'px';
-        canvas.style.height = h + 'px';
+        canvas.width  = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
       }
 
       sizeCanvas();
@@ -485,6 +484,15 @@
         onLoad: function() {
           sizeCanvas();
           riveInst.resizeDrawingSurfaceToCanvas();
+          // Try to fire SM triggers directly — more reliable than synthetic pointer events
+          var inputs = riveInst.stateMachineInputs(SM);
+          if (inputs) {
+            var triggers = inputs.filter(function(i) { return typeof i.fire === 'function'; });
+            if (triggers.length) {
+              fireFn = function() { triggers.forEach(function(t) { t.fire(); }); };
+            }
+          }
+          if (!fireFn) fireFn = syntheticClick;
         },
         onLoadError: function(e) { console.error('[primeintro] load error:', e); },
       });
@@ -521,7 +529,7 @@
         scrollAccum += dy;
         while (scrollAccum >= SCROLL_PER_TRIG) {
           scrollAccum -= SCROLL_PER_TRIG;
-          syntheticClick();
+          if (fireFn) fireFn();
         }
       }, { passive: true });
     })();
