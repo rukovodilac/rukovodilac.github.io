@@ -494,18 +494,20 @@
       overflow: hidden;
       line-height: 0;
       font-size: 0;
+      width: 100%;
+      display: block;
     }
 
     .studios-ribbon-track {
       display: flex;
       flex-wrap: nowrap;
-      animation: studios-scroll 8s linear infinite;
+      animation: studios-scroll 10s linear infinite;
       will-change: transform;
     }
 
     @keyframes studios-scroll {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-300px); }
+      from { transform: translateX(-600px); }
+      to   { transform: translateX(0); }
     }
 
     .studios-inner {
@@ -545,6 +547,100 @@
       display: flex;
       flex-direction: column;
       gap: 1em;
+    }
+
+    /* ── BWCN SECTION ── */
+    #bwcn-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 0;
+      align-items: stretch;
+    }
+
+    .bwcn-rive {
+      grid-column: 1;
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      background: #000;
+    }
+
+    #bwcn-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    .bwcn-interactive-tag {
+      position: absolute;
+      top: clamp(14px, 2vw, 24px);
+      left: clamp(14px, 2vw, 24px);
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .bwcn-interactive-tag svg {
+      width: clamp(16px, 1.75vw, 26px);
+      height: clamp(16px, 1.75vw, 26px);
+    }
+
+    .bwcn-text {
+      grid-column: 2;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px) clamp(40px, 6vw, 80px) clamp(24px, 3vw, 48px);
+    }
+
+    .bwcn-text-inner {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 2.5vw, 36px);
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .bwcn-title {
+      font-size: clamp(28px, 3.5vw, 56px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: #000;
+    }
+
+    .bwcn-title span {
+      display: block;
+      width: fit-content;
+      background: #155BFE;
+      color: #fff;
+      padding: 2px 10px;
+    }
+
+    .bwcn-body {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    @media (max-width: 768px) {
+      #bwcn-section { grid-template-columns: 1fr; }
+      .bwcn-rive { grid-column: 1; order: 1; }
+      .bwcn-text {
+        grid-column: 1;
+        order: 2;
+        padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
+      }
+      .bwcn-text-inner { text-align: center; max-width: 100%; }
+      .bwcn-title span { margin: 0 auto; }
     }
 
     /* ── GLITCH PIECES ── */
@@ -685,6 +781,27 @@
     </div>
   </section>
 
+  <section id="bwcn-section">
+    <div class="bwcn-rive">
+      <canvas id="bwcn-canvas"></canvas>
+      <div class="bwcn-interactive-tag">
+        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      </div>
+    </div>
+    <div class="bwcn-text">
+      <div class="bwcn-text-inner">
+        <h2 class="bwcn-title">
+          <span>Built for What</span>
+          <span>Comes Next</span>
+        </h2>
+        <div class="bwcn-body">
+          <p>The framework I designed had live-ops and continuous iteration built in from the start.</p>
+          <p>Future teams can build on the core brand-consistent motion language without breaking it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="studios-section">
     <div class="studios-ribbon-wrap">
       <div class="studios-ribbon-track" id="studios-ribbon-top"></div>
@@ -728,10 +845,88 @@
   <script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
   <script src="https://player.vimeo.com/api/player.js"></script>
   <script>
+    // ── BWCN ──
+    (function() {
+      const canvas = document.getElementById('bwcn-canvas');
+      let riveInst = null, buffer = null, smNames = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const cssW = p.offsetWidth  || window.innerWidth;
+        const cssH = p.offsetHeight || cssW;
+        canvas.width  = cssW;
+        canvas.height = cssH;
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0),
+          canvas,
+          stateMachines: smNames || undefined,
+          autoplay: true,
+          autoBind: true,
+          fit: rive.Fit.Cover,
+          alignment: rive.Alignment.Center,
+          onLoad: () => {
+            if (!smNames) {
+              const detected = riveInst.stateMachineNames;
+              if (detected && detected.length) {
+                smNames = detected;
+                start();
+                return;
+              }
+            }
+            sizeCanvas();
+            riveInst.resizeDrawingSurfaceToCanvas();
+            riveInst.play(smNames || riveInst.animationNames);
+          },
+          onLoadError: e => console.error('[bwcn] load error:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        const ab = riveInst.artboard;
+        if (ab && ab[method]) ab[method](x, y);
+        else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!riveInst) return;
+          if (e.isIntersecting) riveInst.play(smNames || undefined);
+          else riveInst.pause();
+        });
+      }, { threshold: 0.05 }).observe(canvas.parentElement);
+
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('builtforwhatcomenext.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+
+      window.addEventListener('resize', () => {
+        sizeCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
+      if (window.ResizeObserver) {
+        new ResizeObserver(() => {
+          sizeCanvas();
+          if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+        }).observe(canvas.parentElement);
+      }
+    })();
+
     // ── STUDIOS RIBBON ──
     (function() {
-      var TILE_W    = 300;
-      var TILE_H    = 30;
+      var TILE_W    = 600;
+      var TILE_H    = 60;
       var TILE_COUNT = 8;
 
       function buildRibbon(trackId) {
