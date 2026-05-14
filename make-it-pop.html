@@ -524,6 +524,8 @@
     let coinRive    = null;
     let rivBuffer   = null;
     let loopPending = false;
+    let coinLoaded  = false;
+    let coinVisible = false;
 
     function sizeCoinCanvas() {
       const parent = coinCanvas.parentElement;
@@ -559,7 +561,9 @@
         const states = event.data || [];
         if (!loopPending && states.some(s => s === 'NextCoin')) {
           loopPending = true;
-          setTimeout(startRive, 1520); // 90 frames @ 60fps = 1500ms + buffer
+          setTimeout(() => {
+            if (coinVisible) startRive(); else loopPending = false;
+          }, 1520);
         }
       });
     }
@@ -576,11 +580,25 @@
     coinCanvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
     coinCanvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
 
-    requestAnimationFrame(() => requestAnimationFrame(async () => {
-      sizeCoinCanvas();
-      rivBuffer = await fetch('coin_anim.riv').then(r => r.arrayBuffer());
-      startRive();
-    }));
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        coinVisible = entry.isIntersecting;
+        if (entry.isIntersecting) {
+          if (!coinLoaded) {
+            coinLoaded = true;
+            requestAnimationFrame(() => requestAnimationFrame(async () => {
+              sizeCoinCanvas();
+              rivBuffer = await fetch('coin_anim.riv').then(r => r.arrayBuffer());
+              startRive();
+            }));
+          } else if (coinRive) {
+            coinRive.play(SM);
+          }
+        } else if (coinRive) {
+          coinRive.pause();
+        }
+      });
+    }, { rootMargin: '200px 0px', threshold: 0 }).observe(coinCanvas.parentElement);
 
     window.addEventListener('resize', () => {
       sizeCoinCanvas();
@@ -651,11 +669,21 @@
       if (Math.sqrt(dx * dx + dy * dy) < 10 && trigPushInput) trigPushInput.fire();
     });
 
-    requestAnimationFrame(() => requestAnimationFrame(async () => {
-      sizeKnobCanvas();
-      knobBuffer = await fetch('knob.riv').then(r => r.arrayBuffer());
-      startKnobRive();
-    }));
+    let knobLoaded = false;
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!knobLoaded) {
+            knobLoaded = true;
+            requestAnimationFrame(() => requestAnimationFrame(async () => {
+              sizeKnobCanvas();
+              knobBuffer = await fetch('knob.riv').then(r => r.arrayBuffer());
+              startKnobRive();
+            }));
+          } else if (knobRive) { knobRive.play(KNOB_SM); }
+        } else if (knobRive) { knobRive.pause(); }
+      });
+    }, { rootMargin: '200px 0px', threshold: 0 }).observe(knobCanvas.parentElement);
 
     window.addEventListener('resize', () => {
       sizeKnobCanvas();
@@ -758,11 +786,21 @@
       if (frogOver) { const { cx, cy } = frogCSSPos(e); frogPtr('pointerDown', cx, cy); }
     });
 
-    requestAnimationFrame(() => requestAnimationFrame(async () => {
-      sizeFrogCanvas();
-      frogBuffer = await fetch('froggy.riv').then(r => r.arrayBuffer());
-      startFrogRive();
-    }));
+    let frogLoaded = false;
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!frogLoaded) {
+            frogLoaded = true;
+            requestAnimationFrame(() => requestAnimationFrame(async () => {
+              sizeFrogCanvas();
+              frogBuffer = await fetch('froggy.riv').then(r => r.arrayBuffer());
+              startFrogRive();
+            }));
+          } else if (frogRive) { frogRive.play(FROG_SM); }
+        } else if (frogRive) { frogRive.pause(); }
+      });
+    }, { rootMargin: '200px 0px', threshold: 0 }).observe(frogCanvas.parentElement);
 
     window.addEventListener('resize', () => {
       sizeFrogCanvas();
@@ -816,11 +854,21 @@
     progressCanvas.addEventListener('pointerdown', e => fwdProgress(e, 'pointerDown'));
     progressCanvas.addEventListener('pointerup',   e => fwdProgress(e, 'pointerUp'));
 
-    requestAnimationFrame(() => requestAnimationFrame(async () => {
-      sizeProgressCanvas();
-      progressBuffer = await fetch('progress.riv').then(r => r.arrayBuffer());
-      startProgressRive();
-    }));
+    let progressLoaded = false;
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!progressLoaded) {
+            progressLoaded = true;
+            requestAnimationFrame(() => requestAnimationFrame(async () => {
+              sizeProgressCanvas();
+              progressBuffer = await fetch('progress.riv').then(r => r.arrayBuffer());
+              startProgressRive();
+            }));
+          } else if (progressRive) { progressRive.play(PROG_SM); }
+        } else if (progressRive) { progressRive.pause(); }
+      });
+    }, { rootMargin: '200px 0px', threshold: 0 }).observe(progressCanvas.parentElement);
 
     window.addEventListener('resize', () => {
       sizeProgressCanvas();
@@ -866,11 +914,15 @@
       canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
       canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
 
-      requestAnimationFrame(() => requestAnimationFrame(async () => {
-        sizeCanvas();
-        buffer = await fetch('soda.riv').then(r => r.arrayBuffer());
-        start();
-      }));
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('soda.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
       window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
     })();
   </script>
@@ -913,11 +965,15 @@
       canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
       canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
 
-      requestAnimationFrame(() => requestAnimationFrame(async () => {
-        sizeCanvas();
-        buffer = await fetch('battery.riv').then(r => r.arrayBuffer());
-        start();
-      }));
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('battery.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
       window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
     })();
   </script>
@@ -960,11 +1016,15 @@
       canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
       canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
 
-      requestAnimationFrame(() => requestAnimationFrame(async () => {
-        sizeCanvas();
-        buffer = await fetch('egg.riv').then(r => r.arrayBuffer());
-        start();
-      }));
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('egg.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
       window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
     })();
   </script>
@@ -1012,11 +1072,15 @@
       canvas.addEventListener('pointerdown', e => { fwd(e, 'pointerDown'); if (boolPress) boolPress.value = true; });
       canvas.addEventListener('pointerup',   e => { fwd(e, 'pointerUp');   if (boolPress) boolPress.value = false; });
 
-      requestAnimationFrame(() => requestAnimationFrame(async () => {
-        sizeCanvas();
-        buffer = await fetch('arrows.riv').then(r => r.arrayBuffer());
-        start();
-      }));
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('arrows.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
       window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
     })();
   </script>
@@ -1059,11 +1123,15 @@
       canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
       canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
 
-      requestAnimationFrame(() => requestAnimationFrame(async () => {
-        sizeCanvas();
-        buffer = await fetch('illusion.riv').then(r => r.arrayBuffer());
-        start();
-      }));
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('illusion.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
       window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
     })();
   </script>
@@ -1106,11 +1174,15 @@
       canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
       canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
 
-      requestAnimationFrame(() => requestAnimationFrame(async () => {
-        sizeCanvas();
-        buffer = await fetch('box.riv').then(r => r.arrayBuffer());
-        start();
-      }));
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('box.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
       window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
     })();
   </script>

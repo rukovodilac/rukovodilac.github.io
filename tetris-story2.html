@@ -485,29 +485,14 @@
     }
 
     .blockies-meta-wrap {
-      width: 100%;
-      padding: 0 clamp(20px, 3.5vw, 48px) clamp(80px, 10vw, 140px);
+      display: flex;
+      justify-content: center;
+      padding-bottom: clamp(80px, 10vw, 140px);
     }
 
     #story-meta-canvas {
       display: block;
-    }
-
-    /* ── CHARACTER CANVAS (fixed overlay) ── */
-    #character-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 50;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.4s ease;
-    }
-
-    #character-canvas.active {
-      opacity: 1;
+      flex-shrink: 0;
     }
 
     /* ── Global link underline animation ── */
@@ -675,7 +660,7 @@
         <span>Be Square</span>
       </h2>
       <div class="blockies-body">
-        <p>A meta-layer only works if the world feels alive. Alongside Terry and his dog Cube, you rebuild the Blockies&rsquo; world by earning resources. The player&rsquo;s challenge is the grid; ours was bringing the Blockies to life.</p>
+        <p>A meta-layer only works if the world feels alive. Alongside Terry and dog Cube, you rebuild the Blockies&rsquo; world by earning resources. The player&rsquo;s challenge is the grid but ours was bringing the Blockies to life.</p>
         <p>We built the Blockies as modular characters from the same square DNA as the game pieces with same geometry but entirely different personality.</p>
       </div>
     </div>
@@ -738,6 +723,9 @@
     if (window.ResizeObserver) {
       new ResizeObserver(applyProportionalSize).observe(riveCanvas.parentElement);
     }
+    new IntersectionObserver(entries => {
+      entries.forEach(e => e.isIntersecting ? riveAnim.play() : riveAnim.pause());
+    }, { threshold: 0.05 }).observe(riveCanvas.parentElement);
 
     const storyUiCanvas = document.getElementById('story-ui-canvas');
     let storyUiRatio = null;
@@ -774,6 +762,9 @@
     });
 
     window.addEventListener('resize', applyStoryUiSize);
+    new IntersectionObserver(entries => {
+      entries.forEach(e => e.isIntersecting ? storyUiAnim.play() : storyUiAnim.pause());
+    }, { threshold: 0.05 }).observe(storyUiCanvas.parentElement);
 
     (function() {
       const JIGGLE_SM = 'Jiggle_SM';
@@ -819,6 +810,14 @@
       canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
       canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
 
+      new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!riveInst) return;
+          if (e.isIntersecting) riveInst.play(JIGGLE_SM);
+          else riveInst.pause();
+        });
+      }, { threshold: 0.05 }).observe(canvas.parentElement);
+
       requestAnimationFrame(() => requestAnimationFrame(async () => {
         sizeCanvas();
         buffer = await fetch('jiggle.riv').then(r => r.arrayBuffer());
@@ -837,69 +836,21 @@
       }
     })();
 
-    // ── CHARACTER fixed overlay ──
-    (function() {
-      const section = document.getElementById('blockies-section');
-      const canvas  = document.getElementById('character-canvas');
-      let riveInst = null;
-
-      function sizeCanvas() {
-        canvas.width  = window.innerWidth;
-        canvas.height = window.innerHeight;
-      }
-
-      function show() { canvas.classList.add('active'); }
-      function hide() { canvas.classList.remove('active'); }
-
-      function initAndPlay() {
-        if (riveInst) {
-          try { riveInst.stop(); } catch(e) {}
-          riveInst.play();
-          return;
-        }
-        sizeCanvas();
-        riveInst = new rive.Rive({
-          src: 'story_character.riv',
-          canvas,
-          autoplay: false,
-          layout: new rive.Layout({
-            fit: rive.Fit.Cover,
-            alignment: rive.Alignment.Center,
-          }),
-          onLoad: () => {
-            sizeCanvas();
-            riveInst.resizeDrawingSurfaceToCanvas();
-            riveInst.play();
-          },
-          onLoadError: e => console.error('[character] load error:', e),
-        });
-      }
-
-      new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) { show(); initAndPlay(); }
-          else { hide(); if (riveInst) riveInst.pause(); }
-        });
-      }, { threshold: 0.1 }).observe(section);
-
-      window.addEventListener('resize', () => {
-        sizeCanvas();
-        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
-      });
-    })();
-
     // ── STORY META ──
     (function() {
+      const ARTBOARD_W = 850;
+      const ARTBOARD_H = 460;
+      const RATIO      = ARTBOARD_H / ARTBOARD_W;
+      const MAX_W      = 640; // ~2 column width
+
       const wrap   = document.querySelector('.blockies-meta-wrap');
       const canvas = document.getElementById('story-meta-canvas');
-      let riveInst = null;
-      let metaRatio = null;
+      let riveInst  = null;
       let shouldPlay = false;
 
       function applySize() {
-        if (metaRatio === null) return;
-        const w = wrap.clientWidth;
-        const h = Math.round(w * metaRatio);
+        const w = Math.min(wrap.clientWidth, MAX_W);
+        const h = Math.round(w * RATIO);
         canvas.width  = w;
         canvas.height = h;
         canvas.style.width  = w + 'px';
@@ -908,6 +859,7 @@
       }
 
       function init() {
+        applySize();
         riveInst = new rive.Rive({
           src: 'story_meta.riv',
           canvas,
@@ -917,8 +869,6 @@
             alignment: rive.Alignment.Center,
           }),
           onLoad: () => {
-            const b = riveInst.bounds;
-            metaRatio = (b.maxY - b.minY) / (b.maxX - b.minX);
             applySize();
             if (shouldPlay) riveInst.play();
           },
@@ -937,7 +887,7 @@
             if (riveInst) riveInst.pause();
           }
         });
-      }, { threshold: 0.2 }).observe(wrap);
+      }, { threshold: 0.1 }).observe(wrap);
 
       window.addEventListener('resize', applySize);
     })();
@@ -965,7 +915,6 @@
     });
   </script>
 
-  <canvas id="character-canvas" aria-hidden="true"></canvas>
 
 </body>
 </html>
