@@ -952,19 +952,19 @@
 
   <section id="stats-section">
     <div class="stat-cell bg-black">
-      <div class="stat-number-wrap"><span class="stat-number">~690K daily</span></div>
+      <div class="stat-number-wrap"><span class="stat-number">~<span class="count" data-target="690">0</span>K daily</span></div>
       <div class="stat-label-wrap"><span class="stat-label">active users</span></div>
     </div>
     <div class="stat-cell bg-lime">
-      <div class="stat-number-wrap"><span class="stat-number">~24% D1</span></div>
+      <div class="stat-number-wrap"><span class="stat-number">~<span class="count" data-target="24">0</span>% D1</span></div>
       <div class="stat-label-wrap"><span class="stat-label">retention</span></div>
     </div>
     <div class="stat-cell bg-white">
-      <div class="stat-number-wrap"><span class="stat-number">6 studios</span></div>
+      <div class="stat-number-wrap"><span class="stat-number"><span class="count" data-target="6">0</span> studios</span></div>
       <div class="stat-label-wrap"><span class="stat-label">worldwide</span></div>
     </div>
     <div class="stat-cell bg-blue">
-      <div class="stat-number-wrap"><span class="stat-number">40 years</span></div>
+      <div class="stat-number-wrap"><span class="stat-number"><span class="count" data-target="40">0</span> years</span></div>
       <div class="stat-label-wrap"><span class="stat-label">of legacy</span></div>
     </div>
   </section>
@@ -1373,14 +1373,30 @@
       schedule();
     })();
 
-    // ── STATS ROLL-UP ──
+    // ── STATS ANIMATION + COUNTER ──
     (function() {
+      function animateCount(el, target, duration) {
+        const from  = Math.round(target * 0.8);
+        const start = performance.now();
+        (function step(now) {
+          const p = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 5);
+          el.textContent = Math.round(from + eased * (target - from));
+          if (p < 1) requestAnimationFrame(step);
+        })(start);
+      }
+
       const section = document.getElementById('stats-section');
       const cells   = section.querySelectorAll('.stat-cell');
       new IntersectionObserver(entries => {
         if (!entries[0].isIntersecting) return;
         cells.forEach((cell, i) => {
-          setTimeout(() => cell.classList.add('in-view'), i * 130);
+          setTimeout(() => {
+            cell.classList.add('in-view');
+            cell.querySelectorAll('.count').forEach(el => {
+              animateCount(el, +el.dataset.target, 1400);
+            });
+          }, i * 130);
         });
       }, { threshold: 0.25 }).observe(section);
     })();
