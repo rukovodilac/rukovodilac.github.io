@@ -305,6 +305,16 @@
       aspect-ratio: 1020 / 600;
     }
 
+    /* Portrait: shrink section height so all four gaps equal 15vw */
+    @media (orientation: portrait) {
+      #primeintro-section {
+        height: calc(70vw * 600 / 1020 + 30vw);
+      }
+      #primeintro-canvas {
+        width: 70vw;
+      }
+    }
+
     /* ── GLITCH PIECES ── */
     .glitch-piece {
       position: fixed;
