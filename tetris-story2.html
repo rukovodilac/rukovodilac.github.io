@@ -703,6 +703,96 @@
       width: 100%;
     }
 
+    /* ── TETRISCO SECTION ── */
+    #tetrisco-section {
+      line-height: 0;
+      background: #000;
+    }
+
+    #tetrisco-canvas {
+      display: block;
+      width: 100%;
+    }
+
+    /* ── SUCCESS SECTION ── */
+    #success-section {
+      background: #fff;
+      padding: clamp(80px, 10vw, 140px) clamp(20px, 3.5vw, 48px);
+      display: flex;
+      justify-content: center;
+    }
+
+    .success-text {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(24px, 3vw, 40px);
+      max-width: 700px;
+    }
+
+    .success-title {
+      font-size: clamp(28px, 3.5vw, 56px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: #000;
+    }
+
+    .success-title span {
+      display: block;
+      width: fit-content;
+      margin: 0 auto;
+      background: #E0EC8A;
+      padding: 2px 10px;
+    }
+
+    .success-body {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    /* ── COLOPHON SECTION ── */
+    #colophon-section {
+      background: #fff;
+      padding: clamp(60px, 8vw, 100px) clamp(20px, 3.5vw, 48px) clamp(80px, 10vw, 120px);
+      border-top: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .colophon-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(32px, 4vw, 56px);
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .colophon-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(32px, 5vw, 64px);
+    }
+
+    .colophon-logo {
+      width: clamp(120px, 14vw, 200px);
+      height: auto;
+      display: block;
+    }
+
+    .colophon-copy {
+      font-size: clamp(10px, 0.9vw, 13px);
+      font-weight: 400;
+      line-height: 1.8;
+      color: rgba(0,0,0,0.45);
+    }
+
     /* ── Global link underline animation ── */
     a {
       position: relative;
@@ -916,6 +1006,36 @@
         <p><span class="hl"><strong>Proxy-first workflow:</strong></span> I built a proxy pipeline to validate animation timing before final assets existed, cutting delivery time by 40%.</p>
         <p><span class="hl"><strong>Prototype before it costs you:</strong></span> By prototyping in After Effects before engine implementation, we aligned stakeholders early and reduced technical rework by 80%.</p>
       </div>
+    </div>
+  </section>
+
+  <section id="tetrisco-section">
+    <canvas id="tetrisco-canvas"></canvas>
+  </section>
+
+  <section id="success-section">
+    <div class="success-text">
+      <h2 class="success-title"><span>Success in the Failure</span></h2>
+      <div class="success-body">
+        <p>This was one of my biggest projects and biggest failures.</p>
+        <p>Even though the game was withdrawn from the App Store, the R&amp;D wasn&rsquo;t wasted. Managing an international team and cross-departmental workflows at this scale became a masterclass in leadership.</p>
+        <p>I learned I can control the quality and efficiency of the pipeline but not the market.</p>
+        <p>Some projects ship to millions, others never launch. The discipline and leadership I built here have been more valuable than most measurable wins.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="colophon-section">
+    <div class="colophon-inner">
+      <div class="colophon-logos">
+        <img src="PS_logo.svg" alt="playSTUDIOS" class="colophon-logo">
+        <img src="Tetris_Logo.svg" alt="Tetris" class="colophon-logo">
+      </div>
+      <p class="colophon-copy">
+        Tetris ® &amp; &copy; 1985&ndash;2025 Tetris Holding. Licensed to The Tetris Company. Game design by Alexey Pajitnov. All rights reserved. Sub-licensed to playSTUDIOS&reg;.<br>
+        Non-commercial portfolio showcase. Certain materials are copyrighted and are used here under fair use solely to demonstrate creative work.<br>
+        All trademarks and copyrights remain the property of their respective owners.
+      </p>
     </div>
   </section>
 
@@ -1419,6 +1539,46 @@
       window.addEventListener('scroll', updateParallax, { passive: true });
       window.addEventListener('resize', updateParallax);
       updateParallax();
+    })();
+
+    // ── TETRISCO ──
+    (function() {
+      const canvas = document.getElementById('tetrisco-canvas');
+      let tetriscoRatio = null;
+
+      function applyTetriscoSize() {
+        if (tetriscoRatio === null) return;
+        const w = canvas.offsetWidth;
+        if (!w) return;
+        const h = Math.round(w * tetriscoRatio);
+        canvas.width = w;
+        canvas.height = h;
+        canvas.style.height = h + 'px';
+        tetriscoAnim.resizeDrawingSurfaceToCanvas();
+      }
+
+      const tetriscoAnim = new rive.Rive({
+        src: 'tetrisco.riv',
+        canvas,
+        autoplay: true,
+        layout: new rive.Layout({
+          fit: rive.Fit.Fill,
+          alignment: rive.Alignment.Center,
+        }),
+        onLoad: () => {
+          const b = tetriscoAnim.bounds;
+          tetriscoRatio = (b.maxY - b.minY) / (b.maxX - b.minX);
+          applyTetriscoSize();
+        },
+      });
+
+      window.addEventListener('resize', applyTetriscoSize);
+      if (window.ResizeObserver) {
+        new ResizeObserver(applyTetriscoSize).observe(canvas.parentElement);
+      }
+      new IntersectionObserver(entries => {
+        entries.forEach(e => e.isIntersecting ? tetriscoAnim.play() : tetriscoAnim.pause());
+      }, { threshold: 0.05 }).observe(canvas.parentElement);
     })();
 
     // ── ROCKET ──
