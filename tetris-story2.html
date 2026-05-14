@@ -1622,22 +1622,18 @@
         if (rocketAnim) rocketAnim.resizeDrawingSurfaceToCanvas();
       }
 
-      function initRocket() {
-        if (rocketAnim) { try { rocketAnim.cleanup(); } catch(e) {} }
-        rocketAnim = new rive.Rive({
-          src: 'rocket.riv',
-          canvas,
-          autoplay: true,
-          layout: new rive.Layout({
-            fit: rive.Fit.Fill,
-            alignment: rive.Alignment.Center,
-          }),
-          onLoad: () => { applyRocketSize(); },
-          onLoadError: e => console.error('[rocket] load error:', e),
-        });
-      }
+      rocketAnim = new rive.Rive({
+        src: 'rocket.riv',
+        canvas,
+        autoplay: false,
+        layout: new rive.Layout({
+          fit: rive.Fit.Fill,
+          alignment: rive.Alignment.Center,
+        }),
+        onLoad: () => { applyRocketSize(); },
+        onLoadError: e => console.error('[rocket] load error:', e),
+      });
 
-      // Size canvas early so there's no flash when the section enters view
       applyRocketSize();
       window.addEventListener('resize', applyRocketSize);
       if (window.ResizeObserver) {
@@ -1646,22 +1642,10 @@
 
       new IntersectionObserver(entries => {
         entries.forEach(e => {
-          if (e.isIntersecting) {
-            if (!rocketAnim) initRocket(); // first entry: fresh instance = frame 0
-            else rocketAnim.play();
-          } else {
-            if (rocketAnim) rocketAnim.pause();
-          }
+          if (e.isIntersecting) rocketAnim.play();
+          else rocketAnim.pause();
         });
       }, { threshold: 0.35 }).observe(document.getElementById('derisking-section'));
-
-      // bfcache restore: drop the instance so the next scroll-in creates a fresh one
-      window.addEventListener('pageshow', e => {
-        if (e.persisted && rocketAnim) {
-          try { rocketAnim.cleanup(); } catch(ex) {}
-          rocketAnim = null;
-        }
-      });
     })();
 
 const emailBtn     = document.getElementById('email-btn');
