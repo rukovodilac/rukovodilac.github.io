@@ -540,14 +540,6 @@
       gap: 1em;
     }
 
-    #deg45-vfx-canvas {
-      position: absolute;
-      pointer-events: none;
-      z-index: 10;
-      opacity: 0;
-      transition: opacity 0.15s;
-    }
-
     /* ── STORY2 SECTION ── */
     #story2-section {
       background: #0068FF;
@@ -778,6 +770,22 @@
     </div>
   </section>
 
+  <section id="blockies-section">
+    <div class="blockies-text-wrap">
+      <h2 class="blockies-title">
+        <span>Be There And</span>
+        <span>Be Square</span>
+      </h2>
+      <div class="blockies-body">
+        <p>A meta-layer only works if the world feels alive. Alongside Terry and dog Cube, you rebuild the Blockies&rsquo; world by earning resources. The player&rsquo;s challenge is the grid but ours was bringing the Blockies to life.</p>
+        <p>We built the Blockies as modular characters from the same square DNA as the game pieces with same geometry but entirely different personality.</p>
+      </div>
+    </div>
+    <div class="blockies-meta-wrap">
+      <canvas id="story-meta-canvas"></canvas>
+    </div>
+  </section>
+
   <section id="deg45-section">
     <div class="deg45-rive">
       <canvas id="deg45-canvas"></canvas>
@@ -795,23 +803,6 @@
           <p>A flat square is a heavy, rigid brick, but a rotated square is a dynamic, lightweight sparkle.</p>
         </div>
       </div>
-    </div>
-    <canvas id="deg45-vfx-canvas"></canvas>
-  </section>
-
-  <section id="blockies-section">
-    <div class="blockies-text-wrap">
-      <h2 class="blockies-title">
-        <span>Be There And</span>
-        <span>Be Square</span>
-      </h2>
-      <div class="blockies-body">
-        <p>A meta-layer only works if the world feels alive. Alongside Terry and dog Cube, you rebuild the Blockies&rsquo; world by earning resources. The player&rsquo;s challenge is the grid but ours was bringing the Blockies to life.</p>
-        <p>We built the Blockies as modular characters from the same square DNA as the game pieces with same geometry but entirely different personality.</p>
-      </div>
-    </div>
-    <div class="blockies-meta-wrap">
-      <canvas id="story-meta-canvas"></canvas>
     </div>
   </section>
 
@@ -1035,21 +1026,18 @@
 
     // ── DEG45 ──
     (function() {
-      const SM = '45';
-      const VFX_SM = 'vfx';
+      const SM      = '45';
+      const VFX_SM  = 'vfx';
       const VFX_SIZE = 250;
 
       const section   = document.getElementById('deg45-section');
       const canvas    = document.getElementById('deg45-canvas');
-      const vfxCanvas = document.getElementById('deg45-vfx-canvas');
       const textInner = document.querySelector('.deg45-text-inner');
 
-      let riveInst = null, buffer = null;
-      let vfxInst  = null, vfxBuffer = null, vfxTimeout = null;
+      let riveInst = null, buffer = null, vfxBuffer = null;
 
       function sizeCanvas() {
-        const p    = canvas.parentElement;
-        const cssW = p.offsetWidth || window.innerWidth / 2;
+        const cssW = canvas.parentElement.offsetWidth || window.innerWidth / 2;
         canvas.width  = cssW;
         canvas.height = cssW;
       }
@@ -1090,42 +1078,43 @@
       canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
       canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
 
-      function triggerVfx(clientX, clientY) {
+      function spawnVfx(clientX, clientY) {
         if (!vfxBuffer) return;
         const sr = section.getBoundingClientRect();
         const lx = clientX - sr.left - VFX_SIZE / 2;
         const ly = clientY - sr.top  - VFX_SIZE / 2;
-        vfxCanvas.width  = VFX_SIZE;
-        vfxCanvas.height = VFX_SIZE;
-        vfxCanvas.style.width  = VFX_SIZE + 'px';
-        vfxCanvas.style.height = VFX_SIZE + 'px';
-        vfxCanvas.style.left   = lx + 'px';
-        vfxCanvas.style.top    = ly + 'px';
-        vfxCanvas.style.opacity = '1';
-        if (vfxInst) { try { vfxInst.cleanup(); } catch(e){} vfxInst = null; }
-        vfxInst = new rive.Rive({
+
+        const c = document.createElement('canvas');
+        c.width  = VFX_SIZE;
+        c.height = VFX_SIZE;
+        c.style.cssText = 'position:absolute;pointer-events:none;z-index:10;'
+          + 'width:' + VFX_SIZE + 'px;height:' + VFX_SIZE + 'px;'
+          + 'left:' + lx + 'px;top:' + ly + 'px;';
+        section.appendChild(c);
+
+        const inst = new rive.Rive({
           buffer: vfxBuffer.slice(0),
-          canvas: vfxCanvas,
+          canvas: c,
           stateMachines: VFX_SM,
           autoplay: true,
           layout: new rive.Layout({ fit: rive.Fit.Contain, alignment: rive.Alignment.Center }),
           onLoad: () => {
-            vfxInst.resizeDrawingSurfaceToCanvas();
-            vfxInst.play(VFX_SM);
+            inst.resizeDrawingSurfaceToCanvas();
+            inst.play(VFX_SM);
           },
           onLoadError: e => console.error('[45-vfx] load error:', e),
         });
-        clearTimeout(vfxTimeout);
-        vfxTimeout = setTimeout(() => {
-          vfxCanvas.style.opacity = '0';
-          setTimeout(() => { if (vfxInst) { try { vfxInst.cleanup(); } catch(e){} vfxInst = null; } }, 150);
-        }, 2000);
+
+        setTimeout(() => {
+          try { inst.cleanup(); } catch(e) {}
+          if (c.parentNode) c.parentNode.removeChild(c);
+        }, 2500);
       }
 
-      section.addEventListener('click', e => triggerVfx(e.clientX, e.clientY));
+      section.addEventListener('click', e => spawnVfx(e.clientX, e.clientY));
       section.addEventListener('touchend', e => {
         const t = e.changedTouches[0];
-        triggerVfx(t.clientX, t.clientY);
+        spawnVfx(t.clientX, t.clientY);
       }, { passive: true });
 
       new IntersectionObserver(entries => {
