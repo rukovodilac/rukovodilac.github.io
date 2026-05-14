@@ -1622,12 +1622,12 @@
         if (rocketAnim) rocketAnim.resizeDrawingSurfaceToCanvas();
       }
 
-      function makeRocket() {
+      function initRocket() {
         if (rocketAnim) { try { rocketAnim.cleanup(); } catch(e) {} }
         rocketAnim = new rive.Rive({
           src: 'rocket.riv',
           canvas,
-          autoplay: false,
+          autoplay: true,
           layout: new rive.Layout({
             fit: rive.Fit.Fill,
             alignment: rive.Alignment.Center,
@@ -1637,7 +1637,7 @@
         });
       }
 
-      makeRocket();
+      // Size canvas early so there's no flash when the section enters view
       applyRocketSize();
       window.addEventListener('resize', applyRocketSize);
       if (window.ResizeObserver) {
@@ -1646,15 +1646,21 @@
 
       new IntersectionObserver(entries => {
         entries.forEach(e => {
-          if (e.isIntersecting) rocketAnim.play();
-          else rocketAnim.pause();
+          if (e.isIntersecting) {
+            if (!rocketAnim) initRocket(); // first entry: fresh instance = frame 0
+            else rocketAnim.play();
+          } else {
+            if (rocketAnim) rocketAnim.pause();
+          }
         });
       }, { threshold: 0.35 }).observe(document.getElementById('derisking-section'));
 
-      // On bfcache restore (browser back/forward), recreate the instance so
-      // the animation starts from frame 0 again on next scroll-in
+      // bfcache restore: drop the instance so the next scroll-in creates a fresh one
       window.addEventListener('pageshow', e => {
-        if (e.persisted) makeRocket();
+        if (e.persisted && rocketAnim) {
+          try { rocketAnim.cleanup(); } catch(ex) {}
+          rocketAnim = null;
+        }
       });
     })();
 
