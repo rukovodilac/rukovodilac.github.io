@@ -654,21 +654,22 @@
     #stats-section {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      gap: 2px;
       background: #000;
     }
 
     .stat-cell {
-      padding: clamp(48px, 7vw, 100px) clamp(24px, 4vw, 64px);
-      border-right: 1px solid rgba(255,255,255,0.1);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding: clamp(40px, 6vw, 88px) clamp(24px, 4vw, 64px);
       display: flex;
       flex-direction: column;
-      gap: clamp(8px, 1vw, 14px);
+      justify-content: flex-end;
+      gap: 0;
     }
 
-    .stat-cell:nth-child(even) { border-right: none; }
-    .stat-cell:nth-child(3),
-    .stat-cell:nth-child(4)   { border-bottom: none; }
+    .stat-cell:nth-child(1) { background: #155BFE; }
+    .stat-cell:nth-child(2) { background: #E0EC8A; }
+    .stat-cell:nth-child(3) { background: #000; }
+    .stat-cell:nth-child(4) { background: #fff; }
 
     .stat-number-wrap {
       overflow: hidden;
@@ -677,36 +678,90 @@
 
     .stat-number {
       display: block;
-      font-size: clamp(52px, 7.5vw, 120px);
+      font-size: clamp(40px, 6vw, 96px);
       font-weight: 500;
       line-height: 1;
-      color: #E0EC8A;
       transform: translateY(110%);
       transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
     }
+
+    .stat-cell:nth-child(1) .stat-number { color: #E0EC8A; }
+    .stat-cell:nth-child(2) .stat-number { color: #000; }
+    .stat-cell:nth-child(3) .stat-number { color: #E0EC8A; }
+    .stat-cell:nth-child(4) .stat-number { color: #000; }
 
     .stat-cell.in-view .stat-number {
       transform: translateY(0);
     }
 
-    .stat-label {
-      font-size: clamp(14px, 1.4vw, 20px);
-      font-weight: 400;
-      line-height: 1.4;
-      color: rgba(255,255,255,0.5);
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity 0.5s 0.45s, transform 0.5s 0.45s;
+    .stat-label-wrap {
+      overflow: hidden;
+      line-height: 1.1;
+      margin-top: 0.1em;
     }
 
+    .stat-label {
+      display: block;
+      font-size: clamp(40px, 6vw, 96px);
+      font-weight: 500;
+      line-height: 1.1;
+      transform: translateY(110%);
+      transition: transform 0.85s 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .stat-cell:nth-child(1) .stat-label { color: rgba(255,255,255,0.45); }
+    .stat-cell:nth-child(2) .stat-label { color: rgba(0,0,0,0.45); }
+    .stat-cell:nth-child(4) .stat-label { color: rgba(0,0,0,0.45); }
+
     .stat-cell.in-view .stat-label {
-      opacity: 1;
       transform: translateY(0);
     }
 
     @media (max-width: 768px) {
-      #stats-section { grid-template-columns: 1fr 1fr; }
-      .stat-cell:nth-child(even) { border-right: none; }
+      #stats-section { grid-template-columns: 1fr 1fr; gap: 2px; }
+    }
+
+    /* ── COLOPHON SECTION ── */
+    #colophon-section {
+      background: #F4E9D5;
+      padding: clamp(60px, 8vw, 100px) clamp(20px, 3.5vw, 48px) clamp(80px, 10vw, 120px);
+    }
+
+    .colophon-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(32px, 4vw, 56px);
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .colophon-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(32px, 5vw, 64px);
+    }
+
+    .colophon-logo {
+      width: clamp(100px, 12vw, 160px);
+      height: auto;
+      display: block;
+    }
+
+    .colophon-logos img + img {
+      width: clamp(72px, 8.5vw, 118px);
+    }
+
+    .colophon-copy {
+      font-size: clamp(10px, 0.9vw, 13px);
+      font-weight: 400;
+      line-height: 1.8;
+      color: rgba(0,0,0,0.45);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75em;
     }
 
     /* ── GLITCH PIECES ── */
@@ -897,19 +952,30 @@
   <section id="stats-section">
     <div class="stat-cell">
       <div class="stat-number-wrap"><span class="stat-number">~690K</span></div>
-      <p class="stat-label">daily active users</p>
+      <div class="stat-label-wrap"><span class="stat-label">daily active users</span></div>
     </div>
     <div class="stat-cell">
       <div class="stat-number-wrap"><span class="stat-number">~24%</span></div>
-      <p class="stat-label">D1 retention</p>
+      <div class="stat-label-wrap"><span class="stat-label">D1 retention</span></div>
     </div>
     <div class="stat-cell">
-      <div class="stat-number-wrap"><span class="stat-number">6</span></div>
-      <p class="stat-label">studios</p>
+      <div class="stat-number-wrap"><span class="stat-number">6 studios</span></div>
     </div>
     <div class="stat-cell">
       <div class="stat-number-wrap"><span class="stat-number">40 years</span></div>
-      <p class="stat-label">of legacy</p>
+      <div class="stat-label-wrap"><span class="stat-label">of legacy</span></div>
+    </div>
+  </section>
+
+  <section id="colophon-section">
+    <div class="colophon-inner">
+      <div class="colophon-logos">
+        <img src="PS_logo.svg" alt="playSTUDIOS" class="colophon-logo">
+        <img src="Tetris_Logo.svg" alt="Tetris" class="colophon-logo">
+      </div>
+      <div class="colophon-copy">
+        <p>Tetris ® &amp; &copy; 1985&ndash;2025 Tetris Holding. Licensed to The Tetris Company.<br>Game design by Alexey Pajitnov. All rights reserved. Sub-licensed to playSTUDIOS&reg;.<br>Non-commercial portfolio showcase.<br>Certain materials are copyrighted and are used here under fair use solely to demonstrate creative work.</p>
+      </div>
     </div>
   </section>
 
