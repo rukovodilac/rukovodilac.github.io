@@ -241,12 +241,12 @@
       #interp-section {
         grid-template-columns: 1fr;
       }
+      .interp-rive { grid-column: 1; order: 1; }
       .interp-text {
         grid-column: 1;
-        order: 1;
+        order: 2;
         padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
       }
-      .interp-rive { grid-column: 1; order: 2; }
       .interp-text-inner { text-align: center; max-width: 100%; }
       .interp-title span { margin: 0 auto; }
     }
@@ -391,7 +391,9 @@
     @media (max-width: 768px) {
       #tetris40-section { grid-template-columns: 1fr; }
       #tetris40-canvas { width: clamp(160px, 55vw, 300px); }
-      .tetris40-text-inner { max-width: 100%; }
+      .tetris40-text { padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px); }
+      .tetris40-text-inner { text-align: center; max-width: 100%; }
+      .tetris40-title span { margin: 0 auto; }
     }
 
     /* ── INTERP SECTION ── */
@@ -743,7 +745,7 @@
     // ── INTERP ──
     (function() {
       const canvas = document.getElementById('interp-canvas');
-      let riveInst = null, buffer = null;
+      let riveInst = null, buffer = null, smNames = null;
 
       function sizeCanvas() {
         const p = canvas.parentElement;
@@ -758,16 +760,23 @@
         riveInst = new rive.Rive({
           buffer: buffer.slice(0),
           canvas,
+          stateMachines: smNames || undefined,
           autoplay: true,
           autoBind: true,
           fit: rive.Fit.Cover,
           alignment: rive.Alignment.Center,
           onLoad: () => {
+            if (!smNames) {
+              const detected = riveInst.stateMachineNames;
+              if (detected && detected.length) {
+                smNames = detected;
+                start(); // restart with state machine properly wired
+                return;
+              }
+            }
             sizeCanvas();
             riveInst.resizeDrawingSurfaceToCanvas();
-            const machines = riveInst.stateMachineNames;
-            if (machines && machines.length) riveInst.play(machines[0]);
-            else riveInst.play();
+            riveInst.play(smNames || riveInst.animationNames);
           },
           onLoadError: e => console.error('[interp] load error:', e),
         });
@@ -788,7 +797,7 @@
       new IntersectionObserver(entries => {
         entries.forEach(e => {
           if (!riveInst) return;
-          if (e.isIntersecting) riveInst.play();
+          if (e.isIntersecting) riveInst.play(smNames || undefined);
           else riveInst.pause();
         });
       }, { threshold: 0.05 }).observe(canvas.parentElement);
