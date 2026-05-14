@@ -582,11 +582,9 @@
 
     // ── TETRIS40 SCROLL SCRUB ──
     (function() {
-      var DURATION = 2; // Shine animation is 2 s at 60 fps
       var canvas   = document.getElementById('tetris40-canvas');
       var section  = document.getElementById('tetris40-section');
       var riveInst = null;
-      var ready    = false;
 
       function sizeCanvas() {
         canvas.width  = canvas.offsetWidth  || 1;
@@ -606,26 +604,14 @@
         onLoad: function() {
           sizeCanvas();
           riveInst.resizeDrawingSurfaceToCanvas();
-          // Add Shine to the active animation list then pause — scrub() needs it active
-          riveInst.play('Shine');
-          riveInst.pause('Shine');
-          ready = true;
-          updateScroll(); // apply current scroll position immediately
         },
         onLoadError: function(e) { console.error('[tetris40] load error:', e); },
       });
 
-      function updateScroll() {
-        if (!ready) return;
-        var rect     = section.getBoundingClientRect();
-        var vh       = window.innerHeight;
-        var progress = (vh - rect.top) / (vh + rect.height);
-        progress = Math.max(0, Math.min(1, progress));
-        riveInst.scrub('Shine', progress * DURATION);
-      }
-
-      window.addEventListener('scroll', updateScroll, { passive: true });
-      updateScroll();
+      new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) riveInst.play('Shine');
+        else riveInst.pause('Shine');
+      }, { threshold: 0.2 }).observe(section);
 
       window.addEventListener('resize', function() {
         sizeCanvas();
