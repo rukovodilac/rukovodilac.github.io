@@ -22,6 +22,16 @@
     }
 
     /* ── HEADER ── */
+    @keyframes pageBlueFade {
+      from { background: #0a4bbd; }
+      to   { background: #000; }
+    }
+
+    #page-top {
+      background: #000;
+      animation: pageBlueFade 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
     #header {
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
     }
@@ -817,6 +827,8 @@
     </defs>
   </svg>
 
+  <div id="page-top">
+
   <header id="header">
     <a href="/" id="logo">a–z</a>
   </header>
@@ -862,6 +874,8 @@
       </div>
     </div>
   </div>
+
+  </div><!-- /#page-top -->
 
   <section id="primeintro-section">
     <canvas id="primeintro-canvas"></canvas>
