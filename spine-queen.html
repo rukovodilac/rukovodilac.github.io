@@ -28,6 +28,7 @@
     let skeleton, animState;
     const animations = ['Idle', 'Idle2'];
     let current = 0;
+    let debugBones = false;
 
     function init() {
       try {
@@ -73,6 +74,10 @@
       animState.setAnimation(0, animations[current], true);
     });
 
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'd' || e.key === 'D') debugBones = !debugBones;
+    });
+
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -98,6 +103,7 @@
 
         renderer.begin();
         renderer.drawSkeleton(skeleton, true);
+        if (debugBones) renderer.drawSkeletonDebug(skeleton, false);
         renderer.end();
       }
     }
