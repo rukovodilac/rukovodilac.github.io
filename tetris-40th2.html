@@ -1434,16 +1434,20 @@
         }
       }
 
-      // [position 0–1, r, g, b]
-      // 40% blue → 20% purple → 40% black
-      const stops = [
+      const stopsDesktop = [
         [0.0,  21,  91, 254],
         [0.4, 178, 106, 237],
         [0.6, 178, 106, 237],
         [1.0,   0,   0,   0]
       ];
 
+      const stopsMobile = [
+        [0.0, 21, 91, 254],
+        [1.0,  0,  0,   0]
+      ];
+
       function update() {
+        const stops = window.innerWidth < 768 ? stopsMobile : stopsDesktop;
         const t = easeInOut(Math.min(1, Math.max(0, window.scrollY / target)));
         let i = 0;
         while (i < stops.length - 2 && t >= stops[i + 1][0]) i++;
