@@ -18,7 +18,7 @@
 
     body {
       font-family: "Host Grotesk", sans-serif;
-      background: #F4E9D5;
+      background: #AA95FC;
     }
 
     canvas { touch-action: pan-y; }
@@ -1780,6 +1780,23 @@ const emailBtn     = document.getElementById('email-btn');
     })();
   </script>
 
+  <script>
+    (function () {
+      const TOP    = '#AA95FC';
+      const BOTTOM = '#E0EC8A';
+      const THRESHOLD = 4;
+
+      function update() {
+        const atBottom =
+          window.scrollY + window.innerHeight >=
+          document.documentElement.scrollHeight - THRESHOLD;
+        document.body.style.background = atBottom ? BOTTOM : TOP;
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
+  </script>
 
 </body>
 </html>
