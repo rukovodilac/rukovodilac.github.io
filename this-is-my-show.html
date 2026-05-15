@@ -16,10 +16,6 @@
       box-sizing: border-box;
     }
 
-    html {
-      background: #E0EC8A;
-    }
-
     body {
       font-family: "Host Grotesk", sans-serif;
       background: #FFC03F;
@@ -388,6 +384,25 @@
         }, 2000);
       });
     });
+  </script>
+
+  <script>
+    // ── OVERSCROLL COLOUR ──
+    (function () {
+      const TOP    = '#FFC03F';
+      const BOTTOM = '#E0EC8A';
+      const THRESHOLD = 4; // px from bottom edge
+
+      function update() {
+        const atBottom =
+          window.scrollY + window.innerHeight >=
+          document.documentElement.scrollHeight - THRESHOLD;
+        document.body.style.background = atBottom ? BOTTOM : TOP;
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
   </script>
 
 </body>
