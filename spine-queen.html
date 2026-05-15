@@ -3,44 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Queen — Spine Test</title>
-  <link rel="stylesheet" href="https://unpkg.com/@esotericsoftware/spine-player@4.2.116/dist/spine-player.css">
+  <title>Queen</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #1a1a2e;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      font-family: sans-serif;
-      color: #fff;
-    }
-    h1 { margin-bottom: 24px; font-size: 1.2rem; opacity: 0.6; letter-spacing: 0.1em; text-transform: uppercase; }
-    #player { width: 600px; height: 600px; }
+    body { background: #0d0d1a; overflow: hidden; }
+    canvas { display: block; }
   </style>
 </head>
 <body>
-  <h1>Queen</h1>
-  <div id="player"></div>
-
-  <script src="https://unpkg.com/@esotericsoftware/spine-player@4.2.116/dist/iife/spine-player.js"></script>
+  <canvas id="canvas"></canvas>
+  <script src="https://unpkg.com/@esotericsoftware/spine-webgl@4.2.116/dist/iife/spine-webgl.js"></script>
   <script>
-    new spine.SpinePlayer("player", {
-      skelUrl: "Queen.skel",
-      atlasUrl: "Queen.atlas",
-      animation: "Idle",
-      showControls: true,
-      backgroundColor: "#1a1a2e",
-      premultipliedAlpha: true,
-      success: function(player) {
-        console.log("Animations:", player.animationState.data.skeletonData.animations.map(a => a.name));
-      },
-      error: function(player, msg) {
-        console.error("Spine error:", msg);
-      }
+    const canvas = document.getElementById('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const context = new spine.ManagedWebGLRenderingContext(canvas);
+    const renderer = new spine.SceneRenderer(canvas, context);
+    const assets = new spine.AssetManager(context);
+
+    assets.loadBinary('Queen.skel');
+    assets.loadTextureAtlas('Queen.atlas');
+
+    let skeleton, animState;
+    const animations = ['Idle', 'Idle2'];
+    let current = 0;
+
+    function init() {
+      const atlas = assets.get('Queen.atlas');
+      const loader = new spine.AtlasAttachmentLoader(atlas);
+      const binary = new spine.SkeletonBinary(loader);
+      binary.scale = 0.5;
+
+      const data = binary.readSkeletonData(assets.get('Queen.skel'));
+      skeleton = new spine.Skeleton(data);
+      skeleton.setToSetupPose();
+      skeleton.updateWorldTransform();
+
+      const stateData = new spine.AnimationStateData(data);
+      stateData.defaultMix = 0.3;
+      animState = new spine.AnimationState(stateData);
+      animState.setAnimation(0, 'Idle', true);
+
+      // center camera on skeleton bounds
+      const offset = new spine.Vector2();
+      const size = new spine.Vector2();
+      skeleton.getBounds(offset, size, []);
+
+      renderer.camera.position.x = offset.x + size.x / 2;
+      renderer.camera.position.y = offset.y + size.y / 2;
+      renderer.camera.zoom = Math.max(size.x / canvas.width, size.y / canvas.height) * 1.2;
+      renderer.camera.update();
+    }
+
+    // click to toggle animations
+    canvas.addEventListener('click', () => {
+      if (!animState) return;
+      current = (current + 1) % animations.length;
+      animState.setAnimation(0, animations[current], true);
     });
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      renderer.camera.update();
+    });
+
+    let last = Date.now() / 1000;
+    function render() {
+      requestAnimationFrame(render);
+
+      const now = Date.now() / 1000;
+      const delta = Math.min(now - last, 0.1);
+      last = now;
+
+      const gl = context.gl;
+      gl.clearColor(0.05, 0.05, 0.1, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      if (skeleton && animState) {
+        animState.update(delta);
+        animState.apply(skeleton);
+        skeleton.updateWorldTransform();
+
+        renderer.begin();
+        renderer.drawSkeleton(skeleton, true);
+        renderer.end();
+      }
+    }
+
+    function waitForLoad() {
+      if (assets.isLoadingComplete()) {
+        init();
+        render();
+      } else {
+        requestAnimationFrame(waitForLoad);
+      }
+    }
+    waitForLoad();
   </script>
 </body>
 </html>
