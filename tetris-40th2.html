@@ -1422,6 +1422,11 @@
       function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
 
       const video = document.getElementById('video-wrap');
+      let target = 1;
+
+      function cacheTarget() {
+        target = video ? video.offsetTop : el.offsetHeight || 1;
+      }
 
       // [position 0–1, r, g, b]
       // 40% blue → 20% purple → 40% black
@@ -1433,7 +1438,6 @@
       ];
 
       function update() {
-        const target = video ? video.offsetTop : el.offsetHeight;
         const t = easeInOut(Math.min(1, Math.max(0, window.scrollY / target)));
         let i = 0;
         while (i < stops.length - 2 && t >= stops[i + 1][0]) i++;
@@ -1454,7 +1458,9 @@
       }
 
       window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('load', update);
+      window.addEventListener('load', () => { cacheTarget(); update(); });
+      window.addEventListener('resize', cacheTarget, { passive: true });
+      cacheTarget();
       update();
     })();
 
