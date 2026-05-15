@@ -1007,6 +1007,15 @@
         }, 2000);
       });
     });
+
+    window.addEventListener('pageshow', (e) => {
+      if (e.persisted) {
+        document.querySelectorAll('.work-media video').forEach(v => {
+          v.load();
+          v.play().catch(() => {});
+        });
+      }
+    });
   </script>
 
 </body>
