@@ -387,7 +387,6 @@
       position: relative;
       overflow: hidden;
       background: #000;
-      cursor: crosshair;
     }
 
     #scratchboard-canvas {
@@ -411,23 +410,23 @@
 
     .scratchcard-headline {
       font-family: "Host Grotesk", sans-serif;
-      font-size: clamp(32px, 6vw, 88px);
+      font-size: clamp(56px, 11vw, 180px);
       font-weight: 800;
       font-style: italic;
-      line-height: 0.95;
+      line-height: 0.9;
       color: #B89A4A;
       text-align: center;
       text-transform: uppercase;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
     }
 
     .scratchcard-exp {
       font-family: "Host Grotesk", sans-serif;
-      font-size: clamp(11px, 1.6vw, 22px);
+      font-size: clamp(14px, 2.5vw, 40px);
       font-weight: 700;
       font-style: italic;
       color: #fff;
-      margin-top: clamp(6px, 1vw, 14px);
+      margin-top: clamp(8px, 1.2vw, 18px);
       text-align: center;
     }
 
@@ -1338,7 +1337,6 @@
   <script>
     // ── Scratch card ──
     (function () {
-      const SM = 'State Machine 1';
       const rivCanvas = document.getElementById('scratchboard-canvas');
       const scratchCanvas = document.getElementById('scratch-canvas');
       const ctx = scratchCanvas.getContext('2d');
@@ -1346,7 +1344,6 @@
 
       // Tomorrow's date in Belgrade timezone
       const nowBelgrade = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Belgrade' }));
-      nowBelgrade.setDate(nowBelgrade.getDate() + 1);
       const d = String(nowBelgrade.getDate()).padStart(2, '0');
       const m = String(nowBelgrade.getMonth() + 1).padStart(2, '0');
       const y = nowBelgrade.getFullYear();
@@ -1365,16 +1362,25 @@
         if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
         riveInst = new rive.Rive({
           buffer: buffer.slice(0), canvas: rivCanvas,
-          stateMachines: SM, autoplay: true, autoBind: true,
+          autoplay: true,
           fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
-          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoad: () => {
+            riveInst.resizeDrawingSurfaceToCanvas();
+            // Play all available animations/state machines
+            const sms = riveInst.stateMachineNames;
+            const anims = riveInst.animationNames;
+            if (sms && sms.length) riveInst.play(sms);
+            else if (anims && anims.length) riveInst.play(anims);
+            else riveInst.play();
+          },
           onLoadError: e => console.error('skrechboard:', e),
         });
       }
 
-      // Scratch layer
+      // Scratch layer — store points as normalized coords so resize can replay them
       const img = new Image();
       img.src = 'SkrechLayer.png';
+      const scratchedPoints = []; // [{nx, ny}] normalized 0-1
 
       function sizeScratchCanvas() {
         const p = scratchCanvas.parentElement;
@@ -1394,6 +1400,20 @@
           ctx.fillStyle = '#ccc';
           ctx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
         }
+        // Re-apply all previously scratched points
+        reapplyScratches();
+      }
+
+      function reapplyScratches() {
+        if (!scratchedPoints.length) return;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const radius = 40 * dpr;
+        ctx.globalCompositeOperation = 'destination-out';
+        for (const { nx, ny } of scratchedPoints) {
+          ctx.beginPath();
+          ctx.arc(nx * scratchCanvas.width, ny * scratchCanvas.height, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
 
       img.onload = () => { if (scratchCanvas.width > 0) drawScratchLayer(); };
@@ -1403,21 +1423,18 @@
       function getPos(e) {
         const r = scratchCanvas.getBoundingClientRect();
         const dpr = Math.min(2, window.devicePixelRatio || 1);
-        let cx, cy;
-        if (e.touches && e.touches.length) {
-          cx = e.touches[0].clientX; cy = e.touches[0].clientY;
-        } else {
-          cx = e.clientX; cy = e.clientY;
-        }
+        const cx = e.clientX, cy = e.clientY;
         return [(cx - r.left) * dpr, (cy - r.top) * dpr];
       }
 
-      function scratch(x, y) {
+      function scratch(physX, physY) {
         const dpr = Math.min(2, window.devicePixelRatio || 1);
-        const radius = 36 * dpr;
+        const radius = 40 * dpr;
+        // Save normalized position so it survives resize
+        scratchedPoints.push({ nx: physX / scratchCanvas.width, ny: physY / scratchCanvas.height });
         ctx.globalCompositeOperation = 'destination-out';
         ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.arc(physX, physY, radius, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -1432,8 +1449,8 @@
         const [x, y] = getPos(e);
         scratch(x, y);
       });
-      scratchCanvas.addEventListener('pointerup',   () => { isScratching = false; });
-      scratchCanvas.addEventListener('pointerout',  () => { isScratching = false; });
+      scratchCanvas.addEventListener('pointerup',  () => { isScratching = false; });
+      scratchCanvas.addEventListener('pointerout', () => { isScratching = false; });
 
       let loaded = false;
       new IntersectionObserver(entries => {
@@ -1447,13 +1464,14 @@
                 buffer = await fetch('skrechboard.riv').then(r => r.arrayBuffer());
                 startRive();
               }));
-            } else if (riveInst) { riveInst.play(SM); }
+            } else if (riveInst) { riveInst.play(); }
           } else if (riveInst) { riveInst.pause(); }
         });
       }, { rootMargin: '200px 0px', threshold: 0 }).observe(scratchCanvas.parentElement);
 
       window.addEventListener('resize', () => {
-        sizeRivCanvas(); sizeScratchCanvas();
+        sizeRivCanvas();
+        sizeScratchCanvas(); // redraws image + replays all scratches
         if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
       });
     })();
