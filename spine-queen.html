@@ -30,30 +30,40 @@
     let current = 0;
 
     function init() {
-      const atlas = assets.get('Queen.atlas');
-      const loader = new spine.AtlasAttachmentLoader(atlas);
-      const binary = new spine.SkeletonBinary(loader);
-      binary.scale = 0.5;
+      try {
+        const atlas = assets.get('Queen.atlas');
+        console.log('atlas:', atlas);
+        const loader = new spine.AtlasAttachmentLoader(atlas);
+        const binary = new spine.SkeletonBinary(loader);
+        binary.scale = 0.5;
 
-      const data = binary.readSkeletonData(assets.get('Queen.skel'));
-      skeleton = new spine.Skeleton(data);
-      skeleton.setToSetupPose();
-      skeleton.updateWorldTransform();
+        const skelData = assets.get('Queen.skel');
+        console.log('skelData:', skelData);
+        const data = binary.readSkeletonData(skelData);
+        console.log('animations:', data.animations.map(a => a.name));
 
-      const stateData = new spine.AnimationStateData(data);
-      stateData.defaultMix = 0.3;
-      animState = new spine.AnimationState(stateData);
-      animState.setAnimation(0, 'Idle', true);
+        skeleton = new spine.Skeleton(data);
+        skeleton.setToSetupPose();
+        skeleton.updateWorldTransform();
 
-      // center camera on skeleton bounds
-      const offset = new spine.Vector2();
-      const size = new spine.Vector2();
-      skeleton.getBounds(offset, size, []);
+        const stateData = new spine.AnimationStateData(data);
+        stateData.defaultMix = 0.3;
+        animState = new spine.AnimationState(stateData);
+        animState.setAnimation(0, 'Idle', true);
 
-      renderer.camera.position.x = offset.x + size.x / 2;
-      renderer.camera.position.y = offset.y + size.y / 2;
-      renderer.camera.zoom = Math.max(size.x / canvas.width, size.y / canvas.height) * 1.2;
-      renderer.camera.update();
+        const offset = new spine.Vector2();
+        const size = new spine.Vector2();
+        skeleton.getBounds(offset, size, []);
+        console.log('bounds offset:', offset, 'size:', size);
+
+        renderer.camera.position.x = offset.x + size.x / 2;
+        renderer.camera.position.y = offset.y + size.y / 2;
+        renderer.camera.zoom = Math.max(size.x / canvas.width, size.y / canvas.height) * 1.2;
+        renderer.camera.update();
+      } catch(e) {
+        console.error('init error:', e);
+        document.body.innerHTML = '<pre style="color:red;padding:20px">' + e + '\n' + e.stack + '</pre>';
+      }
     }
 
     // click to toggle animations
