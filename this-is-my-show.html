@@ -46,21 +46,6 @@
       padding: 0 clamp(20px, 3.5vw, 48px) clamp(32px, 4vw, 56px);
     }
 
-    @media (min-width: 768px) {
-      #page-top {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-template-areas:
-          "header  header  header"
-          "title   credits credits"
-          "video   video   video";
-      }
-
-      #header         { grid-area: header; }
-      #project-header { grid-area: title;   padding-bottom: clamp(32px, 4vw, 56px); }
-      #credits        { grid-area: credits; align-self: start; padding-top: 0; }
-      #video-wrap     { grid-area: video; }
-    }
 
     #project-title h1 {
       font-size: clamp(32px, 5vw, 72px);
@@ -150,6 +135,22 @@
       font-weight: 500;
       line-height: 1.5;
       color: #000;
+    }
+
+    @media (min-width: 768px) {
+      #page-top {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-areas:
+          "header  header  header"
+          "title   credits credits"
+          "video   video   video";
+      }
+
+      #header         { grid-area: header; }
+      #project-header { grid-area: title; padding-bottom: clamp(32px, 4vw, 56px); }
+      #credits        { grid-area: credits; align-self: start; padding-top: 0; }
+      #video-wrap     { grid-area: video; }
     }
 
     /* ── FOOTER / CONTACT ── */
