@@ -378,6 +378,67 @@
 
     .stamp-in  { animation: stamp-spring 0.28s cubic-bezier(0.36, 0, 0.66, -0.56) both; }
     .stamp-out { animation: stamp-fade   0.2s  ease forwards; }
+
+    /* ── SCRATCH CARD ── */
+    .si-scratchcard {
+      grid-column: 1 / 3;
+      grid-row: 8;
+      aspect-ratio: 2 / 1;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      cursor: crosshair;
+    }
+
+    #scratchboard-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .scratchcard-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      gap: 0;
+    }
+
+    .scratchcard-headline {
+      font-family: "Host Grotesk", sans-serif;
+      font-size: clamp(32px, 6vw, 88px);
+      font-weight: 800;
+      font-style: italic;
+      line-height: 0.95;
+      color: #B89A4A;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+
+    .scratchcard-exp {
+      font-family: "Host Grotesk", sans-serif;
+      font-size: clamp(11px, 1.6vw, 22px);
+      font-weight: 700;
+      font-style: italic;
+      color: #fff;
+      margin-top: clamp(6px, 1vw, 14px);
+      text-align: center;
+    }
+
+    #scratch-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
   </style>
 </head>
 <body>
@@ -516,6 +577,15 @@
     <!-- Row 7: illusion cols 2-3 -->
     <div class="showcase-item si-illusion">
       <canvas id="illusion-canvas"></canvas>
+    </div>
+    <!-- Row 8: scratch card cols 1-2 -->
+    <div class="showcase-item si-scratchcard" id="scratchcard">
+      <canvas id="scratchboard-canvas"></canvas>
+      <div class="scratchcard-text">
+        <div class="scratchcard-headline">HAVE A<br>NICE DAY!</div>
+        <div class="scratchcard-exp" id="scratchcard-exp"></div>
+      </div>
+      <canvas id="scratch-canvas"></canvas>
     </div>
     <!-- Row 8: box col 3 -->
     <div class="showcase-item si-box">
@@ -1262,6 +1332,130 @@
         });
       }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
       window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Scratch card ──
+    (function () {
+      const SM = 'State Machine 1';
+      const rivCanvas = document.getElementById('scratchboard-canvas');
+      const scratchCanvas = document.getElementById('scratch-canvas');
+      const ctx = scratchCanvas.getContext('2d');
+      let riveInst = null, buffer = null;
+
+      // Tomorrow's date in Belgrade timezone
+      const nowBelgrade = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Belgrade' }));
+      nowBelgrade.setDate(nowBelgrade.getDate() + 1);
+      const d = String(nowBelgrade.getDate()).padStart(2, '0');
+      const m = String(nowBelgrade.getMonth() + 1).padStart(2, '0');
+      const y = nowBelgrade.getFullYear();
+      document.getElementById('scratchcard-exp').textContent = `EXP: ${d}.${m}.${y}.`;
+
+      function sizeRivCanvas() {
+        const p = rivCanvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || Math.round(cssW / 2);
+        rivCanvas.width = Math.round(cssW * dpr); rivCanvas.height = Math.round(cssH * dpr);
+        rivCanvas.style.width = cssW + 'px'; rivCanvas.style.height = cssH + 'px';
+      }
+
+      function startRive() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas: rivCanvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('skrechboard:', e),
+        });
+      }
+
+      // Scratch layer
+      const img = new Image();
+      img.src = 'SkrechLayer.png';
+
+      function sizeScratchCanvas() {
+        const p = scratchCanvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || Math.round(cssW / 2);
+        scratchCanvas.width = Math.round(cssW * dpr); scratchCanvas.height = Math.round(cssH * dpr);
+        scratchCanvas.style.width = cssW + 'px'; scratchCanvas.style.height = cssH + 'px';
+        drawScratchLayer();
+      }
+
+      function drawScratchLayer() {
+        ctx.globalCompositeOperation = 'source-over';
+        if (img.complete && img.naturalWidth) {
+          ctx.drawImage(img, 0, 0, scratchCanvas.width, scratchCanvas.height);
+        } else {
+          ctx.fillStyle = '#ccc';
+          ctx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+        }
+      }
+
+      img.onload = () => { if (scratchCanvas.width > 0) drawScratchLayer(); };
+
+      let isScratching = false;
+
+      function getPos(e) {
+        const r = scratchCanvas.getBoundingClientRect();
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        let cx, cy;
+        if (e.touches && e.touches.length) {
+          cx = e.touches[0].clientX; cy = e.touches[0].clientY;
+        } else {
+          cx = e.clientX; cy = e.clientY;
+        }
+        return [(cx - r.left) * dpr, (cy - r.top) * dpr];
+      }
+
+      function scratch(x, y) {
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const radius = 36 * dpr;
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      scratchCanvas.addEventListener('pointerdown', e => {
+        isScratching = true;
+        scratchCanvas.setPointerCapture(e.pointerId);
+        const [x, y] = getPos(e);
+        scratch(x, y);
+      });
+      scratchCanvas.addEventListener('pointermove', e => {
+        if (!isScratching) return;
+        const [x, y] = getPos(e);
+        scratch(x, y);
+      });
+      scratchCanvas.addEventListener('pointerup',   () => { isScratching = false; });
+      scratchCanvas.addEventListener('pointerout',  () => { isScratching = false; });
+
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) {
+              loaded = true;
+              requestAnimationFrame(() => requestAnimationFrame(async () => {
+                sizeRivCanvas();
+                sizeScratchCanvas();
+                buffer = await fetch('skrechboard.riv').then(r => r.arrayBuffer());
+                startRive();
+              }));
+            } else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(scratchCanvas.parentElement);
+
+      window.addEventListener('resize', () => {
+        sizeRivCanvas(); sizeScratchCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
     })();
   </script>
 
