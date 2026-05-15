@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Queen — Spine Test</title>
+  <link rel="stylesheet" href="https://esotericsoftware.com/files/spine-player/4.2/spine-player.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: sans-serif;
+      color: #fff;
+    }
+    h1 { margin-bottom: 24px; font-size: 1.2rem; opacity: 0.6; letter-spacing: 0.1em; text-transform: uppercase; }
+    #player { width: 600px; height: 600px; }
+  </style>
+</head>
+<body>
+  <h1>Queen</h1>
+  <div id="player"></div>
+
+  <script src="https://esotericsoftware.com/files/spine-player/4.2/spine-player.js"></script>
+  <script>
+    new spine.SpinePlayer("player", {
+      skelUrl: "Queen.skel",
+      atlasUrl: "Queen.atlas",
+      showControls: true,
+      backgroundColor: "#1a1a2e00",
+      premultipliedAlpha: false,
+      success: function(player) {
+        console.log("Animations:", player.animationState.data.skeletonData.animations.map(a => a.name));
+      },
+      error: function(player, msg) {
+        console.error("Spine error:", msg);
+      }
+    });
+  </script>
+</body>
+</html>
