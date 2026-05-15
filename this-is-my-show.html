@@ -39,24 +39,27 @@
     }
 
     /* ── TITLE + TAGLINE ── */
-    #project-info {
-      display: grid;
-      grid-template-columns: 1fr;
-      padding: 0 clamp(20px, 3.5vw, 48px) clamp(32px, 4vw, 56px);
-      gap: clamp(24px, 3vw, 40px);
-    }
-
-    @media (min-width: 768px) {
-      #project-info {
-        grid-template-columns: 1fr 1fr;
-        align-items: end;
-      }
-    }
-
     #project-header {
       display: flex;
       flex-direction: column;
       gap: 0;
+      padding: 0 clamp(20px, 3.5vw, 48px) clamp(32px, 4vw, 56px);
+    }
+
+    @media (min-width: 768px) {
+      #page-top {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-areas:
+          "header  header  header"
+          "title   credits credits"
+          "video   video   video";
+      }
+
+      #header         { grid-area: header; }
+      #project-header { grid-area: title;   padding-bottom: clamp(32px, 4vw, 56px); }
+      #credits        { grid-area: credits; align-self: start; padding-top: 0; }
+      #video-wrap     { grid-area: video; }
     }
 
     #project-title h1 {
@@ -107,7 +110,7 @@
 
     /* ── CREDITS ── */
     #credits {
-      padding: 0;
+      padding: clamp(32px, 4vw, 56px) clamp(20px, 3.5vw, 48px) clamp(64px, 9vw, 120px);
       max-width: 900px;
       display: flex;
       flex-direction: column;
@@ -293,35 +296,17 @@
     <a href="/" id="logo">a–z</a>
   </header>
 
-  <div id="project-info">
-
-    <div id="project-header">
-      <div id="project-title">
-        <h1>
-          <span>This Is</span>
-          <span>My Show</span>
-        </h1>
-      </div>
-      <div id="tagline">
-        <span>Mixed media.</span>
-        <span>Animation project.</span>
-      </div>
+  <div id="project-header">
+    <div id="project-title">
+      <h1>
+        <span>This Is</span>
+        <span>My Show</span>
+      </h1>
     </div>
-
-    <div id="credits">
-      <p class="credits-desc">A show fully crafted by me, from creative direction and illustration to animation and music.</p>
-      <div class="credits-meta">
-        <div class="credits-col">
-          <span class="credits-label">Role</span>
-          <span class="credits-value">Animator<br>Illustrator<br>Art / Creative Director</span>
-        </div>
-        <div class="credits-col">
-          <span class="credits-label">Tech</span>
-          <span class="credits-value">After Effects, Photoshop<br>Illustrator, Cinema 4D,<br>FL Studio</span>
-        </div>
-      </div>
+    <div id="tagline">
+      <span>Mixed media.</span>
+      <span>Animation project.</span>
     </div>
-
   </div>
 
   <div id="video-wrap">
@@ -332,6 +317,20 @@
         referrerpolicy="strict-origin-when-cross-origin"
         title="This Is My Show">
       </iframe>
+    </div>
+  </div>
+
+  <div id="credits">
+    <p class="credits-desc">A show fully crafted by me, from creative direction and illustration to animation and music.</p>
+    <div class="credits-meta">
+      <div class="credits-col">
+        <span class="credits-label">Role</span>
+        <span class="credits-value">Animator<br>Illustrator<br>Art / Creative Director</span>
+      </div>
+      <div class="credits-col">
+        <span class="credits-label">Tech</span>
+        <span class="credits-value">After Effects, Photoshop<br>Illustrator, Cinema 4D,<br>FL Studio</span>
+      </div>
     </div>
   </div>
 
