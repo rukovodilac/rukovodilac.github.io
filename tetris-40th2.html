@@ -1427,8 +1427,8 @@
       // 40% blue → 20% purple → 40% black
       const stops = [
         [0.0,  21,  91, 254],
-        [0.4, 214, 193, 162],
-        [0.6, 214, 193, 162],
+        [0.4, 178, 106, 237],
+        [0.6, 178, 106, 237],
         [1.0,   0,   0,   0]
       ];
 
@@ -1445,7 +1445,16 @@
         el.style.background = `rgb(${r},${g},${b})`;
       }
 
-      window.addEventListener('scroll', update, { passive: true });
+      let rafPending = false;
+      function onScroll() {
+        if (!rafPending) {
+          rafPending = true;
+          requestAnimationFrame(() => { update(); rafPending = false; });
+        }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('load', update);
       update();
     })();
 
