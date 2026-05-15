@@ -148,13 +148,14 @@
         grid-template-columns: 1fr 1fr 1fr;
         grid-template-areas:
           "header  header  header"
-          "title   credits credits"
-          "video   video   video";
+          "title   .       ."
+          "video   video   video"
+          "credits credits credits";
       }
 
       #header         { grid-area: header; }
       #project-header { grid-area: title; padding-bottom: clamp(32px, 4vw, 56px); }
-      #credits        { grid-area: credits; align-self: start; padding-top: 0; }
+      #credits        { grid-area: credits; }
       #video-wrap     { grid-area: video; }
     }
 
