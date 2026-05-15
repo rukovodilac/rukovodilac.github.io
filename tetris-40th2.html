@@ -18,7 +18,7 @@
 
     body {
       font-family: "Host Grotesk", sans-serif;
-      background: #000;
+      background: #155BFE;
     }
 
     /* ── HEADER ── */
@@ -135,6 +135,26 @@
       font-weight: 500;
       line-height: 1.5;
       color: #fff;
+    }
+
+    @media (min-width: 768px) {
+      #video-wrap {
+        padding-bottom: clamp(32px, 4vw, 56px);
+      }
+
+      #page-top {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-areas:
+          "header  header  header"
+          "title   credits credits"
+          "video   video   video";
+      }
+
+      #header         { grid-area: header; }
+      #project-header { grid-area: title; padding-bottom: clamp(32px, 4vw, 56px); }
+      #credits        { grid-area: credits; align-self: start; padding-top: 0; }
+      #video-wrap     { grid-area: video; }
     }
 
     /* ── FOOTER / CONTACT ── */
@@ -1474,6 +1494,24 @@
       update();
     })();
 
+  </script>
+
+  <script>
+    (function () {
+      const TOP    = '#155BFE';
+      const BOTTOM = '#fff';
+      const THRESHOLD = 4;
+
+      function update() {
+        const atBottom =
+          window.scrollY + window.innerHeight >=
+          document.documentElement.scrollHeight - THRESHOLD;
+        document.body.style.background = atBottom ? BOTTOM : TOP;
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
   </script>
 
 </body>
