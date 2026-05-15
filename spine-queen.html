@@ -44,7 +44,7 @@
 
         skeleton = new spine.Skeleton(data);
         skeleton.setToSetupPose();
-        skeleton.updateWorldTransform();
+        skeleton.updateWorldTransform(spine.Physics.update);
 
         const stateData = new spine.AnimationStateData(data);
         stateData.defaultMix = 0.3;
@@ -94,7 +94,7 @@
       if (skeleton && animState) {
         animState.update(delta);
         animState.apply(skeleton);
-        skeleton.updateWorldTransform();
+        skeleton.updateWorldTransform(spine.Physics.update);
 
         renderer.begin();
         renderer.drawSkeleton(skeleton, true);
