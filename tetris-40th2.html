@@ -1421,9 +1421,11 @@
       function lerp(a, b, t) { return a + (b - a) * t; }
       function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
 
+      const video = document.getElementById('video-wrap');
+
       function update() {
-        const h = el.offsetHeight;
-        const t = easeInOut(Math.min(1, Math.max(0, window.scrollY / h)));
+        const target = video ? video.offsetTop : el.offsetHeight;
+        const t = easeInOut(Math.min(1, Math.max(0, window.scrollY / target)));
         const r = Math.round(lerp(10,  0, t));
         const g = Math.round(lerp(75,  0, t));
         const b = Math.round(lerp(189, 0, t));
