@@ -367,8 +367,8 @@
     }
 
     @keyframes stamp-spring {
-      from { transform: translate(-50%, -50%) scale(0) rotate(var(--sr)); }
-      to   { transform: translate(-50%, -50%) scale(1) rotate(var(--sr)); }
+      from { transform: translate(-50%, -50%) scale(1.5) rotate(var(--sr)); }
+      to   { transform: translate(-50%, -50%) scale(1)   rotate(var(--sr)); }
     }
 
     @keyframes stamp-fade {
@@ -376,7 +376,7 @@
       to   { opacity: 0;   transform: translate(-50%, -50%) scale(0.75) rotate(var(--sr)); }
     }
 
-    .stamp-in  { animation: stamp-spring 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+    .stamp-in  { animation: stamp-spring 0.28s cubic-bezier(0.36, 0, 0.66, -0.56) both; }
     .stamp-out { animation: stamp-fade   0.2s  ease forwards; }
   </style>
 </head>
