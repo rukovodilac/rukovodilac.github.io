@@ -76,7 +76,13 @@
 
     /* ── VIDEO ── */
     #video-wrap {
-      padding: 0 clamp(20px, 3.5vw, 48px) clamp(32px, 4vw, 56px);
+      padding: 0 clamp(20px, 3.5vw, 48px);
+    }
+
+    @media (min-width: 768px) {
+      #video-wrap {
+        padding-bottom: clamp(32px, 4vw, 56px);
+      }
     }
 
     .vimeo-container {
