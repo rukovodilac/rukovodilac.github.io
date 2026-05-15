@@ -30,8 +30,9 @@
     new spine.SpinePlayer("player", {
       skelUrl: "Queen.skel",
       atlasUrl: "Queen.atlas",
+      animation: "Idle",
       showControls: true,
-      backgroundColor: "#1a1a2e00",
+      backgroundColor: "#1a1a2e",
       premultipliedAlpha: true,
       success: function(player) {
         console.log("Animations:", player.animationState.data.skeletonData.animations.map(a => a.name));
