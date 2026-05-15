@@ -1422,10 +1422,16 @@
       function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
 
       const video = document.getElementById('video-wrap');
+      const projectTitle = document.getElementById('project-title');
       let target = 1;
 
       function cacheTarget() {
-        target = video ? video.offsetTop : el.offsetHeight || 1;
+        const isMobile = window.innerWidth < 768;
+        if (isMobile && projectTitle) {
+          target = projectTitle.offsetTop + projectTitle.offsetHeight;
+        } else {
+          target = video ? video.offsetTop : el.offsetHeight || 1;
+        }
       }
 
       // [position 0–1, r, g, b]
