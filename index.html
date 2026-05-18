@@ -36,9 +36,17 @@
     #hero {
       position: relative;
       width: 100%;
-      height: max(80px, calc(50vw * 9 / 32));
+      height: min(100vh, calc(100vw * 9 / 16));
       overflow: hidden;
-      background: #E0EC8A;
+    }
+
+    #rive-canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
     }
 
     #trail-canvas {
@@ -54,69 +62,40 @@
       position: absolute;
       inset: 0;
       pointer-events: none;
-      display: flex;
-      align-items: stretch;
     }
 
     #logo {
-      display: flex;
-      align-items: center;
-      padding: 0 clamp(20px, 3.5vw, 48px);
-      font-size: clamp(28px, 3.5vw, 52px);
+      position: absolute;
+      top: clamp(20px, 3vw, 40px);
+      left: clamp(20px, 3.5vw, 48px);
+      font-size: clamp(48px, 6.5vw, 96px);
       font-weight: 500;
       line-height: 1;
       color: #000;
       text-decoration: none;
       pointer-events: auto;
-      flex-shrink: 0;
-      background: #F4E9D5;
-      border-right: 2px solid #000;
     }
 
-    .hero-marquee {
-      flex: 1;
-      overflow: hidden;
+    #headline {
+      position: absolute;
+      bottom: clamp(28px, 5vh, 72px);
+      left: clamp(20px, 3.5vw, 48px);
       display: flex;
-      align-items: center;
-      cursor: default;
+      flex-direction: column;
+      gap: 0;
+      pointer-events: auto;
+      user-select: text;
     }
 
-    .hero-marquee-track {
-      display: flex;
-      align-items: center;
-      white-space: nowrap;
-      will-change: transform;
-      animation: hero-scroll 24s linear infinite;
-    }
-
-    .hero-marquee:hover .hero-marquee-track {
-      animation-play-state: paused;
-    }
-
-    .hero-item {
-      font-size: clamp(18px, 2.6vw, 38px);
+    #headline span {
+      display: block;
+      width: fit-content;
+      background: #E0EC8A;
+      padding: 2px 10px;
+      font-size: clamp(24px, 4vw, 120px);
       font-weight: 500;
       line-height: 1;
       color: #000;
-      padding: 0 clamp(16px, 2.5vw, 36px);
-    }
-
-    .hero-sep {
-      display: inline-block;
-      width: 0.45em;
-      height: 0.45em;
-      background: #000;
-      vertical-align: middle;
-      flex-shrink: 0;
-    }
-
-    @keyframes hero-scroll {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .hero-marquee-track { animation-play-state: paused; }
     }
 
     /* ── WORK SECTION ── */
@@ -570,13 +549,13 @@
 
   <section id="hero">
     <canvas id="trail-canvas"></canvas>
+    <canvas id="rive-canvas"></canvas>
 
     <div id="overlay">
       <a href="/" id="logo">a–z</a>
-      <div class="hero-marquee">
-        <div class="hero-marquee-track" aria-label="Interactive Motion Designer for Games, Apps and Web">
-          <span class="hero-item">Interactive Motion Designer</span><span class="hero-sep" aria-hidden="true"></span><span class="hero-item">for Games, Apps &amp; Web</span><span class="hero-sep" aria-hidden="true"></span><span class="hero-item">Interactive Motion Designer</span><span class="hero-sep" aria-hidden="true"></span><span class="hero-item">for Games, Apps &amp; Web</span><span class="hero-sep" aria-hidden="true"></span>
-        </div>
+      <div id="headline">
+        <span>Interactive Motion Designer</span>
+        <span>for Games, Apps &amp; Web</span>
       </div>
     </div>
   </section>
@@ -701,10 +680,25 @@
     window.scrollTo(0, 0);
 
     function heroH() {
-      return Math.max(80, Math.round(window.innerWidth * 0.5 * 9 / 32));
+      return Math.min(window.innerHeight, Math.round(window.innerWidth * 9 / 16));
     }
 
     const dpr = window.devicePixelRatio || 1;
+
+    const canvas = document.getElementById('rive-canvas');
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = heroH() * dpr;
+
+    const r = new rive.Rive({
+      src: 'web_head_full.riv',
+      canvas: canvas,
+      animations: 'Idle',
+      autoplay: true,
+      fit: rive.Fit.Cover,
+      alignment: rive.Alignment.Center,
+      onLoad: () => requestAnimationFrame(() => r.resizeDrawingSurfaceToCanvas()),
+      onLoadError: (e) => console.error('Rive error:', e)
+    });
 
     const trailCanvas = document.getElementById('trail-canvas');
     const tc = trailCanvas.getContext('2d');
@@ -868,6 +862,7 @@
     doneCanvas.addEventListener('touchend', (e) => { e.preventDefault(); fireSlot(); }, { passive: false });
 
     window.addEventListener('resize', () => {
+      r.resizeDrawingSurfaceToCanvas();
       trailCanvas.width = window.innerWidth * dpr;
       trailCanvas.height = heroH() * dpr;
       tc.scale(dpr, dpr);
