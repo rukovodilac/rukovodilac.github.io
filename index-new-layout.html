@@ -91,10 +91,6 @@
     .work-item-wrap {
       display: flex;
       flex-direction: column;
-      gap: 0;
-      border-radius: 12px;
-      border: 1px solid #000;
-      overflow: hidden;
     }
 
     /* Row 1: narrow | wide — Row 2: wide | narrow */
@@ -111,6 +107,7 @@
       cursor: pointer;
       aspect-ratio: 16 / 9;
       width: 100%;
+      border-radius: 20px;
     }
 
     .work-media {
@@ -141,33 +138,38 @@
       -webkit-appearance: none;
     }
 
-    /* Tag overlaid inside image, bottom-left */
-    .work-tag-overlay {
+    /* Tag + title stacked inside image, bottom-left */
+    .work-overlay {
       position: absolute;
-      bottom: clamp(10px, 1.2vw, 16px);
-      left: clamp(10px, 1.2vw, 16px);
+      bottom: clamp(10px, 1.4vw, 18px);
+      left: clamp(10px, 1.4vw, 18px);
+      right: clamp(10px, 1.4vw, 18px);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+      pointer-events: none;
+    }
+
+    .work-tag-overlay {
       background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 6px;
+      border-radius: 8px;
       padding: 5px 10px;
       font-size: clamp(11px, 0.85vw, 13px);
       font-weight: 500;
       color: #000;
       line-height: 1;
-      pointer-events: none;
-    }
-
-    /* Caption below thumbnail */
-    .work-caption {
-      padding: clamp(12px, 1.4vw, 18px) clamp(14px, 1.4vw, 20px);
-      border-top: 1px solid rgba(0,0,0,0.08);
     }
 
     .work-title {
-      font-size: clamp(14px, 1.3vw, 20px);
+      background: rgba(255,255,255,0.92);
+      border-radius: 8px;
+      padding: clamp(8px, 1vw, 12px) clamp(10px, 1.2vw, 14px);
+      font-size: clamp(13px, 1.2vw, 18px);
       font-weight: 600;
       line-height: 1.3;
       color: #000;
+      width: 100%;
     }
 
     .arrow-icon {
@@ -600,26 +602,24 @@
           }
           a.appendChild(media);
 
-          // Tag overlaid inside image
+          // Tag + title overlaid inside image
+          const overlay = document.createElement('div');
+          overlay.className = 'work-overlay';
+
           if (p.tags && p.tags.length) {
             const tag = document.createElement('div');
             tag.className = 'work-tag-overlay';
             tag.textContent = p.tags[0].label;
-            a.appendChild(tag);
+            overlay.appendChild(tag);
           }
-
-          wrap.appendChild(a);
-
-          // Caption: just the project title
-          const caption = document.createElement('div');
-          caption.className = 'work-caption';
 
           const titleEl = document.createElement('div');
           titleEl.className = 'work-title';
           titleEl.textContent = p.title.join(' ');
-          caption.appendChild(titleEl);
+          overlay.appendChild(titleEl);
 
-          wrap.appendChild(caption);
+          a.appendChild(overlay);
+          wrap.appendChild(a);
           row.appendChild(wrap);
         });
 
