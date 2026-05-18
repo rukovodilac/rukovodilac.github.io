@@ -92,17 +92,22 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.1em;
+      gap: 0.05em;
     }
 
     .headline-line span {
       display: inline-block;
       background: #E0EC8A;
-      padding: 0.07em 0.22em;
+      padding: 0.07em 0.15em;
       font-weight: 500;
       line-height: 1;
       color: #000;
       border-radius: var(--r, 4px);
+    }
+
+    .hl-stroke {
+      background: transparent;
+      box-shadow: inset 0 0 0 2px #000;
     }
 
     /* ── WORK SECTION ── */
@@ -562,16 +567,16 @@
       <a href="/" id="logo">a–z</a>
       <div id="headline">
         <div class="headline-line">
-          <span style="--r:8px">Interactive</span>
-          <span style="--r:999px">Motion</span>
-          <span style="--r:20px">Designer</span>
+          <span style="--r:0 16px 0 16px">Interactive</span>
+          <span class="hl-stroke" style="--r:999px">Motion</span>
+          <span style="--r:0px">Designer</span>
         </div>
         <div class="headline-line">
-          <span style="--r:999px">for</span>
-          <span style="--r:4px">Games,</span>
-          <span style="--r:999px">Apps</span>
-          <span style="--r:999px; aspect-ratio:1/1; display:inline-flex; align-items:center; justify-content:center; padding:0.12em;">&amp;</span>
-          <span style="--r:14px">Web</span>
+          <span class="hl-stroke" style="--r:999px">for</span>
+          <span style="--r:16px 0 16px 0">Games,</span>
+          <span class="hl-stroke" style="--r:6px">Apps</span>
+          <span class="hl-stroke" style="--r:999px; aspect-ratio:1/1; display:inline-flex; align-items:center; justify-content:center; padding:0.12em;">&amp;</span>
+          <span style="--r:0 0 16px 0">Web</span>
         </div>
       </div>
     </div>
