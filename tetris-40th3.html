@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tetris® 40th — Aleksandar Zdravković</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "DM Sans", sans-serif;
+      background: #155BFE;
+    }
+
+    /* ── HEADER ── */
+    #page-top {
+      background: #155BFE;
+    }
+
+    #header {
+      padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
+    }
+
+    #logo-circle {
+      display: block;
+      width: clamp(48px, 6.5vw, 96px);
+      height: clamp(48px, 6.5vw, 96px);
+      border-radius: 50%;
+      background: #C5FF30;
+      text-decoration: none;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* ── TITLE + TAGLINE ── */
+    #project-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 0 clamp(20px, 3.5vw, 48px) clamp(32px, 4vw, 56px);
+    }
+
+    #project-title h1 {
+      font-size: clamp(32px, 5vw, 72px);
+      font-weight: 500;
+      line-height: 1.1;
+      color: #fff;
+    }
+
+    #project-title h1 span {
+      display: block;
+      width: fit-content;
+    }
+
+    #tagline {
+      font-size: clamp(24px, 3.5vw, 48px);
+      font-weight: 500;
+      line-height: 1;
+      color: #E0EC8A;
+      margin-top: clamp(8px, 1.5vw, 16px);
+    }
+
+    #tagline span {
+      display: block;
+      width: fit-content;
+    }
+
+    /* ── VIDEO ── */
+    #video-wrap {
+      padding: 0 clamp(20px, 3.5vw, 48px);
+    }
+
+    .vimeo-container {
+      padding: 56.25% 0 0 0;
+      position: relative;
+    }
+
+    .vimeo-container iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* ── CREDITS ── */
+    #credits {
+      padding: clamp(32px, 4vw, 56px) clamp(20px, 3.5vw, 48px) clamp(64px, 9vw, 120px);
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(24px, 3vw, 40px);
+    }
+
+    .credits-desc {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.75);
+      max-width: 620px;
+    }
+
+    .credits-meta {
+      display: flex;
+      gap: clamp(32px, 5vw, 80px);
+      flex-wrap: wrap;
+    }
+
+    .credits-col {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .credits-label {
+      display: inline-block;
+      width: fit-content;
+      font-size: clamp(10px, 0.85vw, 12px);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 6px;
+      padding: 2px 8px;
+    }
+
+    .credits-value {
+      font-size: clamp(14px, 1.3vw, 18px);
+      font-weight: 500;
+      line-height: 1.5;
+      color: #fff;
+    }
+
+    @media (min-width: 768px) {
+      #video-wrap {
+        padding-bottom: clamp(32px, 4vw, 56px);
+      }
+
+      #page-top {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-areas:
+          "header  header  header"
+          "title   credits credits"
+          "video   video   video";
+      }
+
+      #header         { grid-area: header; }
+      #project-header { grid-area: title; padding-bottom: clamp(32px, 4vw, 56px); }
+      #credits        { grid-area: credits; align-self: start; padding-top: 0; }
+      #video-wrap     { grid-area: video; }
+    }
+
+    /* ── FOOTER / CONTACT ── */
+    #contact {
+      background: #155BFE;
+      padding: clamp(32px, 5vw, 64px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: clamp(32px, 5vw, 64px);
+    }
+
+    .contact-tagline {
+      font-size: clamp(28px, 4vw, 56px);
+      font-weight: 500;
+      line-height: 1.3;
+      color: #fff;
+      margin: 0;
+    }
+
+    .contact-linkedin {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .contact-email-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    .contact-email-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: #fff;
+      cursor: pointer;
+      overflow: visible;
+    }
+
+    .email-tooltip {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      background: #fff;
+      color: #000;
+      font-size: clamp(18px, 2vw, 28px);
+      font-weight: 500;
+      padding: 6px 14px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 10;
+    }
+
+    .email-tooltip::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 10px;
+      border: 7px solid transparent;
+      border-bottom-color: #fff;
+    }
+
+    .contact-email-wrap:hover .email-tooltip,
+    .contact-email-wrap.copied .email-tooltip {
+      opacity: 1;
+    }
+
+    .contact-right {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: clamp(8px, 1.5vw, 16px);
+    }
+
+    #footer-logo {
+      width: clamp(48px, 6vw, 88px);
+      height: clamp(48px, 6vw, 88px);
+      border-radius: 50%;
+      background: #C5FF30;
+      display: block;
+      overflow: hidden;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .contact-legal {
+      font-size: clamp(10px, 0.9vw, 13px);
+      color: rgba(255,255,255,0.45);
+      text-align: right;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      #contact {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .contact-right {
+        width: 100%;
+        align-items: flex-start;
+      }
+      .contact-legal {
+        text-align: left;
+      }
+    }
+
+    /* ── Global link underline animation ── */
+    a:not(#logo-circle):not(#footer-logo),
+    .contact-email-btn {
+      position: relative;
+    }
+
+    a:not(#logo-circle):not(#footer-logo)::after,
+    .contact-email-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: currentColor;
+      transition: width 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+      pointer-events: none;
+    }
+
+    @media (hover: hover) {
+      a:not(#logo-circle):not(#footer-logo):hover::after,
+      .contact-email-btn:hover::after {
+        width: 100%;
+      }
+    }
+
+    /* ── PROJECT TAG ── */
+    .project-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      font-size: clamp(13px, 1.2vw, 17px);
+      font-weight: 500;
+      line-height: 1;
+      margin-top: clamp(12px, 1.5vw, 20px);
+    }
+
+    .project-tag svg {
+      width: 1.7em;
+      height: 1.7em;
+      flex-shrink: 0;
+    }
+
+    .project-tag span {
+      height: 1.7em;
+      display: flex;
+      align-items: center;
+      padding: 0 9px;
+      color: rgba(255,255,255,0.75);
+    }
+
+    /* ── PRIMEINTRO SECTION ── */
+    #primeintro-section {
+      width: 100%;
+      height: 100vh;
+      background: #155BFE;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #primeintro-canvas {
+      display: block;
+      width: min(calc(100vw * 0.70), calc(100vh * 0.70 * 1020 / 600));
+      aspect-ratio: 1020 / 600;
+    }
+
+    @media (orientation: portrait) {
+      #primeintro-section {
+        height: calc(70vw * 600 / 1020 + 30vw);
+      }
+      #primeintro-canvas {
+        width: 70vw;
+      }
+    }
+
+    /* ── TETRIS40 SCROLL SECTION ── */
+    #tetris40-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: stretch;
+    }
+
+    .tetris40-rive {
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(48px, 7vw, 100px) clamp(20px, 3.5vw, 48px);
+    }
+
+    #tetris40-canvas {
+      display: block;
+      width: clamp(160px, 28vw, 400px);
+      aspect-ratio: 1 / 1;
+    }
+
+    .tetris40-text {
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(48px, 7vw, 100px) clamp(20px, 3.5vw, 48px);
+    }
+
+    .tetris40-text-inner {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 2.5vw, 36px);
+      max-width: 420px;
+      width: 100%;
+    }
+
+    .tetris40-title {
+      font-size: clamp(28px, 3.5vw, 56px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: #000;
+    }
+
+    .tetris40-title span {
+      display: block;
+      width: fit-content;
+      background: #E0EC8A;
+      color: #000;
+      padding: 2px 10px;
+    }
+
+    .tetris40-body {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    @media (max-width: 768px) {
+      #tetris40-section { grid-template-columns: 1fr; }
+      #tetris40-canvas { width: clamp(160px, 55vw, 300px); }
+      .tetris40-text { padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px); }
+      .tetris40-text-inner { text-align: center; max-width: 100%; }
+      .tetris40-title span { margin: 0 auto; }
+    }
+
+    /* ── INTERP SECTION ── */
+    #interp-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 0;
+      align-items: stretch;
+    }
+
+    .interp-text {
+      grid-column: 1;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(40px, 6vw, 80px) clamp(24px, 3vw, 48px) clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
+    }
+
+    .interp-text-inner {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 2.5vw, 36px);
+      max-width: 480px;
+      width: 100%;
+    }
+
+    .interp-title {
+      font-size: clamp(28px, 3.5vw, 56px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: #000;
+    }
+
+    .interp-title span {
+      display: block;
+      width: fit-content;
+      background: #E0EC8A;
+      color: #000;
+      padding: 2px 10px;
+    }
+
+    .interp-body {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    .interp-rive {
+      grid-column: 2;
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      background: #000;
+    }
+
+    #interp-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    .interp-interactive-tag {
+      position: absolute;
+      top: clamp(14px, 2vw, 24px);
+      left: clamp(14px, 2vw, 24px);
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .interp-interactive-tag svg {
+      width: clamp(16px, 1.75vw, 26px);
+      height: clamp(16px, 1.75vw, 26px);
+    }
+
+    @media (max-width: 768px) {
+      #interp-section { grid-template-columns: 1fr; }
+      .interp-rive { grid-column: 1; order: 1; }
+      .interp-text {
+        grid-column: 1;
+        order: 2;
+        padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
+      }
+      .interp-text-inner { text-align: center; max-width: 100%; }
+      .interp-title span { margin: 0 auto; }
+    }
+
+    /* ── STUDIOS SECTION ── */
+    #studios-section {
+      background: #0068FF;
+    }
+
+    .studios-ribbon-wrap {
+      overflow: hidden;
+      height: 100px;
+    }
+
+    .ribbon-track {
+      display: flex;
+      height: 100px;
+      will-change: transform;
+      animation: ribbon-scroll 42s linear infinite;
+    }
+
+    @keyframes ribbon-scroll {
+      from { transform: translateX(-3000px); }
+      to   { transform: translateX(0); }
+    }
+
+    .ribbon-tile {
+      display: block;
+      flex-shrink: 0;
+      width: 1000px;
+      height: 100px;
+      margin-right: -1px;
+    }
+
+    .studios-inner {
+      padding: clamp(64px, 9vw, 112px) clamp(20px, 3.5vw, 48px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .studios-text-inner {
+      max-width: 640px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 2.5vw, 36px);
+    }
+
+    .studios-title {
+      font-size: clamp(32px, 4.5vw, 72px);
+      font-weight: 500;
+      line-height: 1.15;
+      color: #fff;
+    }
+
+    .studios-title span {
+      display: block;
+      width: fit-content;
+      margin: 0 auto;
+    }
+
+    .studios-body {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.75);
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    /* ── BWCN SECTION ── */
+    #bwcn-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .bwcn-rive {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      background: #000;
+    }
+
+    #bwcn-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+      touch-action: none;
+    }
+
+    .bwcn-interactive-tag {
+      position: absolute;
+      top: clamp(14px, 2vw, 24px);
+      left: clamp(14px, 2vw, 24px);
+      display: flex;
+      align-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .bwcn-interactive-tag svg {
+      width: clamp(16px, 1.75vw, 26px);
+      height: clamp(16px, 1.75vw, 26px);
+    }
+
+    .bwcn-text {
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(40px, 6vw, 80px);
+    }
+
+    .bwcn-text-inner {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 2.5vw, 36px);
+      width: 100%;
+    }
+
+    .bwcn-title {
+      font-size: clamp(28px, 3.5vw, 56px);
+      font-weight: 500;
+      line-height: 1.2;
+      color: #000;
+    }
+
+    .bwcn-title span {
+      display: block;
+      width: fit-content;
+      background: #E0EC8A;
+      color: #000;
+      padding: 2px 10px;
+    }
+
+    .bwcn-body {
+      font-size: clamp(15px, 1.5vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
+
+    @media (max-width: 768px) {
+      #bwcn-section { grid-template-columns: 1fr; }
+      .bwcn-text {
+        padding: clamp(32px, 5vw, 60px) clamp(20px, 3.5vw, 48px);
+      }
+      .bwcn-text-inner { text-align: center; }
+      .bwcn-title span { margin: 0 auto; }
+    }
+
+    /* ── STATEMENT SECTION ── */
+    #statement-section {
+      position: relative;
+      overflow: hidden;
+      background: #155BFE;
+      padding: clamp(80px, 12vw, 160px) clamp(20px, 3.5vw, 48px);
+    }
+
+    .statement-text {
+      position: relative;
+      z-index: 1;
+      font-size: clamp(28px, 4vw, 64px);
+      font-weight: 500;
+      line-height: 1.15;
+      color: #fff;
+      pointer-events: none;
+      text-align: center;
+    }
+
+    /* ── STATS SECTION ── */
+    #stats-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .stat-cell {
+      padding: clamp(40px, 6vw, 88px) clamp(24px, 4vw, 64px);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 0;
+    }
+
+    .stat-cell.bg-black { background: #000; }
+    .stat-cell.bg-lime  { background: #E0EC8A; }
+    .stat-cell.bg-white { background: #fff; }
+    .stat-cell.bg-blue  { background: #155BFE; }
+
+    .stat-number-wrap {
+      line-height: 1;
+    }
+
+    .stat-number {
+      display: block;
+      font-size: clamp(40px, 6vw, 96px);
+      font-weight: 500;
+      line-height: 1;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .stat-cell.bg-black .stat-number { color: #E0EC8A; }
+    .stat-cell.bg-lime  .stat-number { color: #000; }
+    .stat-cell.bg-white .stat-number { color: #000; }
+    .stat-cell.bg-blue  .stat-number { color: #E0EC8A; }
+
+    .stat-cell.in-view .stat-number {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .stat-label-wrap {
+      line-height: 1.1;
+      margin-top: 0.1em;
+    }
+
+    .stat-label {
+      display: block;
+      font-size: clamp(40px, 6vw, 96px);
+      font-weight: 500;
+      line-height: 1.1;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.7s 0.12s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .stat-cell.bg-black .stat-label { color: rgba(255,255,255,0.45); }
+    .stat-cell.bg-lime  .stat-label { color: #fff; }
+    .stat-cell.bg-white .stat-label { color: rgba(0,0,0,0.45); }
+    .stat-cell.bg-blue  .stat-label { color: rgba(255,255,255,0.45); }
+
+    .stat-cell.in-view .stat-label {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      #stats-section { grid-template-columns: 1fr; }
+      .stat-cell { text-align: center; }
+    }
+
+    /* ── COLOPHON SECTION ── */
+    #colophon-section {
+      background: #000;
+      padding: clamp(60px, 8vw, 100px) clamp(20px, 3.5vw, 48px) clamp(80px, 10vw, 120px);
+    }
+
+    .colophon-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: clamp(32px, 4vw, 56px);
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .colophon-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(32px, 5vw, 64px);
+    }
+
+    .colophon-logo {
+      height: auto;
+      display: block;
+      filter: brightness(0) invert(1);
+    }
+
+    .colophon-logos img:nth-child(1) { width: clamp(72px, 8.5vw, 118px); }
+    .colophon-logos img:nth-child(2) { width: clamp(100px, 12vw, 160px); }
+
+    .colophon-copy {
+      font-size: clamp(10px, 0.9vw, 13px);
+      font-weight: 400;
+      line-height: 1.8;
+      color: rgba(255,255,255,0.35);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75em;
+    }
+
+    /* ── GLITCH PIECES ── */
+    .glitch-piece {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      image-rendering: pixelated;
+    }
+  </style>
+</head>
+<body>
+<script>if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; window.scrollTo(0, 0);</script>
+
+  <svg aria-hidden="true" focusable="false" style="display:none;position:absolute;width:0;height:0">
+    <defs>
+      <symbol id="icon-interactive" viewBox="0 0 77 77" style="fill-rule:evenodd;clip-rule:evenodd;">
+        <g transform="matrix(1,0,0,1,-2149.604938,-1183.484688)">
+          <g transform="matrix(1,0,0,1,-149,91.368069)">
+            <circle cx="2337.105" cy="1130.617" r="38.5" fill="#C5FF30"/>
+          </g>
+          <g transform="matrix(0.157025,0,0,0.157025,1855.447913,1025.917434)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0,0.157025,-0.157025,0,2384.172192,889.327663)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(-0.157025,0,0,-0.157025,2520.761963,1418.051942)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0,-0.157025,0.157025,0,1992.037685,1554.641713)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0.111033,-0.111033,0.111033,0.111033,1814.240416,1318.568241)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(0.111033,0.111033,-0.111033,0.111033,2091.521385,848.120165)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(-0.111033,0.111033,-0.111033,-0.111033,2561.969461,1125.401134)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(-0.111033,-0.111033,0.111033,-0.111033,2284.688492,1595.849211)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+        </g>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div id="page-top">
+
+  <header id="header">
+    <a href="/" id="logo-circle" aria-label="Home">
+      <svg viewBox="0 0 100 100" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+              font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#163F1A">a</text>
+      </svg>
+    </a>
+  </header>
+
+  <div id="project-header">
+    <div id="project-title">
+      <h1>
+        <span>Tetris® 40th</span>
+        <span>Mobile Game</span>
+      </h1>
+    </div>
+    <div id="tagline">
+      <span>Classic Tetris.</span>
+      <span>Amplified.</span>
+    </div>
+    <div class="project-tag">
+      <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      <span>Some elements on this page are interactive.<br>Feel free to explore.</span>
+    </div>
+  </div>
+
+  <div id="video-wrap">
+    <div class="vimeo-container">
+      <iframe src="https://player.vimeo.com/video/1190632685?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479"
+        frameborder="0"
+        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        title="TP_Reel">
+      </iframe>
+    </div>
+  </div>
+
+  <div id="credits">
+    <p class="credits-desc">Creative revamp for its 40th anniversary. I guided the animation team in reimagining visuals, elevating motion design, and keeping the iconic brand fresh while honouring its legacy.</p>
+    <div class="credits-meta">
+      <div class="credits-col">
+        <span class="credits-label">Role</span>
+        <span class="credits-value">Animation Team Lead</span>
+      </div>
+      <div class="credits-col">
+        <span class="credits-label">Tech</span>
+        <span class="credits-value">Unity, Custom Game Engine,<br>After Effects, Figma,<br>Photoshop</span>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /#page-top -->
+
+  <section id="primeintro-section">
+    <canvas id="primeintro-canvas"></canvas>
+  </section>
+
+  <section id="tetris40-section">
+    <div class="tetris40-rive">
+      <canvas id="tetris40-canvas"></canvas>
+    </div>
+    <div class="tetris40-text">
+      <div class="tetris40-text-inner">
+        <h2 class="tetris40-title">
+          <span>Tetris turns 40.</span>
+        </h2>
+        <div class="tetris40-body">
+          <p>A universally recognised icon, played across every demographic, platform, and generation.</p>
+          <p>The brief was a full modernisation of the core mobile experience for the 40th anniversary.</p>
+          <p>Built to last another decade of live-ops, iteration, and global scale.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="interp-section">
+    <div class="interp-text">
+      <div class="interp-text-inner">
+        <h2 class="interp-title">
+          <span>Interaction Over</span>
+          <span>Interpolation</span>
+        </h2>
+        <div class="interp-body">
+          <p>Stripping the visual language back to its core geometry forced an uncomfortable question: how much motion is too much?</p>
+          <p>Early explorations leaned toward heavier visual feedback, but A/B testing consistently showed that speed and clarity outperformed complex animation.</p>
+          <p>Sometimes less animation creates the best interaction.</p>
+        </div>
+      </div>
+    </div>
+    <div class="interp-rive">
+      <canvas id="interp-canvas"></canvas>
+      <div class="interp-interactive-tag">
+        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <section id="studios-section">
+    <div class="studios-ribbon-wrap">
+      <div class="ribbon-track ribbon-track-top"></div>
+    </div>
+    <div class="studios-inner">
+      <div class="studios-text-inner">
+        <h2 class="studios-title">
+          <span>One System,</span>
+          <span>Six Studios</span>
+        </h2>
+        <div class="studios-body">
+          <p>Coordinating a 4-year-old codebase across six global studios made misalignment a constant risk.</p>
+          <p>I led a centralized Unity motion library: reusable animation components any studio could implement independently.</p>
+          <p>Brand consistency at scale, without the bottleneck.</p>
+        </div>
+      </div>
+    </div>
+    <div class="studios-ribbon-wrap">
+      <div class="ribbon-track ribbon-track-bot"></div>
+    </div>
+  </section>
+
+  <section id="bwcn-section">
+    <div class="bwcn-rive">
+      <canvas id="bwcn-canvas"></canvas>
+      <div class="bwcn-interactive-tag">
+        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      </div>
+    </div>
+    <div class="bwcn-text">
+      <div class="bwcn-text-inner">
+        <h2 class="bwcn-title">
+          <span>Built for What</span>
+          <span>Comes Next</span>
+        </h2>
+        <div class="bwcn-body">
+          <p>The framework I designed had live-ops and continuous iteration built in from the start.</p>
+          <p>Future teams can build on the core brand consistent motion language without breaking it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="statement-section">
+    <p class="statement-text">This was a deeply collaborative effort across time zones and studios. At any hour of the day, someone, somewhere was working on Tetris.</p>
+  </section>
+
+  <section id="stats-section">
+    <div class="stat-cell bg-black">
+      <div class="stat-number-wrap"><span class="stat-number">~<span class="count" data-target="690">0</span>K daily</span></div>
+      <div class="stat-label-wrap"><span class="stat-label">active users</span></div>
+    </div>
+    <div class="stat-cell bg-lime">
+      <div class="stat-number-wrap"><span class="stat-number">~<span class="count" data-target="24">0</span>% D1</span></div>
+      <div class="stat-label-wrap"><span class="stat-label">retention</span></div>
+    </div>
+    <div class="stat-cell bg-white">
+      <div class="stat-number-wrap"><span class="stat-number"><span class="count" data-target="6">0</span> studios</span></div>
+      <div class="stat-label-wrap"><span class="stat-label">worldwide</span></div>
+    </div>
+    <div class="stat-cell bg-blue">
+      <div class="stat-number-wrap"><span class="stat-number"><span class="count" data-target="40">0</span> years</span></div>
+      <div class="stat-label-wrap"><span class="stat-label">of legacy</span></div>
+    </div>
+  </section>
+
+  <section id="colophon-section">
+    <div class="colophon-inner">
+      <div class="colophon-logos">
+        <img src="Tetris_Logo.svg" alt="Tetris" class="colophon-logo">
+        <img src="PS_logo.svg" alt="playSTUDIOS" class="colophon-logo">
+      </div>
+      <div class="colophon-copy">
+        <p>Tetris ® &amp; &copy; 1985&ndash;2025 Tetris Holding. Licensed to The Tetris Company.<br>Game design by Alexey Pajitnov. All rights reserved. Sub-licensed to playSTUDIOS&reg;.<br>Non-commercial portfolio showcase.<br>Certain materials are copyrighted and are used here under fair use solely to demonstrate creative work.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer id="contact">
+    <div class="contact-left">
+      <p class="contact-tagline">
+        Get in touch<br>
+        via <a class="contact-linkedin" href="https://www.linkedin.com/in/a-zdravkovic" target="_blank" rel="noopener">LinkedIn</a>
+        or
+        <span class="contact-email-wrap" id="email-wrap">
+          <button class="contact-email-btn" id="email-btn">e-mail</button>
+          <span class="email-tooltip" id="email-tooltip">Copy e-mail</span>
+        </span>
+      </p>
+    </div>
+    <div class="contact-right">
+      <a href="/" id="footer-logo">
+        <svg viewBox="0 0 100 100" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+                font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#163F1A">z</text>
+        </svg>
+      </a>
+      <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials belong to their respective owners.</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
+  <script src="https://player.vimeo.com/api/player.js"></script>
+  <script>
+    // ── BWCN ──
+    (function() {
+      const canvas = document.getElementById('bwcn-canvas');
+      let riveInst = null, buffer = null, smNames = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const cssW = p.offsetWidth  || window.innerWidth;
+        const cssH = p.offsetHeight || cssW;
+        canvas.width  = cssW;
+        canvas.height = cssH;
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0),
+          canvas,
+          stateMachines: smNames || undefined,
+          autoplay: true,
+          autoBind: true,
+          fit: rive.Fit.Cover,
+          alignment: rive.Alignment.Center,
+          onLoad: () => {
+            if (!smNames) {
+              const detected = riveInst.stateMachineNames;
+              if (detected && detected.length) {
+                smNames = detected;
+                start();
+                return;
+              }
+            }
+            sizeCanvas();
+            riveInst.resizeDrawingSurfaceToCanvas();
+            riveInst.play(smNames || riveInst.animationNames);
+          },
+          onLoadError: e => console.error('[bwcn] load error:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        const ab = riveInst.artboard;
+        if (ab && ab[method]) ab[method](x, y);
+        else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!riveInst) return;
+          if (e.isIntersecting) riveInst.play(smNames || undefined);
+          else riveInst.pause();
+        });
+      }, { threshold: 0.05 }).observe(canvas.parentElement);
+
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('builtforwhatcomesnext.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+
+      window.addEventListener('resize', () => {
+        sizeCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
+      if (window.ResizeObserver) {
+        new ResizeObserver(() => {
+          sizeCanvas();
+          if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+        }).observe(canvas.parentElement);
+      }
+    })();
+
+    // ── STUDIOS RIBBON ──
+    (function() {
+      var TILE_W = 1000, TILE_H = 100, TILE_COUNT = 6;
+      var tracks = [
+        document.querySelector('.ribbon-track-top'),
+        document.querySelector('.ribbon-track-bot'),
+      ];
+
+      fetch('line.riv')
+        .then(function(r) { return r.arrayBuffer(); })
+        .then(function(buf) {
+          tracks.forEach(function(track) {
+            for (var i = 0; i < TILE_COUNT; i++) {
+              var canvas = document.createElement('canvas');
+              canvas.className = 'ribbon-tile';
+              canvas.width  = TILE_W;
+              canvas.height = TILE_H;
+              track.appendChild(canvas);
+              (function(c) {
+                var r = new rive.Rive({
+                  buffer: buf.slice(0),
+                  canvas: c,
+                  autoplay: true,
+                  layout: new rive.Layout({ fit: rive.Fit.Fill, alignment: rive.Alignment.Center }),
+                  onLoad: function() { r.resizeDrawingSurfaceToCanvas(); },
+                  onLoadError: function(e) { console.error('[ribbon]', e); },
+                });
+              })(canvas);
+            }
+          });
+        })
+        .catch(function(e) { console.error('[ribbon fetch]', e); });
+    })();
+
+    const emailBtn     = document.getElementById('email-btn');
+    const emailWrap    = document.getElementById('email-wrap');
+    const emailTooltip = document.getElementById('email-tooltip');
+
+    emailBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
+        emailTooltip.textContent = 'Copied!';
+        emailWrap.classList.add('copied');
+        setTimeout(() => {
+          emailTooltip.textContent = 'Copy e-mail';
+          emailWrap.classList.remove('copied');
+        }, 2000);
+      }).catch(() => {
+        emailTooltip.textContent = 'Copy failed';
+        emailWrap.classList.add('copied');
+        setTimeout(() => {
+          emailTooltip.textContent = 'Copy e-mail';
+          emailWrap.classList.remove('copied');
+        }, 2000);
+      });
+    });
+
+    // ── PRIMEINTRO ──
+    (function() {
+      var canvas  = document.getElementById('primeintro-canvas');
+      var section = document.getElementById('primeintro-section');
+      var riveInst = null;
+
+      function sizeCanvas() {
+        canvas.width  = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+      }
+
+      sizeCanvas();
+
+      riveInst = new rive.Rive({
+        src: 'primeintro.riv',
+        canvas: canvas,
+        autoplay: false,
+        layout: new rive.Layout({
+          fit: rive.Fit.Contain,
+          alignment: rive.Alignment.Center,
+        }),
+        onLoad: function() {
+          sizeCanvas();
+          riveInst.resizeDrawingSurfaceToCanvas();
+        },
+        onLoadError: function(e) { console.error('[primeintro] load error:', e); },
+      });
+
+      window.addEventListener('resize', function() {
+        sizeCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
+
+      new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) riveInst.play();
+      }, { threshold: 0.3 }).observe(section);
+    })();
+
+    // ── TETRIS40 SCROLL SCRUB ──
+    (function() {
+      var canvas   = document.getElementById('tetris40-canvas');
+      var section  = document.getElementById('tetris40-section');
+      var riveInst = null;
+
+      function sizeCanvas() {
+        canvas.width  = canvas.offsetWidth  || 1;
+        canvas.height = canvas.offsetHeight || 1;
+      }
+
+      sizeCanvas();
+
+      riveInst = new rive.Rive({
+        src: 'tetris40.riv',
+        canvas: canvas,
+        autoplay: false,
+        layout: new rive.Layout({
+          fit: rive.Fit.Contain,
+          alignment: rive.Alignment.Center,
+        }),
+        onLoad: function() {
+          sizeCanvas();
+          riveInst.resizeDrawingSurfaceToCanvas();
+        },
+        onLoadError: function(e) { console.error('[tetris40] load error:', e); },
+      });
+
+      new IntersectionObserver(function(entries) {
+        if (entries[0].isIntersecting) riveInst.play('Shine');
+        else riveInst.pause('Shine');
+      }, { threshold: 0.2 }).observe(section);
+
+      window.addEventListener('resize', function() {
+        sizeCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
+      if (window.ResizeObserver) {
+        new ResizeObserver(function() {
+          sizeCanvas();
+          if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+        }).observe(canvas.parentElement);
+      }
+    })();
+
+    // ── INTERP ──
+    (function() {
+      const canvas = document.getElementById('interp-canvas');
+      let riveInst = null, buffer = null, smNames = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const cssW = p.offsetWidth  || window.innerWidth;
+        const cssH = p.offsetHeight || cssW;
+        canvas.width  = cssW;
+        canvas.height = cssH;
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0),
+          canvas,
+          stateMachines: smNames || undefined,
+          autoplay: true,
+          autoBind: true,
+          fit: rive.Fit.Cover,
+          alignment: rive.Alignment.Center,
+          onLoad: () => {
+            if (!smNames) {
+              const detected = riveInst.stateMachineNames;
+              if (detected && detected.length) {
+                smNames = detected;
+                start();
+                return;
+              }
+            }
+            sizeCanvas();
+            riveInst.resizeDrawingSurfaceToCanvas();
+            riveInst.play(smNames || riveInst.animationNames);
+          },
+          onLoadError: e => console.error('[interp] load error:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        const ab = riveInst.artboard;
+        if (ab && ab[method]) ab[method](x, y);
+        else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!riveInst) return;
+          if (e.isIntersecting) riveInst.play(smNames || undefined);
+          else riveInst.pause();
+        });
+      }, { threshold: 0.05 }).observe(canvas.parentElement);
+
+      requestAnimationFrame(() => requestAnimationFrame(async () => {
+        sizeCanvas();
+        buffer = await fetch('interactionoverinterpolation.riv').then(r => r.arrayBuffer());
+        start();
+      }));
+
+      window.addEventListener('resize', () => {
+        sizeCanvas();
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
+      if (window.ResizeObserver) {
+        new ResizeObserver(() => {
+          sizeCanvas();
+          if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+        }).observe(canvas.parentElement);
+      }
+    })();
+
+    // ── GLITCH PIECES ──
+    (function() {
+      const PIECES = [
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#000" d="M0 0h40v40H0z"/><path fill="#FF8100" transform="translate(10 5)" d="M-10-5h40v40h-40zM0 0v30h20V20H10V0z" fill-rule="evenodd"/></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#000" d="M0 0h40v40H0z"/><path fill="#FF0046" transform="translate(5 10)" d="M-5-10h40v40h-40zM0 0v10h10v10h20V10H20V0z" fill-rule="evenodd"/></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#000" d="M0 0h40v40H0z"/><path fill="#73E100" transform="translate(5 20)" d="M-5-20h40v40h-40zM0 0v10h20V0h10v-10H10v10z" fill-rule="evenodd"/></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#000" d="M0 0h40v40H0z"/><path fill="#FFC400" transform="translate(10 10)" d="M-10-10h40v40h-40zM0 0v20h20V0z" fill-rule="evenodd"/></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#000" d="M0 0h40v40H0z"/><path fill="#00DFEF" transform="translate(0 15)" d="M0-15h40v40H0zM0 0v10h40V0z" fill-rule="evenodd"/></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#000" d="M0 0h40v40H0z"/><path fill="#0081E7" transform="matrix(-1 0 0 1 30 5)" d="M-10-5h40v40h-40zM0 0v30h20V20H10V0z" fill-rule="evenodd"/></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><path fill="#000" d="M0 0h40v40H0z"/><path fill="#B26AEC" transform="translate(15 10)" d="M-15-10h40v40h-40zM0 0v10h-10v10h30V10H10V0z" fill-rule="evenodd"/></svg>',
+      ];
+
+      const urls = PIECES.map(svg =>
+        'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
+      );
+
+      const videoWrap = document.getElementById('video-wrap');
+
+      function overlapsVideo(xVw, yVh, size) {
+        const r = videoWrap.getBoundingClientRect();
+        const vw = window.innerWidth, vh = window.innerHeight;
+        const px = xVw / 100 * vw;
+        const py = yVh / 100 * vh;
+        const pad = 16;
+        return px + size > r.left - pad && px < r.right + pad &&
+               py + size > r.top  - pad && py < r.bottom + pad;
+      }
+
+      function spawnPiece() {
+        const url  = urls[Math.floor(Math.random() * urls.length)];
+        const size = Math.round(12 + Math.random() * 24);
+        let x, y, tries = 0;
+        do {
+          x = Math.random() * 96;
+          y = Math.random() * 94;
+          tries++;
+        } while (overlapsVideo(x, y, size) && tries < 10);
+        if (tries >= 10) return;
+
+        const el = document.createElement('img');
+        el.src = url;
+        el.className = 'glitch-piece';
+        el.style.width   = size + 'px';
+        el.style.height  = size + 'px';
+        el.style.left    = x + 'vw';
+        el.style.top     = y + 'vh';
+        el.style.opacity = '1';
+        el.style.transform = 'rotate(' + Math.round(Math.random() * 3) * 90 + 'deg)';
+        document.body.appendChild(el);
+
+        const life = 300 + Math.random() * 700;
+        setTimeout(() => el.remove(), life);
+      }
+
+      function burst() {
+        const count = Math.random() < 0.3 ? 2 + Math.floor(Math.random() * 3) : 1;
+        for (let i = 0; i < count; i++) {
+          setTimeout(spawnPiece, i * 60);
+        }
+      }
+
+      function schedule() {
+        const delay = 400 + Math.random() * 3200;
+        setTimeout(() => { burst(); schedule(); }, delay);
+      }
+
+      schedule();
+    })();
+
+    // ── STATS ANIMATION + COUNTER ──
+    (function() {
+      function animateCount(el, target, duration) {
+        const from  = Math.round(target * 0.8);
+        const start = performance.now();
+        (function step(now) {
+          const p = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 5);
+          el.textContent = Math.round(from + eased * (target - from));
+          if (p < 1) requestAnimationFrame(step);
+        })(start);
+      }
+
+      const section = document.getElementById('stats-section');
+      const cells   = section.querySelectorAll('.stat-cell');
+      new IntersectionObserver(entries => {
+        if (!entries[0].isIntersecting) return;
+        cells.forEach((cell, i) => {
+          setTimeout(() => {
+            cell.classList.add('in-view');
+            cell.querySelectorAll('.count').forEach(el => {
+              animateCount(el, +el.dataset.target, 1400);
+            });
+          }, i * 130);
+        });
+      }, { threshold: 0.25 }).observe(section);
+    })();
+
+    // ── PAGE-TOP SCROLL FADE: blue → black ──
+    (function () {
+      const el = document.getElementById('page-top');
+      if (!el) return;
+
+      function lerp(a, b, t) { return a + (b - a) * t; }
+      function easeInOut(t) { return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t; }
+
+      const video = document.getElementById('video-wrap');
+      const projectTitle = document.getElementById('project-title');
+      let target = 1;
+
+      function cacheTarget() {
+        const isMobile = window.innerWidth < 768;
+        if (isMobile && projectTitle) {
+          target = projectTitle.offsetTop + projectTitle.offsetHeight;
+        } else {
+          target = video ? video.offsetTop : el.offsetHeight || 1;
+        }
+      }
+
+      const stopsDesktop = [
+        [0.0,  21,  91, 254],
+        [0.4, 178, 106, 237],
+        [0.6, 178, 106, 237],
+        [1.0,   0,   0,   0]
+      ];
+
+      const stopsMobile = [
+        [0.0, 21, 91, 254],
+        [1.0,  0,  0,   0]
+      ];
+
+      function update() {
+        const stops = window.innerWidth < 768 ? stopsMobile : stopsDesktop;
+        const t = easeInOut(Math.min(1, Math.max(0, window.scrollY / target)));
+        let i = 0;
+        while (i < stops.length - 2 && t >= stops[i + 1][0]) i++;
+        const span = stops[i + 1][0] - stops[i][0];
+        const f = span === 0 ? 1 : (t - stops[i][0]) / span;
+        const r = Math.round(lerp(stops[i][1], stops[i + 1][1], f));
+        const g = Math.round(lerp(stops[i][2], stops[i + 1][2], f));
+        const b = Math.round(lerp(stops[i][3], stops[i + 1][3], f));
+        el.style.background = `rgb(${r},${g},${b})`;
+      }
+
+      let rafPending = false;
+      function onScroll() {
+        if (!rafPending) {
+          rafPending = true;
+          requestAnimationFrame(() => { update(); rafPending = false; });
+        }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('load', () => { cacheTarget(); update(); });
+      window.addEventListener('resize', cacheTarget, { passive: true });
+      cacheTarget();
+      update();
+    })();
+
+  </script>
+
+  <script>
+    (function () {
+      const TOP    = '#155BFE';
+      const BOTTOM = '#155BFE';
+      const THRESHOLD = 4;
+
+      function update() {
+        const atBottom =
+          window.scrollY + window.innerHeight >=
+          document.documentElement.scrollHeight - THRESHOLD;
+        document.body.style.background = atBottom ? BOTTOM : TOP;
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
+  </script>
+
+</body>
+</html>
