@@ -27,7 +27,17 @@
     }
 
     #header {
+    }
+
+    #header-nav {
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
+    }
+
+    #header-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
     }
 
     #logo {
@@ -69,7 +79,7 @@
     #tagline span {
       display: block;
       width: fit-content;
-      background: #E0EC8A;
+      background: #FFA5C8;
       padding: 2px 10px;
     }
 
@@ -287,7 +297,6 @@
       display: flex;
       align-items: center;
       padding: 0 9px;
-      background: rgb(224,236,138);
       color: #000;
     }
 
@@ -483,7 +492,10 @@
   <div id="page-top">
 
   <header id="header">
-    <a href="/" id="logo">a–z</a>
+    <div id="header-nav">
+      <a href="/" id="logo">a–z</a>
+    </div>
+    <img src="makeitpopheader.jpg" id="header-img" alt="" width="1920" height="600">
   </header>
 
   <div id="project-header">
@@ -1572,7 +1584,7 @@
 
   <script>
     (function () {
-      const TOP    = '#F4E9D5';
+      const TOP    = '#B8DDF6';
       const BOTTOM = '#E0EC8A';
       const THRESHOLD = 4;
 
