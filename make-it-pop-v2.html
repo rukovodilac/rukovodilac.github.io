@@ -63,15 +63,11 @@
     }
 
     #tagline span {
-      display: inline-block;
-      width: fit-content;
+      display: block;
       font-size: clamp(24px, 3.5vw, 48px);
       font-weight: 500;
       line-height: 1;
-      color: #000;
-      border: 1.5px solid #000;
-      border-radius: 10px;
-      padding: clamp(4px, 0.5vw, 8px) clamp(10px, 1.2vw, 18px);
+      color: #FF7BA8;
     }
 
     /* ── CREDITS ── */
@@ -285,26 +281,30 @@
     }
     .showcase-item canvas.coin-reload { opacity: 0; }
 
-    /* Explicit grid placement per item */
-    /* Wide items define row height via aspect-ratio.
-       1:1 items that share a row with a wide item have no aspect-ratio
-       so they stretch to fill — otherwise the gap math makes them
-       slightly shorter than the wide item's height. */
-    .si-coin     { grid-column: 1 / 3; grid-row: 1; aspect-ratio: 2 / 1; }
-    .si-knob     { grid-column: 3 / 4; grid-row: 2; aspect-ratio: 1 / 1; } /* sole row-height setter */
-    .si-progress { grid-column: 1 / 3; grid-row: 3; aspect-ratio: 2 / 1; }
-    .si-froggy   { grid-column: 3 / 4; grid-row: 3; }   /* stretches to match progress */
-    .si-soda     { grid-column: 4 / 5; grid-row: 3; }   /* stretches to match progress */
-    .si-battery  { grid-column: 2 / 4; grid-row: 4; aspect-ratio: 2 / 1; }
-    .si-egg      { grid-column: 2 / 3; grid-row: 5; }   /* stretches to match stamp */
-    .si-arrows   { grid-column: 1 / 3; grid-row: 6; aspect-ratio: 4 / 1; }
-    .si-illusion { grid-column: 2 / 4; grid-row: 7; aspect-ratio: 2 / 1; }
-    .si-box      { grid-column: 3 / 4; grid-row: 8; }   /* stretches to match scratchcard */
+    /*
+     * Aspect-ratio correction for 2-column items:
+     *   padding = 3.5vw, gap = 1.2vw
+     *   colW = (100 − 7 − 3.6)vw / 4 = 22.35vw
+     *   2-col width = 2×22.35 + 1.2 = 45.9vw
+     *   AR = 45.9 / 22.35 = 2.054
+     * This makes 2-col item height = colW = exact height of a 1:1 single-col item.
+     * 1:1 items sharing a row have no aspect-ratio and stretch to fill.
+     */
+    .si-coin     { grid-column: 1 / 3; grid-row: 1; aspect-ratio: 45.9 / 22.35; }
+    .si-knob     { grid-column: 3 / 4; grid-row: 2; aspect-ratio: 1 / 1; }
+    .si-progress { grid-column: 1 / 3; grid-row: 3; aspect-ratio: 45.9 / 22.35; }
+    .si-froggy   { grid-column: 3 / 4; grid-row: 3; }
+    .si-soda     { grid-column: 4 / 5; grid-row: 3; }
+    .si-battery  { grid-column: 2 / 4; grid-row: 4; aspect-ratio: 45.9 / 22.35; }
+    .si-egg      { grid-column: 2 / 3; grid-row: 5; }
+    .si-arrows   { grid-column: 1 / 3; grid-row: 6; aspect-ratio: 45.9 / 11.175; }
+    .si-illusion { grid-column: 2 / 4; grid-row: 7; aspect-ratio: 45.9 / 22.35; }
+    .si-box      { grid-column: 3 / 4; grid-row: 8; }
 
-    /* Override deco aspect-ratio for decos in rows with wide items */
-    .si-deco-2   { aspect-ratio: unset; } /* row 4 with battery */
-    .si-deco-3   { aspect-ratio: unset; } /* row 5 with stamp */
-    .si-deco-4   { aspect-ratio: unset; } /* row 8 with scratchcard */
+    /* Decos in mixed rows: no aspect-ratio, stretch to wide item's height */
+    .si-deco-2   { aspect-ratio: unset; }
+    .si-deco-3   { aspect-ratio: unset; }
+    .si-deco-4   { aspect-ratio: unset; }
 
     /* Decorative SVG shapes — desktop only */
     .si-deco {
@@ -338,7 +338,7 @@
     .si-stamp {
       grid-column: 3 / 5;
       grid-row: 5;
-      aspect-ratio: 2 / 1;
+      aspect-ratio: 45.9 / 22.35;
       background: #E0E0E0;
     }
 
@@ -366,7 +366,7 @@
     .si-scratchcard {
       grid-column: 1 / 3;
       grid-row: 8;
-      aspect-ratio: 2 / 1;
+      aspect-ratio: 45.9 / 22.35;
       position: relative;
       overflow: hidden;
       background: #000;
