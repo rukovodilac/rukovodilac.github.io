@@ -1319,6 +1319,13 @@
           onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
           onLoadError: e => console.error('box:', e),
         });
+        riveInst.on(rive.EventType.StateChange, (event) => {
+          const states = event.data || [];
+          if (states.some(s => s === 'PullDownL' || s === 'PullDownR')) {
+            const r = canvas.getBoundingClientRect();
+            fireConfetti(r.left + r.width / 2, r.top + r.height / 2);
+          }
+        });
       }
 
       function fwd(e, method) {
@@ -1342,6 +1349,84 @@
         });
       }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
       window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+
+      // ── Confetti system ──
+      const CONF_COLORS = ['#00933D', '#FFA5C8', '#FF5101', '#FFD504'];
+      const confImgs = [1,2,3,4].map(n => { const i = new Image(); i.src = `make-it-pop-shape-${n}.png`; return i; });
+      let confTiles = null;
+      let confParticles = [];
+      let confRAF = null;
+
+      function bakeConfTiles() {
+        confTiles = [];
+        for (let i = 0; i < 4; i++) {
+          for (let j = 0; j < 4; j++) {
+            const oc = document.createElement('canvas');
+            oc.width = oc.height = 64;
+            const octx = oc.getContext('2d');
+            octx.drawImage(confImgs[i], 0, 0, 64, 64);
+            octx.globalCompositeOperation = 'source-atop';
+            octx.fillStyle = CONF_COLORS[j];
+            octx.fillRect(0, 0, 64, 64);
+            confTiles.push(oc);
+          }
+        }
+      }
+
+      function fireConfetti(ox, oy) {
+        if (!confTiles) bakeConfTiles();
+        const cc = document.getElementById('box-confetti-canvas');
+        cc.width = window.innerWidth; cc.height = window.innerHeight;
+        cc.style.display = 'block';
+
+        for (let i = 0; i < 90; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 3 + Math.random() * 14;
+          confParticles.push({
+            tile:  confTiles[Math.floor(Math.random() * 16)],
+            x: ox, y: oy,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 6,
+            vrot: (Math.random() - 0.5) * 0.25,
+            rot:  Math.random() * Math.PI * 2,
+            size: 14 + Math.random() * 22,
+            alpha: 1,
+          });
+        }
+
+        if (confRAF) cancelAnimationFrame(confRAF);
+        tickConf();
+      }
+
+      function tickConf() {
+        const cc = document.getElementById('box-confetti-canvas');
+        const ctx = cc.getContext('2d');
+        ctx.clearRect(0, 0, cc.width, cc.height);
+        const H = cc.height;
+
+        for (let i = confParticles.length - 1; i >= 0; i--) {
+          const p = confParticles[i];
+          p.vy += 0.45;
+          p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+          p.vx *= 0.99;
+          if (p.y > H * 0.75) p.alpha = Math.max(0, 1 - (p.y - H * 0.75) / (H * 0.25));
+          if (p.alpha <= 0 || p.y > H + p.size) { confParticles.splice(i, 1); continue; }
+
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.drawImage(p.tile, -p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        }
+
+        if (confParticles.length > 0) {
+          confRAF = requestAnimationFrame(tickConf);
+        } else {
+          cc.style.display = 'none';
+          confRAF = null;
+        }
+      }
     })();
   </script>
 
@@ -1647,5 +1732,6 @@
     })();
   </script>
 
+  <canvas id="box-confetti-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
 </body>
 </html>
