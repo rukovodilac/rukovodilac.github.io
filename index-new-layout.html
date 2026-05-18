@@ -29,7 +29,7 @@
 
     body {
       font-family: "DM Sans", sans-serif;
-      background: #F4E9D5;
+      background: #fff;
     }
 
     /* ── SITE HEADER ── */
@@ -38,7 +38,6 @@
       align-items: center;
       gap: clamp(20px, 3vw, 48px);
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
-      background: #E0EC8A;
     }
 
     #logo {
@@ -69,12 +68,9 @@
 
     .headline-line span {
       display: inline-block;
-      background: #F4E9D5;
-      padding: 0.07em 0.15em;
       font-weight: 500;
       line-height: 1;
       color: #000;
-      border-radius: var(--r, 4px);
     }
 
     /* ── WORK SECTION ── */
@@ -206,28 +202,18 @@
 
     .work-title-word {
       display: inline-block;
-      background: #E0EC8A;
-      padding: 0.1em 0.18em;
       line-height: 1;
       color: #000;
-      border-radius: var(--r, 4px);
     }
 
     .work-title-arrow {
       display: inline-flex;
       align-items: center;
       min-height: 1.2em;
-      transition: background 0.35s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     .work-title-arrow .arrow-icon {
       margin-left: 0;
-    }
-
-    @media (hover: hover) {
-      .work-item-wrap:hover .work-title-arrow {
-        background: #fff;
-      }
     }
 
     .arrow-icon {
@@ -248,10 +234,6 @@
 
     /* ── ABOUT SECTION ── */
     #about {
-      position: relative;
-      overflow: hidden;
-      isolation: isolate;
-      background: #E0EC8A;
       padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
       display: flex;
       flex-direction: row;
@@ -284,9 +266,6 @@
 
     .about-highlight {
       display: block;
-      width: fit-content;
-      background: #F4E9D5;
-      padding: 2px 10px;
       font-size: clamp(20px, 3vw, 40px);
       font-weight: 500;
       line-height: 1;
@@ -339,10 +318,6 @@
 
     /* ── Footer / Contact ── */
     #contact {
-      position: relative;
-      overflow: hidden;
-      isolation: isolate;
-      background: #E0EC8A;
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
       display: flex;
       justify-content: space-between;
@@ -867,69 +842,6 @@
     doneCanvas.addEventListener('click', fireSlot);
     doneCanvas.addEventListener('touchend', (e) => { e.preventDefault(); fireSlot(); }, { passive: false });
 
-    // ── Lime section square trails ──
-    function makeLimeTrail(sectionEl) {
-      const canvas = document.createElement('canvas');
-      canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;';
-      sectionEl.appendChild(canvas);
-      const ctx = canvas.getContext('2d');
-      const lDpr = window.devicePixelRatio || 1;
-      const sqs = [];
-      let lpx = null, lpy = null;
-
-      function resize() {
-        canvas.width  = sectionEl.offsetWidth * lDpr;
-        canvas.height = sectionEl.offsetHeight * lDpr;
-        ctx.scale(lDpr, lDpr);
-      }
-      resize();
-      window.addEventListener('resize', resize);
-
-      return {
-        spawn(clientX, clientY) {
-          const rect = sectionEl.getBoundingClientRect();
-          const x = clientX - rect.left;
-          const y = clientY - rect.top;
-          const dx = lpx === null ? 999 : x - lpx;
-          const dy = lpy === null ? 999 : y - lpy;
-          if (dx * dx + dy * dy < 400) return;
-          lpx = x; lpy = y;
-          const vmin = Math.min(window.innerWidth, window.innerHeight);
-          const size = vmin * (0.015 + Math.random() * 0.08);
-          sqs.push({
-            x: x - size / 2 + (Math.random() - 0.5) * 30,
-            y: y - size / 2 + (Math.random() - 0.5) * 30,
-            s: size, born: performance.now(),
-            life: 2700 + Math.random() * 1800
-          });
-        },
-        tick(now) {
-          ctx.clearRect(0, 0, canvas.width / lDpr, canvas.height / lDpr);
-          for (let i = sqs.length - 1; i >= 0; i--) {
-            const sq = sqs[i];
-            const t = (now - sq.born) / sq.life;
-            if (t >= 1) { sqs.splice(i, 1); continue; }
-            const opacity = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
-            ctx.fillStyle = `rgba(255,255,255,${opacity})`;
-            ctx.fillRect(sq.x, sq.y, sq.s, sq.s);
-          }
-        }
-      };
-    }
-
-    const aboutTrail   = makeLimeTrail(document.getElementById('about'));
-    const contactTrail = makeLimeTrail(document.getElementById('contact'));
-
-    window.addEventListener('mousemove', (e) => {
-      aboutTrail.spawn(e.clientX, e.clientY);
-      contactTrail.spawn(e.clientX, e.clientY);
-    });
-    window.addEventListener('touchmove', (e) => {
-      const t = e.touches[0];
-      aboutTrail.spawn(t.clientX, t.clientY);
-      contactTrail.spawn(t.clientX, t.clientY);
-    }, { passive: true });
-
     window.addEventListener('resize', () => {
       sizeDoneCanvas();
       doneRive.resizeDrawingSurfaceToCanvas();
@@ -944,8 +856,6 @@
 
     function tick(now) {
       lenis.raf(now);
-      aboutTrail.tick(now);
-      contactTrail.tick(now);
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
