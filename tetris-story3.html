@@ -369,7 +369,7 @@
       grid-template-columns: 1fr 1fr;
       column-gap: 0;
       align-items: stretch;
-      background: #fff;
+      background: #F5F5F7;
     }
 
     .jiggle-text {
@@ -766,12 +766,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: clamp(24px, 3vw, 48px);
+    }
+
+    .tetrisco-wrap {
+      width: 100%;
+      border-radius: 20px;
+      overflow: hidden;
     }
 
     #tetrisco-canvas {
       display: block;
-      border-radius: 20px;
-      overflow: hidden;
     }
 
     @media (min-width: 769px) {
@@ -1102,7 +1107,9 @@
       </div>
     </div>
     <div class="success-rive">
-      <canvas id="tetrisco-canvas"></canvas>
+      <div class="tetrisco-wrap">
+        <canvas id="tetrisco-canvas"></canvas>
+      </div>
     </div>
   </section>
 
