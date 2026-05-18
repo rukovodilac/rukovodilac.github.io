@@ -129,6 +129,7 @@
       color: #000;
       cursor: pointer;
       aspect-ratio: 16 / 9;
+      border-radius: var(--thumb-r, 0);
     }
 
     /* Video container */
@@ -241,6 +242,7 @@
     .work-title-arrow {
       display: inline-flex;
       align-items: center;
+      min-height: 1.2em;
       transition: background 0.35s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
@@ -623,6 +625,7 @@
     const projects = [
       {
         href:  'make-it-pop',
+        radius: '0px',
         title: ['Make It', 'Pop'],
         tags:  [
           { type: 'hot',         label: 'Hot',        icon: 'icon-hot' }
@@ -631,18 +634,21 @@
       },
       {
         href:  'tetris-story2',
+        radius: '20px',
         title: ['Tetris® Story', 'Mobile Game'],
         tags:  [{ type: 'latest', label: 'Latest', icon: 'icon-latest' }],
         video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/TetrisStory_Pre_pbezjz.mp4'
       },
       {
         href:  'tetris-40th2',
+        radius: '8px',
         title: ['Tetris® 40th', 'Mobile Game'],
         tags:  [{ type: 'latest', label: 'Latest', icon: 'icon-latest' }],
         video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/Tetris40_Pre_clttxf.mp4'
       },
       {
         href:  'this-is-my-show',
+        radius: '40px',
         title: ['This Is', 'My Show'],
         tags:  [{ type: 'rerun', label: 'Rerun', icon: 'icon-rerun' }],
         video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/TheShow_Pre_lmjx2h.mp4'
@@ -661,6 +667,7 @@
         const a = document.createElement('a');
         a.href      = p.href;
         a.className = 'work-item' + (featured ? ' work-item--featured' : '');
+        if (p.radius) a.style.setProperty('--thumb-r', p.radius);
 
         const media = document.createElement('div');
         media.className = 'work-media';
