@@ -36,7 +36,7 @@
     #hero {
       position: relative;
       width: 100%;
-      height: clamp(160px, 22vh, 240px);
+      height: max(80px, calc(50vw * 9 / 32));
       overflow: hidden;
       background: #E0EC8A;
     }
@@ -669,7 +669,7 @@
     window.scrollTo(0, 0);
 
     function heroH() {
-      return Math.min(Math.round(window.innerHeight * 0.22), 240);
+      return Math.max(80, Math.round(window.innerWidth * 0.5 * 9 / 32));
     }
 
     const dpr = window.devicePixelRatio || 1;
