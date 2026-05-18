@@ -1352,15 +1352,30 @@
 
       // ── Confetti system ──
       const confImgs = [1,2,3,4].map(n => { const i = new Image(); i.src = `make-it-pop-shape-${n}.png`; return i; });
+      let confTiles = null;
       let confParticles = [];
       let confRAF = null;
       let confCooldown = false;
+
+      function bakeConfTiles() {
+        confTiles = confImgs.map(src => {
+          const oc = document.createElement('canvas');
+          oc.width = oc.height = 64;
+          const octx = oc.getContext('2d');
+          octx.drawImage(src, 0, 0, 64, 64);
+          octx.globalCompositeOperation = 'source-atop';
+          octx.fillStyle = '#FFE97F';
+          octx.fillRect(0, 0, 64, 64);
+          return oc;
+        });
+      }
 
       function fireConfetti(ox, oy) {
         if (confCooldown) return;
         confCooldown = true;
         setTimeout(() => { confCooldown = false; }, 800);
 
+        if (!confTiles) bakeConfTiles();
         const cc = document.getElementById('box-confetti-canvas');
         cc.width = window.innerWidth; cc.height = window.innerHeight;
         cc.style.display = 'block';
@@ -1369,7 +1384,7 @@
           const angle = Math.random() * Math.PI * 2;
           const speed = 8 + Math.random() * 22;
           confParticles.push({
-            img:  confImgs[Math.floor(Math.random() * 4)],
+            img:  confTiles[Math.floor(Math.random() * 4)],
             x: ox, y: oy,
             vx: Math.cos(angle) * speed,
             vy: Math.sin(angle) * speed - 12,
