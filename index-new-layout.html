@@ -46,6 +46,13 @@
       height: clamp(64px, 9vw, 140px);
       border-radius: 50%;
       background: #C5FF30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: clamp(28px, 4vw, 62px);
+      font-weight: 500;
+      color: #000;
     }
 
     #headline {
@@ -246,11 +253,17 @@
     }
 
     #footer-logo {
-      font-size: clamp(48px, 6vw, 88px);
-      font-weight: 500;
-      line-height: 1.1;
-      color: #000;
+      width: clamp(48px, 6vw, 88px);
+      height: clamp(48px, 6vw, 88px);
+      border-radius: 50%;
+      background: #C5FF30;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-decoration: none;
+      font-size: clamp(21px, 2.65vw, 39px);
+      font-weight: 500;
+      color: #000;
     }
 
     .contact-legal {
@@ -276,12 +289,12 @@
     }
 
     /* ── Global link underline animation ── */
-    a:not(.work-item),
+    a:not(.work-item):not(#logo-placeholder):not(#footer-logo),
     .contact-email-btn {
       position: relative;
     }
 
-    a:not(.work-item)::after,
+    a:not(.work-item):not(#logo-placeholder):not(#footer-logo)::after,
     .contact-email-btn::after {
       content: '';
       position: absolute;
@@ -295,7 +308,7 @@
     }
 
     @media (hover: hover) {
-      a:not(.work-item):hover::after,
+      a:not(.work-item):not(#logo-placeholder):not(#footer-logo):hover::after,
       .contact-email-btn:hover::after {
         width: 100%;
       }
@@ -375,7 +388,7 @@
   </svg>
 
   <header id="site-header">
-    <div id="logo-placeholder"></div>
+    <a href="/" id="logo-placeholder">a</a>
     <h1 id="headline">Interactive Motion Designer<br>for Games, Apps &amp; Web</h1>
   </header>
 
@@ -400,7 +413,7 @@
       </p>
     </div>
     <div class="contact-right">
-      <a href="/" id="footer-logo">a–z</a>
+      <a href="/" id="footer-logo">Z</a>
       <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials belong to their respective owners.</p>
     </div>
   </footer>
