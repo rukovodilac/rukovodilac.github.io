@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Make It Pop — Aleksandar Zdravković</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "DM Sans", sans-serif;
+      background: #fff;
+    }
+
+    /* ── NAV ── */
+    #header-nav {
+      padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) 0;
+    }
+
+    #logo {
+      font-size: clamp(48px, 6.5vw, 96px);
+      font-weight: 500;
+      line-height: 1;
+      color: #000;
+      text-decoration: none;
+      position: relative;
+    }
+
+    #logo::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: currentColor;
+      transition: width 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    @media (hover: hover) {
+      #logo:hover::after { width: 100%; }
+    }
+
+    /* ── 3-COL HEADER GRID ── */
+    #page-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      grid-template-areas:
+        "nav    nav    nav"
+        "title  creds  creds"
+        "hero   hero   hero";
+      padding-bottom: 0;
+    }
+
+    #header        { grid-area: nav; }
+    #project-header { grid-area: title; padding: clamp(20px, 3vw, 40px) clamp(20px, 2vw, 32px) clamp(32px, 4vw, 48px) clamp(20px, 3.5vw, 48px); }
+    #credits       { grid-area: creds; padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) clamp(32px, 4vw, 48px) clamp(20px, 2vw, 32px); }
+    #project-hero  { grid-area: hero; }
+
+    /* ── TITLE + TAGLINE ── */
+    #project-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    #project-title h1 {
+      font-size: clamp(40px, 5.5vw, 80px);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #000;
+    }
+
+    #project-title h1 span {
+      display: block;
+      width: fit-content;
+    }
+
+    #tagline {
+      font-size: clamp(18px, 2.2vw, 32px);
+      font-weight: 400;
+      line-height: 1.3;
+      color: rgba(0,0,0,0.5);
+      margin-top: clamp(10px, 1.5vw, 20px);
+    }
+
+    /* ── CREDITS ── */
+    #credits {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(20px, 2.5vw, 32px);
+      align-self: end;
+    }
+
+    .credits-desc {
+      font-size: clamp(15px, 1.4vw, 20px);
+      font-weight: 400;
+      line-height: 1.6;
+      color: #000;
+    }
+
+    .credits-meta {
+      display: flex;
+      gap: clamp(24px, 4vw, 64px);
+      flex-wrap: wrap;
+    }
+
+    .credits-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .credits-label {
+      font-size: clamp(10px, 0.9vw, 13px);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(0,0,0,0.45);
+    }
+
+    .credits-value {
+      font-size: clamp(14px, 1.2vw, 18px);
+      font-weight: 500;
+      line-height: 1.5;
+      color: #000;
+    }
+
+    /* ── HERO IMAGE ── */
+    #project-hero {
+      width: 100%;
+      padding: 0 clamp(20px, 3.5vw, 48px) clamp(20px, 3vw, 40px);
+    }
+
+    #project-hero img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
+    }
+
+    @media (max-width: 767px) {
+      #page-top {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "nav"
+          "title"
+          "hero"
+          "creds";
+      }
+      #credits { padding-top: 0; }
+    }
+
+    /* ── FOOTER / CONTACT ── */
+    #contact {
+      border-top: 1px solid rgba(0,0,0,0.12);
+      padding: clamp(32px, 5vw, 64px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: clamp(32px, 5vw, 64px);
+    }
+
+    .contact-tagline {
+      font-size: clamp(28px, 4vw, 56px);
+      font-weight: 500;
+      line-height: 1.15;
+      color: #000;
+      margin: 0;
+    }
+
+    .contact-linkedin {
+      display: inline-block;
+      background: #0957C3;
+      color: #fff;
+      padding: 0 10px 2px;
+      text-decoration: none;
+      line-height: inherit;
+    }
+
+    .contact-email-wrap {
+      position: relative;
+      display: inline-block;
+    }
+
+    .contact-email-btn {
+      background: #FFC03F;
+      border: none;
+      padding: 0 10px 2px;
+      margin: 0;
+      font: inherit;
+      color: #000;
+      cursor: pointer;
+      line-height: inherit;
+    }
+
+    .email-tooltip {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 0;
+      background: #000;
+      color: #FFC03F;
+      font-size: clamp(18px, 2vw, 28px);
+      font-weight: 500;
+      padding: 6px 14px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 10;
+    }
+
+    .email-tooltip::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 10px;
+      border: 7px solid transparent;
+      border-bottom-color: #000;
+    }
+
+    .contact-email-wrap:hover .email-tooltip,
+    .contact-email-wrap.copied .email-tooltip {
+      opacity: 1;
+    }
+
+    .contact-right {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: clamp(8px, 1.5vw, 16px);
+    }
+
+    #footer-logo {
+      font-size: clamp(48px, 6vw, 88px);
+      font-weight: 500;
+      line-height: 1;
+      color: #000;
+      text-decoration: none;
+    }
+
+    .contact-legal {
+      font-size: clamp(10px, 0.9vw, 13px);
+      color: rgba(0,0,0,0.45);
+      text-align: right;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      #contact {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .contact-right {
+        width: 100%;
+        align-items: flex-start;
+      }
+      .contact-legal {
+        text-align: left;
+      }
+    }
+
+    /* ── Global link underline animation ── */
+    a {
+      position: relative;
+    }
+
+    a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: currentColor;
+      transition: width 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+      pointer-events: none;
+    }
+
+    @media (hover: hover) {
+      a:hover::after {
+        width: 100%;
+      }
+    }
+
+    /* ── INTERACTIVE TAG ── */
+    .project-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      font-size: clamp(13px, 1.2vw, 17px);
+      font-weight: 500;
+      line-height: 1;
+      margin-top: clamp(12px, 1.5vw, 20px);
+    }
+
+    .project-tag svg {
+      width: 1.7em;
+      height: 1.7em;
+      flex-shrink: 0;
+    }
+
+    .project-tag span {
+      height: 1.7em;
+      display: flex;
+      align-items: center;
+      padding: 0 9px;
+      color: #000;
+    }
+
+    /* ── SHOWCASE ── */
+    #showcase {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 0 clamp(20px, 3.5vw, 48px) clamp(20px, 3vw, 40px);
+      gap: clamp(8px, 1.2vw, 16px);
+      background: #fff;
+    }
+
+    .showcase-item {
+      position: relative;
+      overflow: hidden;
+      background: #000;
+      border-radius: 20px;
+    }
+
+    .showcase-item canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: pan-y;
+      transition: opacity 0.15s ease;
+    }
+    .showcase-item canvas.coin-reload { opacity: 0; }
+
+    /* Explicit grid placement per item */
+    .si-coin     { grid-column: 1 / 3; grid-row: 1; aspect-ratio: 2 / 1; }
+    .si-knob     { grid-column: 3 / 4; grid-row: 2; aspect-ratio: 1 / 1; }
+    .si-progress { grid-column: 1 / 3; grid-row: 3; aspect-ratio: 2 / 1; }
+    .si-soda     { grid-column: 4 / 5; grid-row: 3; aspect-ratio: 1 / 1; }
+    .si-froggy   { grid-column: 3 / 4; grid-row: 3; aspect-ratio: 1 / 1; }
+    .si-battery  { grid-column: 2 / 4; grid-row: 4; aspect-ratio: 2 / 1; }
+    .si-egg      { grid-column: 2 / 3; grid-row: 5; aspect-ratio: 1 / 1; }
+    .si-arrows   { grid-column: 1 / 3; grid-row: 6; aspect-ratio: 4 / 1; }
+    .si-illusion { grid-column: 2 / 4; grid-row: 7; aspect-ratio: 2 / 1; }
+    .si-box      { grid-column: 3 / 4; grid-row: 8; aspect-ratio: 1 / 1; }
+
+    /* Decorative SVG shapes — desktop only */
+    .si-deco {
+      position: relative;
+      overflow: hidden;
+      pointer-events: none;
+      aspect-ratio: 1 / 1;
+    }
+    .si-deco svg { display: block; width: 100%; height: 100%; }
+    .si-deco-1 { grid-column: 2 / 3; grid-row: 2; }
+    .si-deco-2 { grid-column: 4 / 5; grid-row: 4; }
+    .si-deco-3 { grid-column: 1 / 2; grid-row: 5; }
+    .si-deco-4 { grid-column: 4 / 5; grid-row: 8; }
+
+    @media (max-width: 768px) {
+      #showcase {
+        grid-template-columns: 1fr;
+        gap: clamp(16px, 4vw, 32px);
+        padding: 0 clamp(16px, 4vw, 32px) clamp(16px, 4vw, 32px);
+      }
+      .showcase-item {
+        grid-column: 1 / -1 !important;
+        grid-row: auto !important;
+        border-radius: 16px;
+      }
+      .si-deco { display: none; }
+    }
+
+    /* ── STAMP BOARD ── */
+    .si-stamp {
+      grid-column: 3 / 5;
+      grid-row: 5;
+      aspect-ratio: 2 / 1;
+      background: #E0E0E0;
+    }
+
+    .stamp-el {
+      position: absolute;
+      pointer-events: none;
+      overflow: visible;
+      opacity: 0.8;
+    }
+
+    @keyframes stamp-spring {
+      from { transform: translate(-50%, -50%) scale(1.5) rotate(var(--sr)); }
+      to   { transform: translate(-50%, -50%) scale(1)   rotate(var(--sr)); }
+    }
+
+    @keyframes stamp-fade {
+      from { opacity: 0.8; transform: translate(-50%, -50%) scale(1)    rotate(var(--sr)); }
+      to   { opacity: 0;   transform: translate(-50%, -50%) scale(0.75) rotate(var(--sr)); }
+    }
+
+    .stamp-in  { animation: stamp-spring 0.28s cubic-bezier(0.36, 0, 0.66, -0.56) both; }
+    .stamp-out { animation: stamp-fade   0.2s  ease forwards; }
+
+    /* ── SCRATCH CARD ── */
+    .si-scratchcard {
+      grid-column: 1 / 3;
+      grid-row: 8;
+      aspect-ratio: 2 / 1;
+      position: relative;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #scratchboard-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .scratchcard-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      gap: 0;
+    }
+
+    .scratchcard-headline {
+      font-family: "DM Sans", sans-serif;
+      font-size: clamp(56px, 7.5vw, 108px);
+      font-weight: 800;
+      font-style: italic;
+      line-height: 0.9;
+      color: #B89A4A;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .scratchcard-exp {
+      font-family: "DM Sans", sans-serif;
+      font-size: clamp(14px, 2vw, 28px);
+      font-weight: 700;
+      font-style: italic;
+      color: #B89A4A;
+      margin-top: clamp(8px, 1.2vw, 18px);
+      text-align: center;
+    }
+
+    #scratch-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+    }
+
+    #sparkle-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+<script>if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; window.scrollTo(0, 0);</script>
+
+  <svg aria-hidden="true" focusable="false" style="display:none;position:absolute;width:0;height:0">
+    <defs>
+      <symbol id="icon-interactive" viewBox="0 0 77 77" style="fill-rule:evenodd;clip-rule:evenodd;">
+        <g transform="matrix(1,0,0,1,-2149.604938,-1183.484688)">
+          <g transform="matrix(1,0,0,1,-149,91.368069)">
+            <circle cx="2337.105" cy="1130.617" r="38.5" fill="rgb(224,236,138)"/>
+          </g>
+          <g transform="matrix(0.157025,0,0,0.157025,1855.447913,1025.917434)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0,0.157025,-0.157025,0,2384.172192,889.327663)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(-0.157025,0,0,-0.157025,2520.761963,1418.051942)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0,-0.157025,0.157025,0,1992.037685,1554.641713)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
+          </g>
+          <g transform="matrix(0.111033,-0.111033,0.111033,0.111033,1814.240416,1318.568241)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(0.111033,0.111033,-0.111033,0.111033,2091.521385,848.120165)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(-0.111033,0.111033,-0.111033,-0.111033,2561.969461,1125.401134)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+          <g transform="matrix(-0.111033,-0.111033,0.111033,-0.111033,2284.688492,1595.849211)">
+            <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="white"/>
+          </g>
+        </g>
+      </symbol>
+
+    </defs>
+  </svg>
+
+  <div id="page-top">
+
+    <header id="header">
+      <div id="header-nav">
+        <a href="/" id="logo">a–z</a>
+      </div>
+    </header>
+
+    <div id="project-header">
+      <div id="project-title">
+        <h1>
+          <span>Make It</span>
+          <span>Pop</span>
+        </h1>
+      </div>
+      <div id="tagline">Turning UX into User Excitement.</div>
+      <div class="project-tag">
+        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+        <span>Interactive elements. Feel free to explore.</span>
+      </div>
+    </div>
+
+    <div id="credits">
+      <p class="credits-desc">Tiny interactive moments designed to bring curiosity, delight, and playfulness back into digital experiences. As digital products become increasingly optimised for utility and efficiency, I want to explore the importance of fun, personality, and tactile interaction on the web.</p>
+      <div class="credits-meta">
+        <div class="credits-col">
+          <span class="credits-label">Role</span>
+          <span class="credits-value">Art / Creative Director,<br>Animator, Illustrator,<br>Developer</span>
+        </div>
+        <div class="credits-col">
+          <span class="credits-label">Tech</span>
+          <span class="credits-value">Rive, Affinity,<br>Claude Code</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="project-hero">
+      <img src="makeitpopheader.webp" alt="Make It Pop — header visual">
+    </div>
+
+  </div><!-- /#page-top -->
+
+  <section id="showcase">
+    <!-- Row 1: coin cols 1-2 -->
+    <div class="showcase-item si-coin">
+      <canvas id="coin-canvas"></canvas>
+    </div>
+    <!-- Row 2: knob col 3 -->
+    <div class="showcase-item si-knob">
+      <canvas id="knob-canvas"></canvas>
+    </div>
+    <!-- Row 3: progress cols 1-2 | soda col 3 | froggy col 4 -->
+    <div class="showcase-item si-progress">
+      <canvas id="progress-canvas"></canvas>
+    </div>
+    <div class="showcase-item si-soda">
+      <canvas id="soda-canvas"></canvas>
+    </div>
+    <div class="showcase-item si-froggy">
+      <canvas id="froggy-canvas"></canvas>
+    </div>
+    <!-- Row 4: battery cols 2-3 -->
+    <div class="showcase-item si-battery">
+      <canvas id="battery-canvas"></canvas>
+    </div>
+    <!-- Row 5: egg col 2 -->
+    <div class="showcase-item si-egg">
+      <canvas id="egg-canvas"></canvas>
+    </div>
+    <!-- Row 5: stamp board cols 3-4 -->
+    <div class="showcase-item si-stamp" id="stamp-board">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" style="position:absolute;inset:0;width:100%;height:100%;display:block;">
+        <rect width="800" height="400" fill="#E0E0E0"/>
+        <rect x="0"   y="0"   width="100" height="100" fill="#C2D6FF"/>
+        <rect x="200" y="0"   width="100" height="100" fill="#C2D6FF"/>
+        <circle cx="450" cy="50"  r="50" fill="#C2D6FF"/>
+        <rect x="600" y="0"   width="100" height="100" fill="#C2D6FF"/>
+        <rect x="100" y="100" width="100" height="100" fill="#C2D6FF"/>
+        <rect x="300" y="100" width="100" height="100" fill="#C2D6FF"/>
+        <rect x="500" y="100" width="100" height="100" fill="#C2D6FF"/>
+        <rect x="700" y="100" width="100" height="100" fill="#C2D6FF"/>
+        <rect x="0"   y="200" width="100" height="100" fill="#C2D6FF"/>
+        <circle cx="250" cy="250" r="50" fill="#C2D6FF"/>
+        <rect x="400" y="200" width="100" height="100" fill="#C2D6FF"/>
+        <rect x="600" y="200" width="100" height="100" fill="#C2D6FF"/>
+        <rect x="100" y="300" width="100" height="100" fill="#C2D6FF"/>
+        <rect x="300" y="300" width="100" height="100" fill="#C2D6FF"/>
+        <circle cx="550" cy="350" r="50" fill="#C2D6FF"/>
+        <rect x="700" y="300" width="100" height="100" fill="#C2D6FF"/>
+      </svg>
+    </div>
+
+    <!-- Row 6: arrows cols 1-2 (4:1 ratio) -->
+    <div class="showcase-item si-arrows">
+      <canvas id="arrows-canvas"></canvas>
+    </div>
+    <!-- Row 7: illusion cols 2-3 -->
+    <div class="showcase-item si-illusion">
+      <canvas id="illusion-canvas"></canvas>
+    </div>
+    <!-- Row 8: scratch card cols 1-2 -->
+    <div class="showcase-item si-scratchcard" id="scratchcard">
+      <canvas id="scratchboard-canvas"></canvas>
+      <div class="scratchcard-text">
+        <div class="scratchcard-headline">HAVE A<br>NICE DAY!</div>
+        <div class="scratchcard-exp" id="scratchcard-exp"></div>
+      </div>
+      <canvas id="sparkle-canvas"></canvas>
+      <canvas id="scratch-canvas"></canvas>
+    </div>
+    <!-- Row 8: box col 3 -->
+    <div class="showcase-item si-box">
+      <canvas id="box-canvas"></canvas>
+    </div>
+
+    <!-- Decorative shapes (desktop only) -->
+    <!-- Shape 1: amber spiral — col 2, row 2 -->
+    <div class="si-deco si-deco-1">
+      <svg viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+        <g transform="matrix(1,0,0,1,-8600.247032,-1164.911313)">
+          <g transform="matrix(1,0,0,4.933333,6150.247032,134.433664)">
+            <g transform="matrix(2.580645,0,0,0.523104,-1133.166452,-63.577983)">
+              <path d="M1574.477,520.85L1574.477,706.85L1388.477,706.85L1388.477,520.85L1574.477,520.85ZM1479.464,683.611C1502.259,680.489 1522.329,667.003 1533.832,647.078C1546.655,624.868 1539.034,596.426 1516.825,583.603C1494.615,570.781 1466.173,578.402 1453.35,600.611C1448.248,609.448 1451.281,620.765 1460.118,625.868C1468.955,630.97 1480.272,627.937 1485.374,619.1C1487.992,614.565 1493.8,613.008 1498.336,615.627C1502.871,618.246 1504.427,624.054 1501.809,628.589C1491.47,646.497 1468.537,652.642 1450.629,642.303C1432.721,631.963 1426.576,609.03 1436.915,591.123C1447.028,573.607 1464.672,561.751 1484.71,559.006C1487.171,558.669 1488.895,556.398 1488.558,553.937C1488.221,551.476 1485.95,549.752 1483.489,550.089C1460.695,553.211 1440.625,566.698 1429.121,586.623C1416.298,608.832 1423.919,637.274 1446.129,650.097C1468.339,662.92 1496.78,655.299 1509.603,633.089C1514.705,624.252 1511.673,612.935 1502.836,607.833C1493.999,602.731 1482.682,605.763 1477.58,614.6C1474.961,619.136 1469.153,620.692 1464.618,618.073C1460.082,615.455 1458.526,609.647 1461.145,605.111C1471.484,587.203 1494.417,581.059 1512.325,591.398C1530.232,601.737 1536.377,624.67 1526.038,642.578C1515.925,660.094 1498.282,671.95 1478.243,674.694C1475.782,675.031 1474.058,677.303 1474.395,679.763C1474.732,682.224 1477.004,683.948 1479.464,683.611Z" style="fill:rgb(255,183,24);"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Shape 2: yellow asterisk — col 4, row 4 -->
+    <div class="si-deco si-deco-2">
+      <svg viewBox="0 0 483 483" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+        <g transform="matrix(1,0,0,1,-9559.120483,-2127.927471)">
+          <g transform="matrix(1,0,0,4.933333,6150.247032,134.433664)">
+            <g transform="matrix(2.592759,0,0,0.525559,818.707627,229.600937)">
+              <path d="M1185,332L1185,518L999,518L999,332L1185,332ZM1127.939,362.749C1125.81,361.52 1123.089,362.25 1121.86,364.378C1117.208,372.435 1106.285,391.355 1099.02,403.938C1097.572,406.446 1094.896,407.991 1092,407.991C1089.104,407.991 1086.428,406.446 1084.98,403.938C1077.715,391.355 1066.792,372.435 1062.14,364.378C1060.911,362.25 1058.19,361.52 1056.061,362.749C1056.06,362.75 1056.059,362.75 1056.058,362.751C1053.93,363.98 1053.201,366.701 1054.43,368.83C1059.081,376.887 1070.005,395.806 1077.27,408.39C1078.718,410.898 1078.718,413.987 1077.27,416.495C1075.822,419.003 1073.146,420.548 1070.25,420.548L1024.57,420.548C1022.112,420.548 1020.12,422.541 1020.12,424.998L1020.12,425.002C1020.12,427.459 1022.112,429.452 1024.57,429.452L1070.25,429.452C1073.146,429.452 1075.822,430.997 1077.27,433.505C1078.718,436.013 1078.718,439.102 1077.27,441.61C1070.005,454.194 1059.081,473.113 1054.43,481.17C1053.201,483.299 1053.93,486.02 1056.058,487.249C1056.059,487.25 1056.06,487.25 1056.061,487.251C1058.19,488.48 1060.911,487.75 1062.14,485.622C1066.792,477.565 1077.715,458.645 1084.98,446.062C1086.428,443.554 1089.104,442.009 1092,442.009C1094.896,442.009 1097.572,443.554 1099.02,446.062C1106.285,458.645 1117.208,477.565 1121.86,485.622C1123.089,487.75 1125.81,488.48 1127.939,487.251C1127.94,487.25 1127.941,487.25 1127.942,487.249C1130.07,486.02 1130.799,483.299 1129.57,481.17C1124.919,473.113 1113.995,454.194 1106.73,441.61C1105.282,439.102 1105.282,436.013 1106.73,433.505C1108.178,430.997 1110.854,429.452 1113.75,429.452L1159.43,429.452C1161.888,429.452 1163.88,427.459 1163.88,425.002L1163.88,424.998C1163.88,422.541 1161.888,420.548 1159.43,420.548L1113.75,420.548C1110.854,420.548 1108.178,419.003 1106.73,416.495C1105.282,413.987 1105.282,410.898 1106.73,408.39C1113.995,395.806 1124.919,376.887 1129.57,368.83C1130.799,366.701 1130.07,363.98 1127.942,362.751C1127.941,362.75 1127.94,362.75 1127.939,362.749Z" style="fill:rgb(255,213,4);"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Shape 3: orange X — col 1, row 5 -->
+    <div class="si-deco si-deco-3">
+      <svg viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+        <g transform="matrix(1,0,0,1,-8120.247032,-2612.433664)">
+          <g transform="matrix(1,0,0,4.933333,6150.247032,134.433664)">
+            <g transform="matrix(2.580645,0,0,0.523104,-608.064516,328.626853)">
+              <path d="M1185,332L1185,518L999,518L999,332L1185,332ZM1127.939,362.749C1125.81,361.52 1123.089,362.25 1121.86,364.378C1117.208,372.435 1106.285,391.355 1099.02,403.938C1097.572,406.446 1094.896,407.991 1092,407.991C1089.104,407.991 1086.428,406.446 1084.98,403.938C1077.715,391.355 1066.792,372.435 1062.14,364.378C1060.911,362.25 1058.19,361.52 1056.061,362.749C1056.06,362.75 1056.059,362.75 1056.058,362.751C1053.93,363.98 1053.201,366.701 1054.43,368.83C1060.744,379.766 1078.613,410.716 1083.203,418.667C1083.915,419.9 1084.289,421.297 1084.289,422.72L1084.289,427.28C1084.289,428.703 1083.915,430.1 1083.203,431.333C1078.613,439.284 1060.744,470.234 1054.43,481.17C1053.201,483.299 1053.93,486.02 1056.058,487.249C1056.059,487.25 1056.06,487.25 1056.061,487.251C1058.19,488.48 1060.911,487.75 1062.14,485.622C1066.792,477.565 1077.715,458.645 1084.98,446.062C1086.428,443.554 1089.104,442.009 1092,442.009C1094.896,442.009 1097.572,443.554 1099.02,446.062C1106.285,458.645 1117.208,477.565 1121.86,485.622C1123.089,487.75 1125.81,488.48 1127.939,487.251C1127.94,487.25 1127.941,487.25 1127.942,487.249C1130.07,486.02 1130.799,483.299 1129.57,481.17C1123.256,470.234 1105.387,439.284 1100.797,431.333C1100.085,430.1 1099.711,428.703 1099.711,427.28L1099.711,422.72C1099.711,421.297 1100.085,419.9 1100.797,418.667C1105.387,410.716 1123.256,379.766 1129.57,368.83C1130.799,366.701 1130.07,363.98 1127.942,362.751C1127.941,362.75 1127.94,362.75 1127.939,362.749Z" style="fill:rgb(255,81,1);"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Shape 4: pink cross — col 4, row 8 -->
+    <div class="si-deco si-deco-4">
+      <svg viewBox="0 0 480 480" xmlns="http://www.w3.org/2000/svg" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+        <g transform="matrix(1,0,0,1,-9560.247032,-3808.765107)">
+          <g transform="matrix(1,0,0,4.933333,6150.247032,134.433664)">
+            <g transform="matrix(2.580645,0,0,0.523104,831.935484,571.12647)">
+              <path d="M1185,332L1185,518L999,518L999,332L1185,332ZM1127.939,362.749C1125.81,361.52 1123.089,362.25 1121.86,364.378C1115.546,375.314 1097.677,406.264 1093.086,414.216C1092.375,415.448 1091.351,416.471 1090.119,417.183C1088.919,417.875 1087.37,418.77 1086.17,419.462C1084.938,420.174 1083.54,420.548 1082.118,420.548L1024.57,420.548C1022.112,420.548 1020.12,422.541 1020.12,424.998L1020.12,425.002C1020.12,427.459 1022.112,429.452 1024.57,429.452L1070.25,429.452C1073.146,429.452 1075.822,430.997 1077.27,433.505C1078.718,436.013 1078.718,439.102 1077.27,441.61C1070.005,454.194 1059.081,473.113 1054.43,481.17C1053.201,483.299 1053.93,486.02 1056.058,487.249C1056.059,487.25 1056.06,487.25 1056.061,487.251C1058.19,488.48 1060.911,487.75 1062.14,485.622C1068.454,474.686 1086.323,443.736 1090.914,435.784C1091.625,434.552 1092.649,433.529 1093.881,432.817C1095.081,432.125 1096.63,431.23 1097.83,430.538C1099.062,429.826 1100.46,429.452 1101.882,429.452L1159.43,429.452C1161.888,429.452 1163.88,427.459 1163.88,425.002L1163.88,424.998C1163.88,422.541 1161.888,420.548 1159.43,420.548L1113.75,420.548C1110.854,420.548 1108.178,419.003 1106.73,416.495C1105.282,413.987 1105.282,410.898 1106.73,408.39C1113.995,395.806 1124.919,376.887 1129.57,368.83C1130.799,366.701 1130.07,363.98 1127.942,362.751C1127.941,362.75 1127.94,362.75 1127.939,362.749Z" style="fill:rgb(255,165,200);"/>
+            </g>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <footer id="contact">
+    <div class="contact-left">
+      <p class="contact-tagline">
+        Get in touch<br>
+        via <a class="contact-linkedin" href="https://www.linkedin.com/in/a-zdravkovic" target="_blank" rel="noopener">LinkedIn</a>
+        or
+        <span class="contact-email-wrap" id="email-wrap">
+          <button class="contact-email-btn" id="email-btn">e-mail</button>
+          <span class="email-tooltip" id="email-tooltip">Copy e-mail</span>
+        </span>
+      </p>
+    </div>
+    <div class="contact-right">
+      <a href="/" id="footer-logo">a–z</a>
+      <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials belong to their respective owners.</p>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/@rive-app/webgl2@latest/rive.js"></script>
+  <script>
+    // ── Coin animation ──
+    const SM = 'State Machine 1';
+    const coinCanvas = document.getElementById('coin-canvas');
+    let coinRive    = null;
+    let rivBuffer   = null;
+    let loopPending = false;
+    let coinLoaded  = false;
+    let coinVisible = false;
+
+    function sizeCoinCanvas() {
+      const parent = coinCanvas.parentElement;
+      const dpr  = Math.min(2, window.devicePixelRatio || 1);
+      const cssW = parent.offsetWidth  || Math.round(window.innerWidth / 2);
+      const cssH = parent.offsetHeight || Math.round(cssW / 2);
+      coinCanvas.width        = Math.round(cssW * dpr);
+      coinCanvas.height       = Math.round(cssH * dpr);
+      coinCanvas.style.width  = cssW + 'px';
+      coinCanvas.style.height = cssH + 'px';
+    }
+
+    function startRive() {
+      if (coinRive) { try { coinRive.cleanup(); } catch (e) {} coinRive = null; }
+
+      coinRive = new rive.Rive({
+        buffer: rivBuffer.slice(0),
+        canvas: coinCanvas,
+        stateMachines: SM,
+        autoplay: true,
+        autoBind: true,
+        fit: rive.Fit.Cover,
+        alignment: rive.Alignment.Center,
+        onLoad: () => {
+          coinRive.resizeDrawingSurfaceToCanvas();
+          coinRive.play(SM);
+          loopPending = false;
+        },
+        onLoadError: (e) => console.error('coin_anim:', e),
+      });
+
+      coinRive.on(rive.EventType.StateChange, (event) => {
+        const states = event.data || [];
+        if (!loopPending && states.some(s => s === 'NextCoin')) {
+          loopPending = true;
+          setTimeout(() => {
+            if (coinVisible) startRive(); else loopPending = false;
+          }, 1520);
+        }
+      });
+    }
+
+    function fwd(e, method) {
+      if (!coinRive) return;
+      const r = coinCanvas.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const ab = coinRive.artboard;
+      if (ab && ab[method]) ab[method](x, y);
+      else if (coinRive[method]) coinRive[method](x, y);
+    }
+    coinCanvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+    coinCanvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+    coinCanvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        coinVisible = entry.isIntersecting;
+        if (entry.isIntersecting) {
+          if (!coinLoaded) {
+            coinLoaded = true;
+            requestAnimationFrame(() => requestAnimationFrame(async () => {
+              sizeCoinCanvas();
+              rivBuffer = await fetch('coin_anim.riv').then(r => r.arrayBuffer());
+              startRive();
+            }));
+          } else if (coinRive) {
+            coinRive.play(SM);
+          }
+        } else if (coinRive) {
+          coinRive.pause();
+        }
+      });
+    }, { rootMargin: '200px 0px', threshold: 0 }).observe(coinCanvas.parentElement);
+
+    window.addEventListener('resize', () => {
+      sizeCoinCanvas();
+      if (coinRive) coinRive.resizeDrawingSurfaceToCanvas();
+    });
+  </script>
+
+  <script>
+    // ── Knob animation ──
+    const KNOB_SM = 'State Machine 1';
+    const knobCanvas = document.getElementById('knob-canvas');
+    let knobRive = null;
+    let knobBuffer = null;
+    let trigPushInput = null;
+
+    function sizeKnobCanvas() {
+      const parent = knobCanvas.parentElement;
+      const dpr  = Math.min(2, window.devicePixelRatio || 1);
+      const cssW = parent.offsetWidth  || Math.round(window.innerWidth / 4);
+      const cssH = parent.offsetHeight || cssW;
+      knobCanvas.width        = Math.round(cssW * dpr);
+      knobCanvas.height       = Math.round(cssH * dpr);
+      knobCanvas.style.width  = cssW + 'px';
+      knobCanvas.style.height = cssH + 'px';
+    }
+
+    function startKnobRive() {
+      if (knobRive) { try { knobRive.cleanup(); } catch (e) {} knobRive = null; }
+
+      knobRive = new rive.Rive({
+        buffer: knobBuffer.slice(0),
+        canvas: knobCanvas,
+        stateMachines: KNOB_SM,
+        autoplay: true,
+        autoBind: true,
+        fit: rive.Fit.Cover,
+        alignment: rive.Alignment.Center,
+        onLoad: () => {
+          knobRive.resizeDrawingSurfaceToCanvas();
+          knobRive.play(KNOB_SM);
+          const inputs = knobRive.stateMachineInputs(KNOB_SM);
+          trigPushInput = inputs && inputs.find(i => i.name === 'trigPush');
+        },
+        onLoadError: (e) => console.error('knob:', e),
+      });
+    }
+
+    let knobDownX = 0, knobDownY = 0;
+
+    function fwdKnob(e, method) {
+      if (!knobRive) return;
+      const r = knobCanvas.getBoundingClientRect();
+      const x = e.clientX - r.left, y = e.clientY - r.top;
+      const ab = knobRive.artboard;
+      if (ab && ab[method]) ab[method](x, y);
+      else if (knobRive[method]) knobRive[method](x, y);
+    }
+    knobCanvas.addEventListener('pointermove', e => fwdKnob(e, 'pointerMove'));
+    knobCanvas.addEventListener('pointerdown', e => {
+      knobDownX = e.clientX;
+      knobDownY = e.clientY;
+      fwdKnob(e, 'pointerDown');
+    });
+    knobCanvas.addEventListener('pointerup', e => {
+      fwdKnob(e, 'pointerUp');
+      const dx = e.clientX - knobDownX;
+      const dy = e.clientY - knobDownY;
+      if (Math.sqrt(dx * dx + dy * dy) < 10 && trigPushInput) trigPushInput.fire();
+    });
+
+    let knobLoaded = false;
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!knobLoaded) {
+            knobLoaded = true;
+            requestAnimationFrame(() => requestAnimationFrame(async () => {
+              sizeKnobCanvas();
+              knobBuffer = await fetch('knob.riv').then(r => r.arrayBuffer());
+              startKnobRive();
+            }));
+          } else if (knobRive) { knobRive.play(KNOB_SM); }
+        } else if (knobRive) { knobRive.pause(); }
+      });
+    }, { rootMargin: '200px 0px', threshold: 0 }).observe(knobCanvas.parentElement);
+
+    window.addEventListener('resize', () => {
+      sizeKnobCanvas();
+      if (knobRive) knobRive.resizeDrawingSurfaceToCanvas();
+    });
+  </script>
+
+  <script>
+    // ── Froggy animation ──
+    const FROG_SM = 'State Machine 1';
+    const frogCanvas = document.getElementById('froggy-canvas');
+    let frogRive   = null;
+    let frogBuffer = null;
+    let frogInputs = {};
+
+    function sizeFrogCanvas() {
+      const parent = frogCanvas.parentElement;
+      const dpr  = Math.min(2, window.devicePixelRatio || 1);
+      const cssW = parent.offsetWidth  || Math.round(window.innerWidth / 4);
+      const cssH = parent.offsetHeight || cssW;
+      frogCanvas.width        = Math.round(cssW * dpr);
+      frogCanvas.height       = Math.round(cssH * dpr);
+      frogCanvas.style.width  = cssW + 'px';
+      frogCanvas.style.height = cssH + 'px';
+    }
+
+    function startFrogRive() {
+      if (frogRive) { try { frogRive.cleanup(); } catch (e) {} frogRive = null; }
+
+      frogRive = new rive.Rive({
+        buffer: frogBuffer.slice(0),
+        canvas: frogCanvas,
+        stateMachines: FROG_SM,
+        autoplay: true,
+        autoBind: true,
+        fit: rive.Fit.Cover,
+        alignment: rive.Alignment.Center,
+        onLoad: () => {
+          frogRive.resizeDrawingSurfaceToCanvas();
+          frogRive.play(FROG_SM);
+          const inputs = frogRive.stateMachineInputs(FROG_SM) || [];
+          frogInputs = Object.fromEntries(inputs.map(i => [i.name, i]));
+          const vmi = frogRive.viewModelInstance;
+          if (vmi) frogVMI = vmi;
+        },
+        onLoadError: (e) => console.error('froggy:', e),
+      });
+    }
+
+    function frogCSSPos(e) {
+      const r = frogCanvas.getBoundingClientRect();
+      return { cx: e.clientX - r.left, cy: e.clientY - r.top, w: r.width, h: r.height };
+    }
+
+    let frogOver = false;
+    let frogVMI  = null;
+
+    function frogPtr(method, cx, cy) {
+      if (!frogRive) return;
+      const ab = frogRive.artboard;
+      if (ab && ab[method]) ab[method](cx, cy);
+      else if (frogRive[method]) frogRive[method](cx, cy);
+    }
+
+    function setFrogPos(cx, cy, w, h) {
+      const tx = (cx / w) * 400, ty = (cy / h) * 400;
+      if (frogInputs.targetX) frogInputs.targetX.value = tx;
+      if (frogInputs.targetY) frogInputs.targetY.value = ty;
+      if (frogVMI) {
+        try { const p = frogVMI.number('targetX'); if (p) p.value = tx; } catch(e){}
+        try { const p = frogVMI.number('targetY'); if (p) p.value = ty; } catch(e){}
+      }
+    }
+
+    frogCanvas.addEventListener('pointerenter', e => {
+      frogOver = true;
+      if (frogInputs.isActive) frogInputs.isActive.value = true;
+      const { cx, cy, w, h } = frogCSSPos(e);
+      setFrogPos(cx, cy, w, h);
+      frogPtr('pointerDown', cx, cy);
+      frogPtr('pointerMove', cx, cy);
+    });
+    frogCanvas.addEventListener('pointermove', e => {
+      const { cx, cy, w, h } = frogCSSPos(e);
+      setFrogPos(cx, cy, w, h);
+      frogPtr('pointerMove', cx, cy);
+    });
+    frogCanvas.addEventListener('pointerleave', e => {
+      frogOver = false;
+      const { cx, cy } = frogCSSPos(e);
+      frogPtr('pointerUp', cx, cy);
+      if (frogInputs.isActive) frogInputs.isActive.value = false;
+      if (frogInputs.Bool1)    frogInputs.Bool1.value    = false;
+    });
+    frogCanvas.addEventListener('pointerdown', e => {
+      if (frogInputs.Bool1) frogInputs.Bool1.value = true;
+    });
+    frogCanvas.addEventListener('pointerup', e => {
+      if (frogInputs.Bool1) frogInputs.Bool1.value = false;
+      if (frogOver) { const { cx, cy } = frogCSSPos(e); frogPtr('pointerDown', cx, cy); }
+    });
+
+    let frogLoaded = false;
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!frogLoaded) {
+            frogLoaded = true;
+            requestAnimationFrame(() => requestAnimationFrame(async () => {
+              sizeFrogCanvas();
+              frogBuffer = await fetch('froggy.riv').then(r => r.arrayBuffer());
+              startFrogRive();
+            }));
+          } else if (frogRive) { frogRive.play(FROG_SM); }
+        } else if (frogRive) { frogRive.pause(); }
+      });
+    }, { rootMargin: '200px 0px', threshold: 0 }).observe(frogCanvas.parentElement);
+
+    window.addEventListener('resize', () => {
+      sizeFrogCanvas();
+      if (frogRive) frogRive.resizeDrawingSurfaceToCanvas();
+    });
+  </script>
+
+  <script>
+    // ── Progress animation ──
+    const PROG_SM = 'State Machine 1';
+    const progressCanvas = document.getElementById('progress-canvas');
+    let progressRive   = null;
+    let progressBuffer = null;
+
+    function sizeProgressCanvas() {
+      const parent = progressCanvas.parentElement;
+      const dpr  = Math.min(2, window.devicePixelRatio || 1);
+      const cssW = parent.offsetWidth  || Math.round(window.innerWidth / 2);
+      const cssH = parent.offsetHeight || Math.round(cssW / 2);
+      progressCanvas.width        = Math.round(cssW * dpr);
+      progressCanvas.height       = Math.round(cssH * dpr);
+      progressCanvas.style.width  = cssW + 'px';
+      progressCanvas.style.height = cssH + 'px';
+    }
+
+    function startProgressRive() {
+      if (progressRive) { try { progressRive.cleanup(); } catch (e) {} progressRive = null; }
+
+      progressRive = new rive.Rive({
+        buffer: progressBuffer.slice(0),
+        canvas: progressCanvas,
+        stateMachines: PROG_SM,
+        autoplay: true,
+        autoBind: true,
+        fit: rive.Fit.Cover,
+        alignment: rive.Alignment.Center,
+        onLoad: () => {
+          progressRive.resizeDrawingSurfaceToCanvas();
+          progressRive.play(PROG_SM);
+        },
+        onLoadError: (e) => console.error('progress:', e),
+      });
+    }
+
+    function fwdProgress(e, method) {
+      if (!progressRive) return;
+      const r = progressCanvas.getBoundingClientRect();
+      progressRive[method](e.clientX - r.left, e.clientY - r.top);
+    }
+    progressCanvas.addEventListener('pointermove', e => fwdProgress(e, 'pointerMove'));
+    progressCanvas.addEventListener('pointerdown', e => fwdProgress(e, 'pointerDown'));
+    progressCanvas.addEventListener('pointerup',   e => fwdProgress(e, 'pointerUp'));
+
+    let progressLoaded = false;
+    new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (!progressLoaded) {
+            progressLoaded = true;
+            requestAnimationFrame(() => requestAnimationFrame(async () => {
+              sizeProgressCanvas();
+              progressBuffer = await fetch('progress.riv').then(r => r.arrayBuffer());
+              startProgressRive();
+            }));
+          } else if (progressRive) { progressRive.play(PROG_SM); }
+        } else if (progressRive) { progressRive.pause(); }
+      });
+    }, { rootMargin: '200px 0px', threshold: 0 }).observe(progressCanvas.parentElement);
+
+    window.addEventListener('resize', () => {
+      sizeProgressCanvas();
+      if (progressRive) progressRive.resizeDrawingSurfaceToCanvas();
+    });
+  </script>
+
+  <script>
+    // ── Soda animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('soda-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 4);
+        const cssH = p.offsetHeight || cssW;
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('soda:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('soda.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Battery animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('battery-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || Math.round(cssW / 2);
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('battery:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('battery.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Egg animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('egg-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 4);
+        const cssH = p.offsetHeight || cssW;
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('egg:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('egg.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Arrows animation ──
+    (function() {
+      const SM = 'ArrowsSM';
+      const canvas = document.getElementById('arrows-canvas');
+      let riveInst = null, buffer = null, boolPress = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || Math.round(cssW / 4);
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => {
+            riveInst.resizeDrawingSurfaceToCanvas();
+            riveInst.play(SM);
+            const inputs = riveInst.stateMachineInputs(SM) || [];
+            boolPress = inputs.find(i => i.name === 'boolPress') || null;
+          },
+          onLoadError: e => console.error('arrows:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => { fwd(e, 'pointerDown'); if (boolPress) boolPress.value = true; });
+      canvas.addEventListener('pointerup',   e => { fwd(e, 'pointerUp');   if (boolPress) boolPress.value = false; });
+
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('arrows.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Illusion animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('illusion-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || Math.round(cssW / 2);
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('illusion:', e),
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('illusion.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+    })();
+  </script>
+
+  <script>
+    // ── Box animation ──
+    (function() {
+      const SM = 'State Machine 1';
+      const canvas = document.getElementById('box-canvas');
+      let riveInst = null, buffer = null;
+
+      function sizeCanvas() {
+        const p = canvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 4);
+        const cssH = p.offsetHeight || cssW;
+        canvas.width = Math.round(cssW * dpr); canvas.height = Math.round(cssH * dpr);
+        canvas.style.width = cssW + 'px'; canvas.style.height = cssH + 'px';
+      }
+
+      function start() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas,
+          stateMachines: SM, autoplay: true, autoBind: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => { riveInst.resizeDrawingSurfaceToCanvas(); riveInst.play(SM); },
+          onLoadError: e => console.error('box:', e),
+        });
+        riveInst.on(rive.EventType.StateChange, (event) => {
+          const states = event.data || [];
+          if (states.some(s => s === 'PullDownL' || s === 'PullDownD')) {
+            const r = canvas.getBoundingClientRect();
+            fireConfetti(r.left + r.width / 2, r.top + r.height / 2);
+          }
+        });
+      }
+
+      function fwd(e, method) {
+        if (!riveInst) return;
+        const r = canvas.getBoundingClientRect();
+        const ab = riveInst.artboard;
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (ab && ab[method]) ab[method](x, y); else if (riveInst[method]) riveInst[method](x, y);
+      }
+      canvas.addEventListener('pointermove', e => fwd(e, 'pointerMove'));
+      canvas.addEventListener('pointerdown', e => fwd(e, 'pointerDown'));
+      canvas.addEventListener('pointerup',   e => fwd(e, 'pointerUp'));
+
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) { loaded = true; requestAnimationFrame(() => requestAnimationFrame(async () => { sizeCanvas(); buffer = await fetch('box.riv').then(r => r.arrayBuffer()); start(); })); }
+            else if (riveInst) { riveInst.play(SM); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(canvas.parentElement);
+      window.addEventListener('resize', () => { sizeCanvas(); if (riveInst) riveInst.resizeDrawingSurfaceToCanvas(); });
+
+      // ── Confetti system ──
+      const confImgs = [1,2,3,4].map(n => { const i = new Image(); i.src = `make-it-pop-shape-${n}.png`; return i; });
+      let confTiles = null;
+      let confParticles = [];
+      let confRAF = null;
+      let confCooldown = false;
+
+      function bakeConfTiles() {
+        confTiles = confImgs.map(src => {
+          const oc = document.createElement('canvas');
+          oc.width = oc.height = 64;
+          const octx = oc.getContext('2d');
+          octx.drawImage(src, 0, 0, 64, 64);
+          octx.globalCompositeOperation = 'source-atop';
+          octx.fillStyle = '#FFE97F';
+          octx.fillRect(0, 0, 64, 64);
+          return oc;
+        });
+      }
+
+      function fireConfetti(ox, oy) {
+        if (confCooldown) return;
+        confCooldown = true;
+        setTimeout(() => { confCooldown = false; }, 800);
+
+        if (!confTiles) bakeConfTiles();
+        const cc = document.getElementById('box-confetti-canvas');
+        cc.width = window.innerWidth; cc.height = window.innerHeight;
+        cc.style.display = 'block';
+
+        for (let i = 0; i < 140; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 8 + Math.random() * 22;
+          confParticles.push({
+            img:  confTiles[Math.floor(Math.random() * 4)],
+            x: ox, y: oy,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 12,
+            vrot: (Math.random() - 0.5) * 0.4,
+            rot:  Math.random() * Math.PI * 2,
+            size: 12 + Math.random() * 28,
+            alpha: 1,
+          });
+        }
+
+        if (confRAF) cancelAnimationFrame(confRAF);
+        tickConf();
+      }
+
+      function tickConf() {
+        const cc = document.getElementById('box-confetti-canvas');
+        const ctx = cc.getContext('2d');
+        ctx.clearRect(0, 0, cc.width, cc.height);
+        const H = cc.height;
+
+        for (let i = confParticles.length - 1; i >= 0; i--) {
+          const p = confParticles[i];
+          p.vy += 0.65;
+          p.x += p.vx; p.y += p.vy; p.rot += p.vrot;
+          p.vx *= 0.98;
+          if (p.y > H * 0.8) p.alpha = Math.max(0, 1 - (p.y - H * 0.8) / (H * 0.2));
+          if (p.alpha <= 0 || p.y > H + p.size) { confParticles.splice(i, 1); continue; }
+
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.drawImage(p.img, -p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+        }
+
+        if (confParticles.length > 0) {
+          confRAF = requestAnimationFrame(tickConf);
+        } else {
+          cc.style.display = 'none';
+          confRAF = null;
+        }
+      }
+    })();
+  </script>
+
+  <script>
+    // ── Scratch card ──
+    (function () {
+      const rivCanvas = document.getElementById('scratchboard-canvas');
+      const scratchCanvas = document.getElementById('scratch-canvas');
+      const ctx = scratchCanvas.getContext('2d');
+      let riveInst = null, buffer = null;
+
+      // Tomorrow's date in Belgrade timezone
+      const nowBelgrade = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Belgrade' }));
+      const d = String(nowBelgrade.getDate()).padStart(2, '0');
+      const m = String(nowBelgrade.getMonth() + 1).padStart(2, '0');
+      const y = nowBelgrade.getFullYear();
+      document.getElementById('scratchcard-exp').textContent = `EXP: ${d}.${m}.${y}.`;
+
+      function sizeRivCanvas() {
+        const p = rivCanvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || Math.round(cssW / 2);
+        rivCanvas.width = Math.round(cssW * dpr); rivCanvas.height = Math.round(cssH * dpr);
+        rivCanvas.style.width = cssW + 'px'; rivCanvas.style.height = cssH + 'px';
+      }
+
+      function startRive() {
+        if (riveInst) { try { riveInst.cleanup(); } catch(e){} riveInst = null; }
+        riveInst = new rive.Rive({
+          buffer: buffer.slice(0), canvas: rivCanvas,
+          autoplay: true,
+          fit: rive.Fit.Cover, alignment: rive.Alignment.Center,
+          onLoad: () => {
+            riveInst.resizeDrawingSurfaceToCanvas();
+            // Play all available animations/state machines
+            const sms = riveInst.stateMachineNames;
+            const anims = riveInst.animationNames;
+            if (sms && sms.length) riveInst.play(sms);
+            else if (anims && anims.length) riveInst.play(anims);
+            else riveInst.play();
+          },
+          onLoadError: e => console.error('skrechboard:', e),
+        });
+      }
+
+      // Scratch layer — store points as normalized coords so resize can replay them
+      const img = new Image();
+      img.src = 'SkrechLayer.webp';
+      const scratchedPoints = []; // [{nx, ny}] normalized 0-1
+
+      function sizeScratchCanvas() {
+        const p = scratchCanvas.parentElement;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cssW = p.offsetWidth  || Math.round(window.innerWidth / 2);
+        const cssH = p.offsetHeight || Math.round(cssW / 2);
+        scratchCanvas.width = Math.round(cssW * dpr); scratchCanvas.height = Math.round(cssH * dpr);
+        scratchCanvas.style.width = cssW + 'px'; scratchCanvas.style.height = cssH + 'px';
+        drawScratchLayer();
+      }
+
+      function drawScratchLayer() {
+        ctx.globalCompositeOperation = 'source-over';
+        if (img.complete && img.naturalWidth) {
+          ctx.drawImage(img, 0, 0, scratchCanvas.width, scratchCanvas.height);
+        } else {
+          ctx.fillStyle = '#ccc';
+          ctx.fillRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+        }
+        // Re-apply all previously scratched points
+        reapplyScratches();
+      }
+
+      function reapplyScratches() {
+        if (!scratchedPoints.length) return;
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const radius = 40 * dpr;
+        ctx.globalCompositeOperation = 'destination-out';
+        for (const { nx, ny } of scratchedPoints) {
+          ctx.beginPath();
+          ctx.arc(nx * scratchCanvas.width, ny * scratchCanvas.height, radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      img.onload = () => { if (scratchCanvas.width > 0) drawScratchLayer(); };
+
+      let isScratching = false;
+
+      function getPos(e) {
+        const r = scratchCanvas.getBoundingClientRect();
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const cx = e.clientX, cy = e.clientY;
+        return [(cx - r.left) * dpr, (cy - r.top) * dpr];
+      }
+
+      function scratch(physX, physY) {
+        const dpr = Math.min(2, window.devicePixelRatio || 1);
+        const radius = 40 * dpr;
+        // Save normalized position so it survives resize
+        scratchedPoints.push({ nx: physX / scratchCanvas.width, ny: physY / scratchCanvas.height });
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(physX, physY, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      scratchCanvas.addEventListener('pointerdown', e => {
+        isScratching = true;
+        scratchCanvas.setPointerCapture(e.pointerId);
+        const [x, y] = getPos(e);
+        scratch(x, y);
+      });
+      scratchCanvas.addEventListener('pointermove', e => {
+        if (!isScratching) return;
+        const [x, y] = getPos(e);
+        scratch(x, y);
+      });
+      scratchCanvas.addEventListener('pointerup',  () => { isScratching = false; });
+      scratchCanvas.addEventListener('pointerout', () => { isScratching = false; });
+
+      let loaded = false;
+      new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!loaded) {
+              loaded = true;
+              requestAnimationFrame(() => requestAnimationFrame(async () => {
+                sizeRivCanvas();
+                sizeScratchCanvas();
+                buffer = await fetch('skrechboard.riv').then(r => r.arrayBuffer());
+                startRive();
+              }));
+            } else if (riveInst) { riveInst.play(); }
+          } else if (riveInst) { riveInst.pause(); }
+        });
+      }, { rootMargin: '200px 0px', threshold: 0 }).observe(scratchCanvas.parentElement);
+
+      window.addEventListener('resize', () => {
+        sizeRivCanvas();
+        sizeScratchCanvas(); // redraws image + replays all scratches
+        if (riveInst) riveInst.resizeDrawingSurfaceToCanvas();
+      });
+
+      // ── Sparkle overlay ──
+      const sparkleCanvas = document.getElementById('sparkle-canvas');
+      const sctx = sparkleCanvas.getContext('2d');
+      const sparkleImgs = [1,2,3,4].map(n => { const i = new Image(); i.src = `make-it-pop-shape-${n}.png`; return i; });
+      let glitters = [];
+
+      function buildGlitters() {
+        const w = sparkleCanvas.width, h = sparkleCanvas.height;
+        glitters = Array.from({ length: 55 }, () => ({
+          img:   sparkleImgs[Math.floor(Math.random() * 4)],
+          x:     Math.random() * w,
+          y:     Math.random() * h,
+          size:  10 + Math.random() * 18,
+          rot:   Math.random() * Math.PI * 2,
+          speed: 0.8 + Math.random() * 2.2,
+          phase: Math.random() * Math.PI * 2,
+        }));
+      }
+
+      function sizeSparkleCanvas() {
+        const p = sparkleCanvas.parentElement;
+        sparkleCanvas.width  = p.offsetWidth  || 600;
+        sparkleCanvas.height = p.offsetHeight || 300;
+        buildGlitters();
+      }
+
+      function tickSparkles(ts) {
+        const t = ts * 0.001;
+        sctx.clearRect(0, 0, sparkleCanvas.width, sparkleCanvas.height);
+        for (const g of glitters) {
+          // Sharp spike: power of raised sin gives crisp twinkle rather than smooth fade
+          const raw = Math.sin(t * g.speed + g.phase);
+          const alpha = Math.pow(Math.max(0, raw), 3);
+          if (alpha < 0.01) continue;
+          sctx.save();
+          sctx.globalAlpha = alpha;
+          sctx.translate(g.x, g.y);
+          sctx.rotate(g.rot);
+          sctx.drawImage(g.img, -g.size / 2, -g.size / 2, g.size, g.size);
+          sctx.restore();
+        }
+        requestAnimationFrame(tickSparkles);
+      }
+
+      sizeSparkleCanvas();
+      requestAnimationFrame(tickSparkles);
+      window.addEventListener('resize', sizeSparkleCanvas);
+    })();
+  </script>
+
+  <script>
+    // ── Stamp board ──
+    (function () {
+      const board = document.getElementById('stamp-board');
+      const COLORS = ['#00933D', '#FFA5C8', '#FF5101', '#FFD504'];
+      const MAX = 15;
+      const active = [];
+      const NS = 'http://www.w3.org/2000/svg';
+
+      const SHAPES = [
+        // 1: circle + symmetric bolt
+        "M0 -93C51.3625 -93 93 -51.3625 93 0C93 51.3625 51.3625 93 0 93C-51.3625 93 -93 51.3625 -93 0C-93 -51.3625 -51.3625 -93 0 -93ZM35.939 -62.251C33.81 -63.48 31.089 -62.75 29.86 -60.622C25.208 -52.565 14.285 -33.645 7.02 -21.062C5.572 -18.554 2.896 -17.009 0 -17.009C-2.896 -17.009 -5.572 -18.554 -7.02 -21.062C-14.285 -33.645 -25.208 -52.565 -29.86 -60.622C-31.089 -62.75 -33.81 -63.48 -35.939 -62.251C-38.07 -61.02 -38.799 -58.299 -37.57 -56.17C-32.919 -48.113 -21.995 -29.194 -14.73 -16.61C-13.282 -14.102 -13.282 -11.013 -14.73 -8.505C-16.178 -5.997 -18.854 -4.452 -21.75 -4.452L-67.43 -4.452C-69.888 -4.452 -71.88 -2.459 -71.88 0C-71.88 2.459 -69.888 4.452 -67.43 4.452L-21.75 4.452C-18.854 4.452 -16.178 5.997 -14.73 8.505C-13.282 11.013 -13.282 14.102 -14.73 16.61C-21.995 29.194 -32.919 48.113 -37.57 56.17C-38.799 58.299 -38.07 61.02 -35.939 62.251C-33.81 63.48 -31.089 62.75 -29.86 60.622C-25.208 52.565 -14.285 33.645 -7.02 21.062C-5.572 18.554 -2.896 17.009 0 17.009C2.896 17.009 5.572 18.554 7.02 21.062C14.285 33.645 25.208 52.565 29.86 60.622C31.089 62.75 33.81 63.48 35.939 62.251C38.07 61.02 38.799 58.299 37.57 56.17C32.919 48.113 21.995 29.194 14.73 16.61C13.282 14.102 13.282 11.013 14.73 8.505C16.178 5.997 18.854 4.452 21.75 4.452L67.43 4.452C69.888 4.452 71.88 2.459 71.88 0C71.88 -2.459 69.888 -4.452 67.43 -4.452L21.75 -4.452C18.854 -4.452 16.178 -5.997 14.73 -8.505C13.282 -11.013 13.282 -14.102 14.73 -16.61C21.995 -29.194 32.919 -48.113 37.57 -56.17C38.799 -58.299 38.07 -61.02 35.939 -62.251Z",
+        // 2: symmetric bolt only
+        "M35.939 -62.251C33.81 -63.48 31.089 -62.75 29.86 -60.622C25.208 -52.565 14.285 -33.645 7.02 -21.062C5.572 -18.554 2.896 -17.009 0 -17.009C-2.896 -17.009 -5.572 -18.554 -7.02 -21.062C-14.285 -33.645 -25.208 -52.565 -29.86 -60.622C-31.089 -62.75 -33.81 -63.48 -35.939 -62.251C-38.07 -61.02 -38.799 -58.299 -37.57 -56.17C-32.919 -48.113 -21.995 -29.194 -14.73 -16.61C-13.282 -14.102 -13.282 -11.013 -14.73 -8.505C-16.178 -5.997 -18.854 -4.452 -21.75 -4.452L-67.43 -4.452C-69.888 -4.452 -71.88 -2.459 -71.88 0C-71.88 2.459 -69.888 4.452 -67.43 4.452L-21.75 4.452C-18.854 4.452 -16.178 5.997 -14.73 8.505C-13.282 11.013 -13.282 14.102 -14.73 16.61C-21.995 29.194 -32.919 48.113 -37.57 56.17C-38.799 58.299 -38.07 61.02 -35.939 62.251C-33.81 63.48 -31.089 62.75 -29.86 60.622C-25.208 52.565 -14.285 33.645 -7.02 21.062C-5.572 18.554 -2.896 17.009 0 17.009C2.896 17.009 5.572 18.554 7.02 21.062C14.285 33.645 25.208 52.565 29.86 60.622C31.089 62.75 33.81 63.48 35.939 62.251C38.07 61.02 38.799 58.299 37.57 56.17C32.919 48.113 21.995 29.194 14.73 16.61C13.282 14.102 13.282 11.013 14.73 8.505C16.178 5.997 18.854 4.452 21.75 4.452L67.43 4.452C69.888 4.452 71.88 2.459 71.88 0C71.88 -2.459 69.888 -4.452 67.43 -4.452L21.75 -4.452C18.854 -4.452 16.178 -5.997 14.73 -8.505C13.282 -11.013 13.282 -14.102 14.73 -16.61C21.995 -29.194 32.919 -48.113 37.57 -56.17C38.799 -58.299 38.07 -61.02 35.939 -62.251Z",
+        // 3: circle + asymmetric bolt
+        "M0 -93C51.3625 -93 93 -51.3625 93 0C93 51.3625 51.3625 93 0 93C-51.3625 93 -93 51.3625 -93 0C-93 -51.3625 -51.3625 -93 0 -93ZM35.939 -62.251C33.81 -63.48 31.089 -62.75 29.86 -60.622C23.546 -49.686 5.677 -18.736 1.086 -10.784C0.375 -9.552 -0.649 -8.529 -1.881 -7.817C-3.081 -7.125 -4.63 -6.23 -5.83 -5.538C-7.062 -4.826 -8.46 -4.452 -9.882 -4.452L-67.43 -4.452C-69.888 -4.452 -71.88 -2.459 -71.88 0C-71.88 2.459 -69.888 4.452 -67.43 4.452L-21.75 4.452C-18.854 4.452 -16.178 5.997 -14.73 8.505C-13.282 11.013 -13.282 14.102 -14.73 16.61C-21.995 29.194 -32.919 48.113 -37.57 56.17C-38.799 58.299 -38.07 61.02 -35.939 62.251C-33.81 63.48 -31.089 62.75 -29.86 60.622C-23.546 49.686 -5.677 18.736 -1.086 10.784C-0.375 9.552 0.649 8.529 1.881 7.817C3.081 7.125 4.63 6.23 5.83 5.538C7.062 4.826 8.46 4.452 9.882 4.452L67.43 4.452C69.888 4.452 71.88 2.459 71.88 0C71.88 -2.459 69.888 -4.452 67.43 -4.452L21.75 -4.452C18.854 -4.452 16.178 -5.997 14.73 -8.505C13.282 -11.013 13.282 -14.102 14.73 -16.61C21.995 -29.194 32.919 -48.113 37.57 -56.17C38.799 -58.299 38.07 -61.02 35.939 -62.251Z",
+        // 4: asymmetric bolt only
+        "M35.939 -62.251C33.81 -63.48 31.089 -62.75 29.86 -60.622C23.546 -49.686 5.677 -18.736 1.086 -10.784C0.375 -9.552 -0.649 -8.529 -1.881 -7.817C-3.081 -7.125 -4.63 -6.23 -5.83 -5.538C-7.062 -4.826 -8.46 -4.452 -9.882 -4.452L-67.43 -4.452C-69.888 -4.452 -71.88 -2.459 -71.88 0C-71.88 2.459 -69.888 4.452 -67.43 4.452L-21.75 4.452C-18.854 4.452 -16.178 5.997 -14.73 8.505C-13.282 11.013 -13.282 14.102 -14.73 16.61C-21.995 29.194 -32.919 48.113 -37.57 56.17C-38.799 58.299 -38.07 61.02 -35.939 62.251C-33.81 63.48 -31.089 62.75 -29.86 60.622C-23.546 49.686 -5.677 18.736 -1.086 10.784C-0.375 9.552 0.649 8.529 1.881 7.817C3.081 7.125 4.63 6.23 5.83 5.538C7.062 4.826 8.46 4.452 9.882 4.452L67.43 4.452C69.888 4.452 71.88 2.459 71.88 0C71.88 -2.459 69.888 -4.452 67.43 -4.452L21.75 -4.452C18.854 -4.452 16.178 -5.997 14.73 -8.505C13.282 -11.013 13.282 -14.102 14.73 -16.61C21.995 -29.194 32.919 -48.113 37.57 -56.17C38.799 -58.299 38.07 -61.02 35.939 -62.251Z",
+        // 5: circle + spiral
+        "M0 -93C51.3625 -93 93 -51.3625 93 0C93 51.3625 51.3625 93 0 93C-51.3625 93 -93 51.3625 -93 0C-93 -51.3625 -51.3625 -93 0 -93ZM-2.013 69.761C20.782 66.639 40.852 53.153 52.355 33.228C65.178 11.018 57.557 -17.424 35.348 -30.247C13.138 -43.069 -15.304 -35.448 -28.127 -13.239C-33.229 -4.402 -30.196 6.915 -21.359 12.018C-12.522 17.12 -1.205 14.087 3.897 5.25C6.515 0.715 12.323 -0.842 16.859 1.777C21.394 4.396 22.95 10.204 20.332 14.739C9.993 32.647 -12.94 38.792 -30.848 28.453C-48.756 18.113 -54.901 -4.82 -44.562 -22.727C-34.449 -40.243 -16.805 -52.099 3.233 -54.844C5.694 -55.181 7.418 -57.452 7.081 -59.913C6.744 -62.374 4.473 -64.098 2.012 -63.761C-20.782 -60.639 -40.852 -47.152 -52.356 -27.227C-65.179 -5.018 -57.558 23.424 -35.348 36.247C-13.138 49.07 15.303 41.449 28.126 19.239C33.228 10.402 30.196 -0.915 21.359 -6.017C12.522 -11.119 1.205 -8.087 -3.897 0.75C-6.516 5.286 -12.324 6.842 -16.859 4.223C-21.395 1.605 -22.951 -4.203 -20.332 -8.739C-9.993 -26.647 12.94 -32.791 30.848 -22.452C48.755 -12.113 54.9 10.82 44.561 28.728C34.448 46.244 16.805 58.1 -3.234 60.844C-5.695 61.181 -7.419 63.453 -7.082 65.913C-6.745 68.374 -4.473 70.098 -2.013 69.761Z",
+        // 6: spiral only
+        "M-2.013 69.761C20.782 66.639 40.852 53.153 52.355 33.228C65.178 11.018 57.557 -17.424 35.348 -30.247C13.138 -43.069 -15.304 -35.448 -28.127 -13.239C-33.229 -4.402 -30.196 6.915 -21.359 12.018C-12.522 17.12 -1.205 14.087 3.897 5.25C6.515 0.715 12.323 -0.842 16.859 1.777C21.394 4.396 22.95 10.204 20.332 14.739C9.993 32.647 -12.94 38.792 -30.848 28.453C-48.756 18.113 -54.901 -4.82 -44.562 -22.727C-34.449 -40.243 -16.805 -52.099 3.233 -54.844C5.694 -55.181 7.418 -57.452 7.081 -59.913C6.744 -62.374 4.473 -64.098 2.012 -63.761C-20.782 -60.639 -40.852 -47.152 -52.356 -27.227C-65.179 -5.018 -57.558 23.424 -35.348 36.247C-13.138 49.07 15.303 41.449 28.126 19.239C33.228 10.402 30.196 -0.915 21.359 -6.017C12.522 -11.119 1.205 -8.087 -3.897 0.75C-6.516 5.286 -12.324 6.842 -16.859 4.223C-21.395 1.605 -22.951 -4.203 -20.332 -8.739C-9.993 -26.647 12.94 -32.791 30.848 -22.452C48.755 -12.113 54.9 10.82 44.561 28.728C34.448 46.244 16.805 58.1 -3.234 60.844C-5.695 61.181 -7.419 63.453 -7.082 65.913C-6.745 68.374 -4.473 70.098 -2.013 69.761Z",
+        // 7: circle + arc
+        "M0 -93C51.3625 -93 93 -51.3625 93 0C93 51.3625 51.3625 93 0 93C-51.3625 93 -93 51.3625 -93 0C-93 -51.3625 -51.3625 -93 0 -93ZM45.175 43.624C61.87 14.709 51.963 -22.265 23.047 -38.959C-1.61 -53.195 -33.139 -44.747 -47.375 -20.09C-59.543 0.987 -52.322 27.937 -31.245 40.106C-13.18 50.536 9.921 44.346 20.351 26.281C25.37 17.588 26.087 7.063 22.294 -2.23C21.356 -4.529 18.727 -5.634 16.428 -4.696C14.128 -3.757 13.023 -1.129 13.962 1.171C16.703 7.889 16.185 15.497 12.557 21.781C4.612 35.542 -12.984 40.257 -26.745 32.312C-43.517 22.628 -49.264 1.182 -39.58 -15.59C-27.83 -35.942 -1.805 -42.916 18.547 -31.165C43.158 -16.956 51.59 14.513 37.381 39.124C36.139 41.275 36.877 44.029 39.028 45.271C41.179 46.513 43.934 45.775 45.175 43.624Z",
+        // 8: arc only
+        "M45.175 43.624C61.87 14.709 51.963 -22.265 23.047 -38.959C-1.61 -53.195 -33.139 -44.747 -47.375 -20.09C-59.543 0.987 -52.322 27.937 -31.245 40.106C-13.18 50.536 9.921 44.346 20.351 26.281C25.37 17.588 26.087 7.063 22.294 -2.23C21.356 -4.529 18.727 -5.634 16.428 -4.696C14.128 -3.757 13.023 -1.129 13.962 1.171C16.703 7.889 16.185 15.497 12.557 21.781C4.612 35.542 -12.984 40.257 -26.745 32.312C-43.517 22.628 -49.264 1.182 -39.58 -15.59C-27.83 -35.942 -1.805 -42.916 18.547 -31.165C43.158 -16.956 51.59 14.513 37.381 39.124C36.139 41.275 36.877 44.029 39.028 45.271C41.179 46.513 43.934 45.775 45.175 43.624Z",
+        // 9: circle + X bowtie
+        "M0 -93C51.3625 -93 93 -51.3625 93 0C93 51.3625 51.3625 93 0 93C-51.3625 93 -93 51.3625 -93 0C-93 -51.3625 -51.3625 -93 0 -93ZM35.939 -62.251C33.81 -63.48 31.089 -62.75 29.86 -60.622C25.208 -52.565 14.285 -33.645 7.02 -21.062C5.572 -18.554 2.896 -17.009 0 -17.009C-2.896 -17.009 -5.572 -18.554 -7.02 -21.062C-14.285 -33.645 -25.208 -52.565 -29.86 -60.622C-31.089 -62.75 -33.81 -63.48 -35.939 -62.251C-38.07 -61.02 -38.799 -58.299 -37.57 -56.17C-31.256 -45.234 -13.387 -14.284 -8.797 -6.333C-8.085 -5.1 -7.711 -3.703 -7.711 -2.28L-7.711 2.28C-7.711 3.703 -8.085 5.1 -8.797 6.333C-13.387 14.284 -31.256 45.234 -37.57 56.17C-38.799 58.299 -38.07 61.02 -35.939 62.251C-33.81 63.48 -31.089 62.75 -29.86 60.622C-25.208 52.565 -14.285 33.645 -7.02 21.062C-5.572 18.554 -2.896 17.009 0 17.009C2.896 17.009 5.572 18.554 7.02 21.062C14.285 33.645 25.208 52.565 29.86 60.622C31.089 62.75 33.81 63.48 35.939 62.251C38.07 61.02 38.799 58.299 37.57 56.17C31.256 45.234 13.387 14.284 8.797 6.333C8.085 5.1 7.711 3.703 7.711 2.28L7.711 -2.28C7.711 -3.703 8.085 -5.1 8.797 -6.333C13.387 -14.284 31.256 -45.234 37.57 -56.17C38.799 -58.299 38.07 -61.02 35.939 -62.251Z",
+        // 10: X bowtie only
+        "M35.939 -62.251C33.81 -63.48 31.089 -62.75 29.86 -60.622C25.208 -52.565 14.285 -33.645 7.02 -21.062C5.572 -18.554 2.896 -17.009 0 -17.009C-2.896 -17.009 -5.572 -18.554 -7.02 -21.062C-14.285 -33.645 -25.208 -52.565 -29.86 -60.622C-31.089 -62.75 -33.81 -63.48 -35.939 -62.251C-38.07 -61.02 -38.799 -58.299 -37.57 -56.17C-31.256 -45.234 -13.387 -14.284 -8.797 -6.333C-8.085 -5.1 -7.711 -3.703 -7.711 -2.28L-7.711 2.28C-7.711 3.703 -8.085 5.1 -8.797 6.333C-13.387 14.284 -31.256 45.234 -37.57 56.17C-38.799 58.299 -38.07 61.02 -35.939 62.251C-33.81 63.48 -31.089 62.75 -29.86 60.622C-25.208 52.565 -14.285 33.645 -7.02 21.062C-5.572 18.554 -2.896 17.009 0 17.009C2.896 17.009 5.572 18.554 7.02 21.062C14.285 33.645 25.208 52.565 29.86 60.622C31.089 62.75 33.81 63.48 35.939 62.251C38.07 61.02 38.799 58.299 37.57 56.17C31.256 45.234 13.387 14.284 8.797 6.333C8.085 5.1 7.711 3.703 7.711 2.28L7.711 -2.28C7.711 -3.703 8.085 -5.1 8.797 -6.333C13.387 -14.284 31.256 -45.234 37.57 -56.17C38.799 -58.299 38.07 -61.02 35.939 -62.251Z",
+      ];
+
+      function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+      function spawn(x, y) {
+        const sz = Math.min(board.offsetWidth * 0.22, board.offsetHeight * 0.5);
+        const color = pick(COLORS);
+        const d = pick(SHAPES);
+        const rot = (Math.random() - 0.5) * 30;
+
+        const svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('viewBox', '-100 -100 200 200');
+        svg.classList.add('stamp-el', 'stamp-in');
+        svg.style.cssText = `left:${x}px;top:${y}px;width:${sz}px;height:${sz}px;--sr:${rot}deg`;
+
+        const path = document.createElementNS(NS, 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('fill', color);
+        path.setAttribute('fill-rule', 'evenodd');
+        svg.appendChild(path);
+        board.appendChild(svg);
+        active.push(svg);
+
+        if (active.length > MAX) {
+          const old = active.shift();
+          old.classList.remove('stamp-in');
+          void old.offsetWidth;
+          old.classList.add('stamp-out');
+          old.addEventListener('animationend', () => old.remove(), { once: true });
+        }
+      }
+
+      board.addEventListener('click', e => {
+        const r = board.getBoundingClientRect();
+        spawn(e.clientX - r.left, e.clientY - r.top);
+      });
+    })();
+  </script>
+
+  <script>
+    const emailBtn     = document.getElementById('email-btn');
+    const emailWrap    = document.getElementById('email-wrap');
+    const emailTooltip = document.getElementById('email-tooltip');
+
+    emailBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
+        emailTooltip.textContent = 'Copied!';
+        emailWrap.classList.add('copied');
+        setTimeout(() => {
+          emailTooltip.textContent = 'Copy e-mail';
+          emailWrap.classList.remove('copied');
+        }, 2000);
+      }).catch(() => {
+        emailTooltip.textContent = 'Copy failed';
+        emailWrap.classList.add('copied');
+        setTimeout(() => {
+          emailTooltip.textContent = 'Copy e-mail';
+          emailWrap.classList.remove('copied');
+        }, 2000);
+      });
+    });
+  </script>
+
+  <script>
+    (function () {
+      const TOP    = '#B8DDF6';
+      const BOTTOM = '#E0EC8A';
+      const THRESHOLD = 4;
+
+      function update() {
+        const atBottom =
+          window.scrollY + window.innerHeight >=
+          document.documentElement.scrollHeight - THRESHOLD;
+        document.body.style.background = atBottom ? BOTTOM : TOP;
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
+  </script>
+
+  <canvas id="box-confetti-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
+</body>
+</html>
