@@ -204,82 +204,21 @@
       padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
       display: flex;
       flex-direction: row;
-      gap: clamp(32px, 5vw, 80px);
+      gap: clamp(24px, 4vw, 64px);
       align-items: flex-start;
     }
 
-    .about-left {
-      flex: 1 1 45%;
-      display: flex;
-      flex-direction: column;
-      gap: clamp(16px, 2vw, 28px);
-    }
-
-    .about-right {
-      flex: 1 1 45%;
-      display: flex;
-      flex-direction: column;
-      gap: clamp(16px, 2vw, 24px);
-      padding-top: clamp(40px, 6vw, 100px);
-    }
-
     .about-bio {
-      max-width: min(540px, 100%);
+      flex: 1;
       font-size: clamp(16px, 1.6vw, 22px);
       font-weight: 400;
       line-height: 1.5;
       color: #000;
     }
 
-    .about-highlight {
-      display: block;
-      font-size: clamp(20px, 3vw, 40px);
-      font-weight: 500;
-      line-height: 1;
-      color: #000;
-    }
-
-    .done-it-wrapper {
-      width: 100%;
-    }
-
-    .done-it-canvas-wrap {
-      position: relative;
-      display: block;
-      line-height: 0;
-    }
-
-    #done-it-canvas {
-      display: block;
-      width: 100%;
-      aspect-ratio: 1110 / 540;
-      cursor: pointer;
-    }
-
-    .done-it-interactive-tag {
-      position: absolute;
-      top: clamp(10px, 1.5vw, 16px);
-      left: clamp(10px, 1.5vw, 16px);
-      display: flex;
-      align-items: center;
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    .done-it-interactive-tag svg {
-      width: clamp(16px, 1.75vw, 26px);
-      height: clamp(16px, 1.75vw, 26px);
-    }
-
     @media (max-width: 768px) {
       #about {
         flex-direction: column;
-      }
-      .about-left, .about-right {
-        flex: 1 1 auto;
-      }
-      .about-right {
-        padding-top: 0;
       }
     }
 
@@ -515,25 +454,12 @@
   <section id="work"></section>
 
   <section id="about">
-    <div class="about-left">
-      <span class="about-highlight">You name it, I've done it!</span>
-      <div class="done-it-wrapper">
-        <div class="done-it-canvas-wrap">
-          <canvas id="done-it-canvas"></canvas>
-          <div class="done-it-interactive-tag">
-            <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="about-right">
-      <p class="about-bio">Strong art generalist with 10+ years of experience
-        across advertising, branding, motion, and digital design,
-        working with a variety of global brands and creative teams.</p>
-      <p class="about-bio">In recent years, focused on gaming, interactive
-        motion design, and creative direction for
-        mobile products and entertainment experiences.</p>
-    </div>
+    <p class="about-bio">Strong art generalist with 10+ years of experience
+      across advertising, branding, motion, and digital design,
+      working with a variety of global brands and creative teams.</p>
+    <p class="about-bio">In recent years, focused on gaming, interactive
+      motion design, and creative direction for
+      mobile products and entertainment experiences.</p>
   </section>
 
   <footer id="contact">
@@ -554,7 +480,6 @@
     </div>
   </footer>
 
-  <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
   <script>
     // ── Projects config — add / remove / reorder here ──────────────────
@@ -638,157 +563,6 @@
       }
     })();
 
-    // ── DoneItSlot Rive ──
-    const SLOT_TEXT = 'slotText';
-
-    const slotTitles = [
-      'INTERACTIVE\nMOTION DESIGN',
-      'GRAPHIC DESIGN',
-      'ANIMATION',
-      'ANIMATION\nDIRECTION',
-      'ART DIRECTION',
-      'CREATIVE\nDIRECTION',
-      'ILLUSTRATION',
-      'CAMPAIGN\nDESIGN',
-      'ADVERTISING\nCREATIVE\nPRODUCTION',
-      'UI/UX MOTION\nDESIGN',
-      'WEB GRAPHICS\nDESIGN',
-      'SOCIAL MEDIA\nASSET DESIGN',
-      'VISUAL IDENTITY\nDEVELOPMENT',
-      'SCALABLE\nMOTION\nSYSTEMS',
-      'TEAM\nLEADERSHIP',
-      'NEW IP\nDEVELOPMENT',
-      'LIVE GAME\nCONTENT\nPRODUCTION',
-      'GAME JAM\nMENTORING',
-      'A/B TESTING\nCOLLABORATION',
-      'CREATIVE TEAM\nMANAGEMENT',
-      'BRANDING',
-    ];
-
-    const doneCanvas = document.getElementById('done-it-canvas');
-    let lastSlotIdx  = 0;
-    let isPulling    = false;
-    let idleAnimName = null;
-    let pullAnimName = null;
-    let slotVmInst   = null;
-    let slotTextProp = null;
-    let spinTrigger  = null;
-
-    function sizeDoneCanvas() {
-      const w = doneCanvas.clientWidth || Math.round(window.innerWidth * 0.45);
-      doneCanvas.width  = w;
-      doneCanvas.height = Math.round(w * 540 / 1110);
-    }
-    sizeDoneCanvas();
-
-    function setSlotText(text) {
-      if (slotTextProp) {
-        slotTextProp.value = text;
-      } else {
-        try { doneRive.setTextRunValue(SLOT_TEXT, text); } catch(e) {}
-      }
-    }
-
-    const doneRive = new rive.Rive({
-      src: 'DoneItSlot.riv',
-      canvas: doneCanvas,
-      artboard: 'Slot',
-      stateMachines: 'SlotStateMachine',
-      autoplay: true,
-      fit: rive.Fit.Cover,
-      alignment: rive.Alignment.Center,
-      onLoad: () => {
-        sizeDoneCanvas();
-        requestAnimationFrame(() => doneRive.resizeDrawingSurfaceToCanvas());
-
-        const anims = doneRive.animationNames || [];
-        idleAnimName = anims.find(n => n.toLowerCase().includes('idle')) || anims[0];
-        pullAnimName = anims.find(n => n !== idleAnimName) || anims[1];
-
-        try {
-          const rProto = Object.getPrototypeOf(doneRive);
-          const vmMethods = Object.getOwnPropertyNames(rProto).filter(n =>
-            /viewmodel|context|databind|instance/i.test(n)
-          );
-          console.log('[DoneItSlot] Rive VM methods:', vmMethods);
-
-          slotVmInst = doneRive.viewModelInstance;
-          console.log('[DoneItSlot] viewModelInstance:', slotVmInst);
-
-          if (!slotVmInst) {
-            const vmDef = doneRive.viewModelByName ? doneRive.viewModelByName('SlotVm') : null;
-            if (vmDef) {
-              console.log('[DoneItSlot] instanceCount:', vmDef.instanceCount);
-              if (vmDef.instanceCount > 0 && typeof vmDef.instanceByIndex === 'function') {
-                slotVmInst = vmDef.instanceByIndex(0);
-                console.log('[DoneItSlot] got instanceByIndex(0):', slotVmInst);
-              }
-              if (!slotVmInst && typeof vmDef.defaultInstance === 'function') {
-                slotVmInst = vmDef.defaultInstance();
-                console.log('[DoneItSlot] got defaultInstance:', slotVmInst);
-              }
-              const bindFn = doneRive.setDataContextFromViewModelInstance
-                          || doneRive.bindViewModelInstance;
-              console.log('[DoneItSlot] bind fn:', typeof bindFn);
-              if (slotVmInst && typeof bindFn === 'function') {
-                bindFn.call(doneRive, slotVmInst);
-                console.log('[DoneItSlot] data context bound');
-              }
-            }
-          }
-
-          if (slotVmInst) {
-            slotTextProp = slotVmInst.string  ? slotVmInst.string('slotText')  : null;
-            spinTrigger  = slotVmInst.trigger ? slotVmInst.trigger('trigSpin') : null;
-            console.log('[DoneItSlot] ViewModel OK — textProp:', slotTextProp, '| trigger:', spinTrigger);
-          } else {
-            console.warn('[DoneItSlot] ViewModel null — text stays as baked default.');
-          }
-        } catch(e) {
-          console.warn('[DoneItSlot] ViewModel error:', e.message || e);
-        }
-
-        setSlotText(slotTitles[0]);
-      },
-      onLoadError: (e) => console.error('DoneItSlot Rive error:', e)
-    });
-
-    doneRive.on(rive.EventType.Stop, (event) => {
-      const stopped = event.data || [];
-      if (stopped.some(n => n === pullAnimName)) isPulling = false;
-    });
-
-    doneRive.on(rive.EventType.StateChange, (event) => {
-      const states = event.data || [];
-      if (states.some(s => /idle/i.test(s))) isPulling = false;
-    });
-
-    function changeSlotTitle() {
-      let idx;
-      do { idx = Math.floor(Math.random() * slotTitles.length); }
-      while (slotTitles.length > 1 && idx === lastSlotIdx);
-      lastSlotIdx = idx;
-      setSlotText(slotTitles[idx]);
-    }
-
-    function fireSlot() {
-      if (isPulling) return;
-      isPulling = true;
-      if (spinTrigger && typeof spinTrigger.trigger === 'function') {
-        spinTrigger.trigger();
-      } else if (pullAnimName) {
-        doneRive.play(pullAnimName);
-      }
-      setTimeout(changeSlotTitle, Math.round(8 * 1000 / 60));
-    }
-
-    doneCanvas.addEventListener('click', fireSlot);
-    doneCanvas.addEventListener('touchend', (e) => { e.preventDefault(); fireSlot(); }, { passive: false });
-
-    window.addEventListener('resize', () => {
-      sizeDoneCanvas();
-      doneRive.resizeDrawingSurfaceToCanvas();
-    });
 
     // Lenis smooth scroll
     const lenis = new Lenis({
