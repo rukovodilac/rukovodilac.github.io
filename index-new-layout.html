@@ -34,39 +34,25 @@
 
     /* ── SITE HEADER ── */
     #site-header {
-      display: flex;
-      align-items: center;
-      gap: clamp(20px, 3vw, 48px);
-      padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
+      padding: clamp(24px, 3vw, 48px) clamp(24px, 3.5vw, 48px) clamp(16px, 2vw, 32px);
     }
 
     #logo {
-      font-size: clamp(48px, 6.5vw, 96px);
+      display: block;
+      font-size: clamp(16px, 1.4vw, 22px);
       font-weight: 500;
-      line-height: 1.1;
       color: #000;
       text-decoration: none;
-      flex-shrink: 0;
+      margin-bottom: clamp(12px, 2vw, 24px);
     }
 
     #headline {
-      font-size: clamp(20px, 2.75vw, 40px);
+      font-size: clamp(40px, 7vw, 112px);
       font-weight: 500;
-      letter-spacing: -0.01em;
-      display: flex;
-      flex-direction: column;
-      gap: 0.08em;
-    }
-
-    .headline-line {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0.3em;
-    }
-
-    .headline-line span {
-      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #000;
+      margin: 0;
     }
 
     /* ── WORK SECTION ── */
@@ -260,6 +246,7 @@
       color: #000;
       cursor: pointer;
       line-height: inherit;
+      overflow: visible;
     }
 
     .email-tooltip {
@@ -429,20 +416,7 @@
 
   <header id="site-header">
     <a href="/" id="logo">a–z</a>
-    <div id="headline">
-      <div class="headline-line">
-        <span>Interactive</span>
-        <span>Motion</span>
-        <span>Designer</span>
-      </div>
-      <div class="headline-line">
-        <span>for</span>
-        <span>Games,</span>
-        <span>Apps</span>
-        <span>&amp;</span>
-        <span>Web</span>
-      </div>
-    </div>
+    <h1 id="headline">Interactive Motion Designer<br>for Games, Apps &amp; Web</h1>
   </header>
 
   <section id="work"></section>
