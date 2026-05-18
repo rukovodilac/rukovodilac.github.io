@@ -236,12 +236,21 @@
       line-height: 1;
       color: #000;
       border-radius: var(--r, 4px);
-      transition: filter 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .work-title-arrow {
+      display: inline-flex;
+      align-items: center;
+      transition: background 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .work-title-arrow .arrow-icon {
+      margin-left: 0;
     }
 
     @media (hover: hover) {
-      .work-item:hover .work-title-word {
-        filter: brightness(0.88);
+      .work-item:hover .work-title-arrow {
+        background: #fff;
       }
     }
 
@@ -679,14 +688,20 @@
           const isLastLine = li === p.title.length - 1;
           const lineEl = document.createElement('div');
           lineEl.className = 'work-title-line';
-          line.split(' ').forEach((word, wi, arr) => {
-            const isLastWord = isLastLine && wi === arr.length - 1;
+          line.split(' ').forEach((word) => {
             const w = document.createElement('span');
             w.className = 'work-title-word';
             w.style.setProperty('--r', wordRadii[rIdx++ % wordRadii.length]);
-            w.innerHTML = isLastWord ? `${word} ${arrowSVG}` : word;
+            w.textContent = word;
             lineEl.appendChild(w);
           });
+          if (isLastLine) {
+            const arrow = document.createElement('span');
+            arrow.className = 'work-title-word work-title-arrow';
+            arrow.style.setProperty('--r', wordRadii[rIdx++ % wordRadii.length]);
+            arrow.innerHTML = arrowSVG;
+            lineEl.appendChild(arrow);
+          }
           titleEl.appendChild(lineEl);
         });
         a.appendChild(titleEl);
