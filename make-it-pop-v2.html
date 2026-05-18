@@ -21,7 +21,7 @@
       background: #fff;
     }
 
-    /* ── HEADER NAV ── */
+    /* ── HEADER ── */
     #header-nav {
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
     }
@@ -55,18 +55,17 @@
       width: fit-content;
     }
 
+
     #tagline {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: clamp(10px, 1.5vw, 20px);
+      font-size: clamp(24px, 3.5vw, 48px);
+      font-weight: 500;
+      line-height: 1;
+      color: #000;
+      margin-top: clamp(8px, 1.5vw, 16px);
     }
 
     #tagline span {
       display: block;
-      font-size: clamp(24px, 3.5vw, 48px);
-      font-weight: 500;
-      line-height: 1;
       color: #FF7BA8;
     }
 
@@ -119,7 +118,6 @@
       color: #000;
     }
 
-    /* ── 3-COL HEADER GRID (placed after standalone rules so overrides win) ── */
     @media (min-width: 768px) {
       #page-top {
         display: grid;
@@ -128,8 +126,9 @@
           "header  header  header"
           "title   credits credits";
       }
+
       #header         { grid-area: header; }
-      #project-header { grid-area: title; }
+      #project-header { grid-area: title; padding-bottom: clamp(32px, 4vw, 56px); }
       #credits        { grid-area: credits; align-self: start; padding-top: 0; }
     }
 
@@ -258,18 +257,14 @@
     #showcase {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      padding: clamp(24px, 3.5vw, 48px) clamp(20px, 3.5vw, 48px) clamp(20px, 3vw, 40px);
-      gap: clamp(8px, 1.2vw, 16px);
       background: #fff;
+      padding: 0 clamp(20px, 3.5vw, 48px);
     }
 
     .showcase-item {
       position: relative;
       overflow: hidden;
       background: #000;
-      border-radius: 20px;
-      isolation: isolate;
-      contain: paint;
     }
 
     .showcase-item canvas {
@@ -281,30 +276,17 @@
     }
     .showcase-item canvas.coin-reload { opacity: 0; }
 
-    /*
-     * Aspect-ratio correction for 2-column items:
-     *   padding = 3.5vw, gap = 1.2vw
-     *   colW = (100 − 7 − 3.6)vw / 4 = 22.35vw
-     *   2-col width = 2×22.35 + 1.2 = 45.9vw
-     *   AR = 45.9 / 22.35 = 2.054
-     * This makes 2-col item height = colW = exact height of a 1:1 single-col item.
-     * 1:1 items sharing a row have no aspect-ratio and stretch to fill.
-     */
-    .si-coin     { grid-column: 1 / 3; grid-row: 1; aspect-ratio: 45.9 / 22.35; }
+    /* Explicit grid placement per item */
+    .si-coin     { grid-column: 1 / 3; grid-row: 1; aspect-ratio: 2 / 1; }
     .si-knob     { grid-column: 3 / 4; grid-row: 2; aspect-ratio: 1 / 1; }
-    .si-progress { grid-column: 1 / 3; grid-row: 3; aspect-ratio: 45.9 / 22.35; }
-    .si-froggy   { grid-column: 3 / 4; grid-row: 3; }
-    .si-soda     { grid-column: 4 / 5; grid-row: 3; }
-    .si-battery  { grid-column: 2 / 4; grid-row: 4; aspect-ratio: 45.9 / 22.35; }
-    .si-egg      { grid-column: 2 / 3; grid-row: 5; }
-    .si-arrows   { grid-column: 1 / 3; grid-row: 6; aspect-ratio: 45.9 / 11.175; }
-    .si-illusion { grid-column: 2 / 4; grid-row: 7; aspect-ratio: 45.9 / 22.35; }
-    .si-box      { grid-column: 3 / 4; grid-row: 8; }
-
-    /* Decos in mixed rows: no aspect-ratio, stretch to wide item's height */
-    .si-deco-2   { aspect-ratio: unset; }
-    .si-deco-3   { aspect-ratio: unset; }
-    .si-deco-4   { aspect-ratio: unset; }
+    .si-progress { grid-column: 1 / 3; grid-row: 3; aspect-ratio: 2 / 1; }
+    .si-soda     { grid-column: 4 / 5; grid-row: 3; aspect-ratio: 1 / 1; }
+    .si-froggy   { grid-column: 3 / 4; grid-row: 3; aspect-ratio: 1 / 1; }
+    .si-battery  { grid-column: 2 / 4; grid-row: 4; aspect-ratio: 2 / 1; }
+    .si-egg      { grid-column: 2 / 3; grid-row: 5; aspect-ratio: 1 / 1; }
+    .si-arrows   { grid-column: 1 / 3; grid-row: 6; aspect-ratio: 4 / 1; }
+    .si-illusion { grid-column: 2 / 4; grid-row: 7; aspect-ratio: 2 / 1; }
+    .si-box      { grid-column: 3 / 4; grid-row: 8; aspect-ratio: 1 / 1; }
 
     /* Decorative SVG shapes — desktop only */
     .si-deco {
@@ -312,7 +294,6 @@
       overflow: hidden;
       pointer-events: none;
       aspect-ratio: 1 / 1;
-      border-radius: 20px;
     }
     .si-deco svg { display: block; width: 100%; height: 100%; }
     .si-deco-1 { grid-column: 2 / 3; grid-row: 2; }
@@ -323,13 +304,12 @@
     @media (max-width: 768px) {
       #showcase {
         grid-template-columns: 1fr;
-        gap: clamp(16px, 4vw, 32px);
-        padding: 0 clamp(16px, 4vw, 32px) clamp(16px, 4vw, 32px);
+        gap: 25vw;
+        padding: 0 0 25vw;
       }
       .showcase-item {
         grid-column: 1 / -1 !important;
         grid-row: auto !important;
-        border-radius: 16px;
       }
       .si-deco { display: none; }
     }
@@ -338,7 +318,7 @@
     .si-stamp {
       grid-column: 3 / 5;
       grid-row: 5;
-      aspect-ratio: 45.9 / 22.35;
+      aspect-ratio: 2 / 1;
       background: #E0E0E0;
     }
 
@@ -366,7 +346,7 @@
     .si-scratchcard {
       grid-column: 1 / 3;
       grid-row: 8;
-      aspect-ratio: 45.9 / 22.35;
+      aspect-ratio: 2 / 1;
       position: relative;
       overflow: hidden;
       background: #000;
@@ -474,42 +454,42 @@
 
   <div id="page-top">
 
-    <header id="header">
-      <div id="header-nav">
-        <a href="/" id="logo-circle" aria-label="Home"></a>
-      </div>
-    </header>
+  <header id="header">
+    <div id="header-nav">
+      <a href="/" id="logo-circle" aria-label="Home"></a>
+    </div>
+  </header>
 
-    <div id="project-header">
-      <div id="project-title">
-        <h1>
-          <span>Make It</span>
-          <span>Pop</span>
-        </h1>
+  <div id="project-header">
+    <div id="project-title">
+      <h1>
+        <span>Make It</span>
+        <span>Pop</span>
+      </h1>
+    </div>
+    <div id="tagline">
+      <span>Turning UX into</span>
+      <span>User Excitement.</span>
+    </div>
+    <div class="project-tag">
+      <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
+      <span>Interactive elements. Feel free to explore.</span>
+    </div>
+  </div>
+
+  <div id="credits">
+    <p class="credits-desc">Tiny interactive moments designed to bring curiosity, delight, and playfulness back into digital experiences. As digital products become increasingly optimised for utility and efficiency, I want to explore the importance of fun, personality, and tactile interaction on the web.</p>
+    <div class="credits-meta">
+      <div class="credits-col">
+        <span class="credits-label">Role</span>
+        <span class="credits-value">Art / Creative Director,<br>Animator, Illustrator,<br>Developer</span>
       </div>
-      <div id="tagline">
-        <span>Turning UX into</span>
-        <span>User Excitement.</span>
-      </div>
-      <div class="project-tag">
-        <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
-        <span>Interactive elements. Feel free to explore.</span>
+      <div class="credits-col">
+        <span class="credits-label">Tech</span>
+        <span class="credits-value">Rive, Affinity,<br>Claude Code</span>
       </div>
     </div>
-
-    <div id="credits">
-      <p class="credits-desc">Tiny interactive moments designed to bring curiosity, delight, and playfulness back into digital experiences. As digital products become increasingly optimised for utility and efficiency, I want to explore the importance of fun, personality, and tactile interaction on the web.</p>
-      <div class="credits-meta">
-        <div class="credits-col">
-          <span class="credits-label">Role</span>
-          <span class="credits-value">Art / Creative Director,<br>Animator, Illustrator,<br>Developer</span>
-        </div>
-        <div class="credits-col">
-          <span class="credits-label">Tech</span>
-          <span class="credits-value">Rive, Affinity,<br>Claude Code</span>
-        </div>
-      </div>
-    </div>
+  </div>
 
   </div><!-- /#page-top -->
 
@@ -1682,18 +1662,12 @@
     emailBtn.addEventListener('mouseleave', () => {
       if (!copied) emailBtn.textContent = 'e-mail';
     });
-
     emailBtn.addEventListener('click', () => {
       navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
         copied = true;
         emailBtn.textContent = 'copied!';
-        setTimeout(() => {
-          copied = false;
-          emailBtn.textContent = 'e-mail';
-        }, 2000);
-      }).catch(() => {
-        emailBtn.textContent = 'e-mail';
-      });
+        setTimeout(() => { copied = false; emailBtn.textContent = 'e-mail'; }, 2000);
+      }).catch(() => { emailBtn.textContent = 'e-mail'; });
     });
   </script>
 
