@@ -46,14 +46,9 @@
       height: clamp(64px, 9vw, 140px);
       border-radius: 50%;
       background: #C5FF30;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: block;
+      overflow: hidden;
       text-decoration: none;
-      font-size: clamp(28px, 4vw, 62px);
-      font-weight: 500;
-      line-height: 1;
-      color: #fff;
     }
 
     #headline {
@@ -258,14 +253,9 @@
       height: clamp(48px, 6vw, 88px);
       border-radius: 50%;
       background: #C5FF30;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: block;
+      overflow: hidden;
       text-decoration: none;
-      font-size: clamp(21px, 2.65vw, 39px);
-      font-weight: 500;
-      line-height: 1;
-      color: #fff;
     }
 
     .contact-legal {
@@ -390,7 +380,12 @@
   </svg>
 
   <header id="site-header">
-    <a href="/" id="logo-placeholder">a</a>
+    <a href="/" id="logo-placeholder">
+      <svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+              font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#163F1A">a</text>
+      </svg>
+    </a>
     <h1 id="headline">Interactive Motion Designer<br>for Games, Apps &amp; Web</h1>
   </header>
 
@@ -415,7 +410,12 @@
       </p>
     </div>
     <div class="contact-right">
-      <a href="/" id="footer-logo">z</a>
+      <a href="/" id="footer-logo">
+        <svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+                font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#163F1A">z</text>
+        </svg>
+      </a>
       <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials belong to their respective owners.</p>
     </div>
   </footer>
