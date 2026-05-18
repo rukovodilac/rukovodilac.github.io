@@ -93,7 +93,7 @@
       flex-direction: column;
       gap: 0;
       border-radius: 12px;
-      border: 1px solid rgba(0,0,0,0.1);
+      border: 1px solid #000;
       overflow: hidden;
     }
 
@@ -616,7 +616,7 @@
 
           const titleEl = document.createElement('div');
           titleEl.className = 'work-title';
-          titleEl.innerHTML = p.title.join(' ') + arrowSVG;
+          titleEl.textContent = p.title.join(' ');
           caption.appendChild(titleEl);
 
           wrap.appendChild(caption);
