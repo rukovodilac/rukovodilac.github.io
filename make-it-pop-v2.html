@@ -257,7 +257,6 @@
     #showcase {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: clamp(8px, 1vw, 14px);
       background: #fff;
       padding: 0 clamp(20px, 3.5vw, 48px);
     }
@@ -266,7 +265,6 @@
       position: relative;
       overflow: hidden;
       background: #fff;
-      border-radius: clamp(10px, 1.2vw, 18px);
     }
 
     .showcase-item canvas {
@@ -281,10 +279,10 @@
     /* Explicit grid placement per item */
     .si-coin     { grid-column: 1 / 3; grid-row: 1; aspect-ratio: 2 / 1; }
     .si-knob     { grid-column: 3 / 4; grid-row: 2; aspect-ratio: 1 / 1; }
-    .si-progress { grid-column: 1 / 3; grid-row: 3; aspect-ratio: 46 / 22.5; }
+    .si-progress { grid-column: 1 / 3; grid-row: 3; aspect-ratio: 2 / 1; }
     .si-soda     { grid-column: 4 / 5; grid-row: 3; aspect-ratio: 1 / 1; }
     .si-froggy   { grid-column: 3 / 4; grid-row: 3; aspect-ratio: 1 / 1; }
-    .si-battery  { grid-column: 2 / 4; grid-row: 4; aspect-ratio: 46 / 22.5; }
+    .si-battery  { grid-column: 2 / 4; grid-row: 4; aspect-ratio: 2 / 1; }
     .si-egg      { grid-column: 2 / 3; grid-row: 5; aspect-ratio: 1 / 1; }
     .si-arrows   { grid-column: 1 / 3; grid-row: 6; aspect-ratio: 4 / 1; }
     .si-illusion { grid-column: 2 / 4; grid-row: 7; aspect-ratio: 2 / 1; }
@@ -296,7 +294,6 @@
       overflow: hidden;
       pointer-events: none;
       aspect-ratio: 1 / 1;
-      border-radius: clamp(10px, 1.2vw, 18px);
     }
     .si-deco svg { display: block; width: 100%; height: 100%; }
     .si-deco-1 { grid-column: 2 / 3; grid-row: 2; }
@@ -321,10 +318,8 @@
     .si-stamp {
       grid-column: 3 / 5;
       grid-row: 5;
-      aspect-ratio: 46 / 22.5;
+      aspect-ratio: 2 / 1;
       background: #E0E0E0;
-      border-radius: clamp(10px, 1.2vw, 18px);
-      overflow: hidden;
     }
 
     .stamp-el {
@@ -351,11 +346,10 @@
     .si-scratchcard {
       grid-column: 1 / 3;
       grid-row: 8;
-      aspect-ratio: 46 / 22.5;
+      aspect-ratio: 2 / 1;
       position: relative;
       overflow: hidden;
       background: #000;
-      border-radius: clamp(10px, 1.2vw, 18px);
     }
 
     #scratchboard-canvas {
