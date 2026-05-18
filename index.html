@@ -55,36 +55,68 @@
       inset: 0;
       pointer-events: none;
       display: flex;
-      align-items: center;
-      gap: clamp(16px, 3vw, 40px);
-      padding: 0 clamp(20px, 3.5vw, 48px);
+      align-items: stretch;
     }
 
     #logo {
-      font-size: clamp(32px, 4vw, 60px);
+      display: flex;
+      align-items: center;
+      padding: 0 clamp(20px, 3.5vw, 48px);
+      font-size: clamp(28px, 3.5vw, 52px);
       font-weight: 500;
       line-height: 1;
       color: #000;
       text-decoration: none;
       pointer-events: auto;
       flex-shrink: 0;
+      background: #F4E9D5;
+      border-right: 2px solid #000;
     }
 
-    #headline {
+    .hero-marquee {
+      flex: 1;
+      overflow: hidden;
       display: flex;
-      flex-direction: column;
-      gap: 0;
-      pointer-events: auto;
-      user-select: text;
+      align-items: center;
+      cursor: default;
     }
 
-    #headline span {
-      display: block;
-      width: fit-content;
-      font-size: clamp(13px, 1.6vw, 24px);
+    .hero-marquee-track {
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      will-change: transform;
+      animation: hero-scroll 24s linear infinite;
+    }
+
+    .hero-marquee:hover .hero-marquee-track {
+      animation-play-state: paused;
+    }
+
+    .hero-item {
+      font-size: clamp(18px, 2.6vw, 38px);
       font-weight: 500;
-      line-height: 1.15;
+      line-height: 1;
       color: #000;
+      padding: 0 clamp(16px, 2.5vw, 36px);
+    }
+
+    .hero-sep {
+      display: inline-block;
+      width: 0.45em;
+      height: 0.45em;
+      background: #000;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+
+    @keyframes hero-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-marquee-track { animation-play-state: paused; }
     }
 
     /* ── WORK SECTION ── */
@@ -541,9 +573,10 @@
 
     <div id="overlay">
       <a href="/" id="logo">a–z</a>
-      <div id="headline">
-        <span>Interactive Motion Designer</span>
-        <span>for Games, Apps &amp; Web</span>
+      <div class="hero-marquee">
+        <div class="hero-marquee-track" aria-label="Interactive Motion Designer for Games, Apps and Web">
+          <span class="hero-item">Interactive Motion Designer</span><span class="hero-sep" aria-hidden="true"></span><span class="hero-item">for Games, Apps &amp; Web</span><span class="hero-sep" aria-hidden="true"></span><span class="hero-item">Interactive Motion Designer</span><span class="hero-sep" aria-hidden="true"></span><span class="hero-item">for Games, Apps &amp; Web</span><span class="hero-sep" aria-hidden="true"></span>
+        </div>
       </div>
     </div>
   </section>
