@@ -36,17 +36,9 @@
     #hero {
       position: relative;
       width: 100%;
-      height: min(100vh, calc(100vw * 9 / 16));
+      height: clamp(160px, 22vh, 240px);
       overflow: hidden;
-    }
-
-    #rive-canvas {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      background: #E0EC8A;
     }
 
     #trail-canvas {
@@ -90,8 +82,6 @@
     #headline span {
       display: block;
       width: fit-content;
-      background: #E0EC8A;
-      padding: 2px 10px;
       font-size: clamp(24px, 4vw, 120px);
       font-weight: 500;
       line-height: 1;
@@ -549,7 +539,6 @@
 
   <section id="hero">
     <canvas id="trail-canvas"></canvas>
-    <canvas id="rive-canvas"></canvas>
 
     <div id="overlay">
       <a href="/" id="logo">a–z</a>
@@ -680,25 +669,10 @@
     window.scrollTo(0, 0);
 
     function heroH() {
-      return Math.min(window.innerHeight, Math.round(window.innerWidth * 9 / 16));
+      return Math.min(Math.round(window.innerHeight * 0.22), 240);
     }
 
     const dpr = window.devicePixelRatio || 1;
-
-    const canvas = document.getElementById('rive-canvas');
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = heroH() * dpr;
-
-    const r = new rive.Rive({
-      src: 'web_head_full.riv',
-      canvas: canvas,
-      animations: 'Idle',
-      autoplay: true,
-      fit: rive.Fit.Cover,
-      alignment: rive.Alignment.Center,
-      onLoad: () => requestAnimationFrame(() => r.resizeDrawingSurfaceToCanvas()),
-      onLoadError: (e) => console.error('Rive error:', e)
-    });
 
     const trailCanvas = document.getElementById('trail-canvas');
     const tc = trailCanvas.getContext('2d');
@@ -862,7 +836,6 @@
     doneCanvas.addEventListener('touchend', (e) => { e.preventDefault(); fireSlot(); }, { passive: false });
 
     window.addEventListener('resize', () => {
-      r.resizeDrawingSurfaceToCanvas();
       trailCanvas.width = window.innerWidth * dpr;
       trailCanvas.height = heroH() * dpr;
       tc.scale(dpr, dpr);
