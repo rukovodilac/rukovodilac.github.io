@@ -50,10 +50,9 @@
     }
 
     #headline {
-      /* Two lines together should match logo height:
-         total ≈ 2 × (1 + 0.14) × fs + 0.08 × fs = 2.36 × fs = logo
-         → fs ≈ logo / 2.36 */
       font-size: clamp(20px, 2.75vw, 40px);
+      font-weight: 500;
+      letter-spacing: -0.01em;
       display: flex;
       flex-direction: column;
       gap: 0.08em;
@@ -67,11 +66,7 @@
     }
 
     .headline-line span {
-      display: inline-block;
       font-weight: 500;
-      line-height: 1;
-      color: #000;
-      letter-spacing: -0.01em;
     }
 
     /* ── WORK SECTION ── */
