@@ -223,33 +223,25 @@
       gap: 0;
     }
 
-    /* Per-line highlight + underline draw animation */
-    .work-title span {
-      display: block;
-      width: fit-content;
-      background-color: #F4E9D5;
-      background-image: linear-gradient(#000, #000);
-      background-position: 0 100%;
-      background-repeat: no-repeat;
-      background-size: 0% 3px;
-      padding: 2px 12px 4px;
-      transition: background-size 0.45s cubic-bezier(0.25, 1, 0.5, 1);
+    .work-title-line {
+      display: flex;
+      align-items: center;
+      gap: 0;
     }
 
-    .work-title span:nth-child(2) {
-      transition-delay: 0.07s;
+    .work-title-word {
+      display: inline-block;
+      background: #E0EC8A;
+      padding: 0.1em 0.18em;
+      line-height: 1;
+      color: #000;
+      border-radius: var(--r, 4px);
+      transition: filter 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     @media (hover: hover) {
-      .work-item:hover .work-title span {
-        background-size: 100% 3px;
-      }
-    }
-
-    /* Mobile: underline always visible */
-    @media (hover: none) {
-      .work-title span {
-        background-size: 100% 3px;
+      .work-item:hover .work-title-word {
+        filter: brightness(0.88);
       }
     }
 
@@ -652,6 +644,8 @@
       const section = document.getElementById('work');
       const odd     = projects.length % 2 !== 0;
       const arrowSVG = '<svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg>';
+      const wordRadii = ['8px', '999px', '4px', '20px', '999px', '14px'];
+      let rIdx = 0;
 
       projects.forEach((p, i) => {
         const featured = odd && i === projects.length - 1;
@@ -682,9 +676,18 @@
         const titleEl = document.createElement('div');
         titleEl.className = 'work-title';
         p.title.forEach((line, li) => {
-          const span = document.createElement('span');
-          span.innerHTML = li === p.title.length - 1 ? `${line} ${arrowSVG}` : line;
-          titleEl.appendChild(span);
+          const isLastLine = li === p.title.length - 1;
+          const lineEl = document.createElement('div');
+          lineEl.className = 'work-title-line';
+          line.split(' ').forEach((word, wi, arr) => {
+            const isLastWord = isLastLine && wi === arr.length - 1;
+            const w = document.createElement('span');
+            w.className = 'work-title-word';
+            w.style.setProperty('--r', wordRadii[rIdx++ % wordRadii.length]);
+            w.innerHTML = isLastWord ? `${word} ${arrowSVG}` : word;
+            lineEl.appendChild(w);
+          });
+          titleEl.appendChild(lineEl);
         });
         a.appendChild(titleEl);
 
