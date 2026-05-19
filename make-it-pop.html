@@ -675,6 +675,7 @@
     }
 
     function startRive() {
+      coinCanvas.classList.add('coin-reload');
       if (coinRive) { try { coinRive.cleanup(); } catch (e) {} coinRive = null; }
 
       coinRive = new rive.Rive({
@@ -689,6 +690,9 @@
           coinRive.resizeDrawingSurfaceToCanvas();
           coinRive.play(SM);
           loopPending = false;
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            coinCanvas.classList.remove('coin-reload');
+          }));
         },
         onLoadError: (e) => console.error('coin_anim:', e),
       });
