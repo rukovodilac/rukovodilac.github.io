@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -17,25 +17,23 @@
     }
 
     body {
-      font-family: "Host Grotesk", sans-serif;
-      background: #F4E9D5;
+      font-family: "DM Sans", sans-serif;
+      background: #fff;
     }
 
     /* ── HEADER ── */
-    #page-top {
-      background: #F4E9D5 url('makeitpopheader.webp') no-repeat center / cover;
-    }
-
     #header-nav {
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
     }
 
-    #logo {
-      font-size: clamp(48px, 6.5vw, 96px);
-      font-weight: 500;
-      line-height: 1;
-      color: #000;
+    #logo-circle {
+      display: block;
+      width: clamp(48px, 6.5vw, 96px);
+      height: clamp(48px, 6.5vw, 96px);
+      border-radius: 50%;
+      background: #000;
       text-decoration: none;
+      overflow: hidden;
     }
 
     /* ── TITLE + TAGLINE ── */
@@ -69,9 +67,7 @@
 
     #tagline span {
       display: block;
-      width: fit-content;
-      background: #FFA5C8;
-      padding: 2px 10px;
+      color: #FF7BA8;
     }
 
     /* ── CREDITS ── */
@@ -100,15 +96,20 @@
     .credits-col {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 6px;
     }
 
     .credits-label {
-      font-size: clamp(10px, 0.9vw, 13px);
-      font-weight: 600;
-      letter-spacing: 0.08em;
+      display: inline-block;
+      width: fit-content;
+      font-size: clamp(10px, 0.85vw, 12px);
+      font-weight: 500;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: rgba(0,0,0,0.45);
+      color: rgba(0,0,0,0.5);
+      border: 1px solid rgba(0,0,0,0.25);
+      border-radius: 6px;
+      padding: 2px 8px;
     }
 
     .credits-value {
@@ -134,18 +135,21 @@
 
     /* ── FOOTER / CONTACT ── */
     #contact {
-      background: #E0EC8A;
-      padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
+      margin-top: clamp(40px, 6vw, 80px);
+      border-top: 1px solid rgba(0,0,0,0.12);
+      padding: clamp(32px, 5vw, 64px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
       gap: clamp(32px, 5vw, 64px);
     }
 
+    .contact-left { flex: 1 1 auto; }
+
     .contact-tagline {
       font-size: clamp(28px, 4vw, 56px);
       font-weight: 500;
-      line-height: 1.15;
+      line-height: 1.3;
       color: #000;
       margin: 0;
     }
@@ -178,16 +182,15 @@
       width: clamp(48px, 6vw, 88px);
       height: clamp(48px, 6vw, 88px);
       border-radius: 50%;
-      background: #C5FF30;
+      background: #000;
       display: block;
       overflow: hidden;
       text-decoration: none;
-      flex-shrink: 0;
     }
 
     .contact-legal {
       font-size: clamp(10px, 0.9vw, 13px);
-      color: rgba(0,0,0,0.45);
+      color: rgba(0,0,0,0.4);
       text-align: right;
       line-height: 1.6;
       margin: 0;
@@ -202,17 +205,17 @@
         width: 100%;
         align-items: flex-start;
       }
-      .contact-legal {
-        text-align: left;
-      }
+      .contact-legal { text-align: left; }
     }
 
     /* ── Global link underline animation ── */
-    a {
+    a:not(.work-item):not(#logo-circle):not(#footer-logo),
+    .contact-email-btn {
       position: relative;
     }
 
-    a::after {
+    a:not(.work-item):not(#logo-circle):not(#footer-logo)::after,
+    .contact-email-btn::after {
       content: '';
       position: absolute;
       bottom: 0;
@@ -225,10 +228,10 @@
     }
 
     @media (hover: hover) {
-      a:hover::after {
-        width: 100%;
-      }
+      a:not(.work-item):not(#logo-circle):not(#footer-logo):hover::after,
+      .contact-email-btn:hover::after { width: 100%; }
     }
+
 
     /* ── INTERACTIVE TAG ── */
     .project-tag {
@@ -259,13 +262,14 @@
     #showcase {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      background: #FAF6EE;
+      background: #fff;
+      padding: 0 clamp(20px, 3.5vw, 48px);
     }
 
     .showcase-item {
       position: relative;
       overflow: hidden;
-      background: #000;
+      background: #fff;
     }
 
     .showcase-item canvas {
@@ -295,6 +299,7 @@
       overflow: hidden;
       pointer-events: none;
       aspect-ratio: 1 / 1;
+      border-radius: 50%;
     }
     .si-deco svg { display: block; width: 100%; height: 100%; }
     .si-deco-1 { grid-column: 2 / 3; grid-row: 2; }
@@ -373,7 +378,7 @@
     }
 
     .scratchcard-headline {
-      font-family: "Host Grotesk", sans-serif;
+      font-family: "DM Sans", sans-serif;
       font-size: clamp(56px, 7.5vw, 108px);
       font-weight: 800;
       font-style: italic;
@@ -385,7 +390,7 @@
     }
 
     .scratchcard-exp {
-      font-family: "Host Grotesk", sans-serif;
+      font-family: "DM Sans", sans-serif;
       font-size: clamp(14px, 2vw, 28px);
       font-weight: 700;
       font-style: italic;
@@ -416,12 +421,13 @@
 <body>
 <script>if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; window.scrollTo(0, 0);</script>
 
+
   <svg aria-hidden="true" focusable="false" style="display:none;position:absolute;width:0;height:0">
     <defs>
       <symbol id="icon-interactive" viewBox="0 0 77 77" style="fill-rule:evenodd;clip-rule:evenodd;">
         <g transform="matrix(1,0,0,1,-2149.604938,-1183.484688)">
           <g transform="matrix(1,0,0,1,-149,91.368069)">
-            <circle cx="2337.105" cy="1130.617" r="38.5" fill="rgb(224,236,138)"/>
+            <circle cx="2337.105" cy="1130.617" r="38.5" fill="#C5FF30"/>
           </g>
           <g transform="matrix(0.157025,0,0,0.157025,1855.447913,1025.917434)">
             <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
@@ -457,7 +463,12 @@
 
   <header id="header">
     <div id="header-nav">
-      <a href="/" id="logo">a–z</a>
+      <a href="/" id="logo-circle" aria-label="Home">
+        <svg viewBox="0 0 100 100" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+                font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#fff">a</text>
+        </svg>
+      </a>
     </div>
   </header>
 
@@ -634,7 +645,7 @@
       <a href="/" id="footer-logo">
         <svg viewBox="0 0 100 100" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
-                font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#163F1A">z</text>
+                font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#fff">z</text>
         </svg>
       </a>
       <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials belong to their respective owners.</p>
@@ -1672,20 +1683,15 @@
       navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
         copied = true;
         emailBtn.textContent = 'copied!';
-        setTimeout(() => {
-          copied = false;
-          emailBtn.textContent = 'e-mail';
-        }, 2000);
-      }).catch(() => {
-        emailBtn.textContent = 'e-mail';
-      });
+        setTimeout(() => { copied = false; emailBtn.textContent = 'e-mail'; }, 2000);
+      }).catch(() => { emailBtn.textContent = 'e-mail'; });
     });
   </script>
 
   <script>
     (function () {
-      const TOP    = '#B8DDF6';
-      const BOTTOM = '#E0EC8A';
+      const TOP    = '#fff';
+      const BOTTOM = '#fff';
       const THRESHOLD = 4;
 
       function update() {
@@ -1701,5 +1707,6 @@
   </script>
 
   <canvas id="box-confetti-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;display:none;"></canvas>
+
 </body>
 </html>

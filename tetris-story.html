@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#AA95FC">
   <title>Tetris® Story — Aleksandar Zdravković</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -17,7 +18,7 @@
     }
 
     body {
-      font-family: "Host Grotesk", sans-serif;
+      font-family: "DM Sans", sans-serif;
       background: #AA95FC;
     }
 
@@ -32,12 +33,14 @@
       padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px);
     }
 
-    #logo {
-      font-size: clamp(48px, 6.5vw, 96px);
-      font-weight: 500;
-      line-height: 1;
-      color: #000;
+    #logo-circle {
+      display: block;
+      width: clamp(48px, 6.5vw, 96px);
+      height: clamp(48px, 6.5vw, 96px);
+      border-radius: 50%;
+      background: #fff;
       text-decoration: none;
+      overflow: hidden;
     }
 
     /* ── TITLE + TAGLINE ── */
@@ -64,15 +67,13 @@
       font-size: clamp(24px, 3.5vw, 48px);
       font-weight: 500;
       line-height: 1;
-      color: #000;
+      color: #5813AA;
       margin-top: clamp(8px, 1.5vw, 16px);
     }
 
     #tagline span {
       display: block;
       width: fit-content;
-      background: #E0EC8A;
-      padding: 2px 10px;
     }
 
     /* ── VIDEO ── */
@@ -124,11 +125,16 @@
     }
 
     .credits-label {
-      font-size: clamp(10px, 0.9vw, 13px);
-      font-weight: 600;
-      letter-spacing: 0.08em;
+      display: inline-block;
+      width: fit-content;
+      font-size: clamp(10px, 0.85vw, 12px);
+      font-weight: 500;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: rgba(0,0,0,0.45);
+      color: rgba(0,0,0,0.5);
+      border: 1px solid rgba(0,0,0,0.25);
+      border-radius: 6px;
+      padding: 2px 8px;
     }
 
     .credits-value {
@@ -160,10 +166,8 @@
 
     /* ── FOOTER / CONTACT ── */
     #contact {
-      position: relative;
-      z-index: 2;
-      background: #E0EC8A;
-      padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
+      background: #AA95FC;
+      padding: clamp(32px, 5vw, 64px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -173,18 +177,14 @@
     .contact-tagline {
       font-size: clamp(28px, 4vw, 56px);
       font-weight: 500;
-      line-height: 1.15;
+      line-height: 1.3;
       color: #000;
       margin: 0;
     }
 
     .contact-linkedin {
-      display: inline-block;
-      background: #0957C3;
-      color: #fff;
-      padding: 0 10px 2px;
+      color: #000;
       text-decoration: none;
-      line-height: inherit;
     }
 
     .contact-email-wrap {
@@ -193,14 +193,14 @@
     }
 
     .contact-email-btn {
-      background: #FFC03F;
+      background: none;
       border: none;
-      padding: 0 10px 2px;
+      padding: 0;
       margin: 0;
       font: inherit;
       color: #000;
       cursor: pointer;
-      line-height: inherit;
+      overflow: visible;
     }
 
     .email-tooltip {
@@ -242,10 +242,12 @@
     }
 
     #footer-logo {
-      font-size: clamp(48px, 6vw, 88px);
-      font-weight: 500;
-      line-height: 1;
-      color: #000;
+      width: clamp(48px, 6vw, 88px);
+      height: clamp(48px, 6vw, 88px);
+      border-radius: 50%;
+      background: #fff;
+      display: block;
+      overflow: hidden;
       text-decoration: none;
     }
 
@@ -319,8 +321,6 @@
     .jelly-title span {
       display: block;
       width: fit-content;
-      background: #F4E9D5;
-      padding: 2px 10px;
     }
 
     .jelly-body {
@@ -370,7 +370,7 @@
       grid-template-columns: 1fr 1fr;
       column-gap: 0;
       align-items: stretch;
-      background: #F4E9D5;
+      background: #F5F5F7;
     }
 
     .jiggle-text {
@@ -400,8 +400,6 @@
     .jiggle-title span {
       display: block;
       width: fit-content;
-      background: #fff;
-      padding: 2px 10px;
     }
 
     .jiggle-body {
@@ -568,9 +566,6 @@
     .deg45-title span {
       display: block;
       width: fit-content;
-      background: #E0EC8A;
-      padding: 2px 10px;
-      color: #000;
     }
 
     .deg45-body {
@@ -640,8 +635,6 @@
       display: block;
       width: fit-content;
       margin: 0 auto;
-      background: #F4E9D5;
-      padding: 2px 10px;
     }
 
     .blockies-body {
@@ -672,7 +665,7 @@
     /* ── DERISKING SECTION ── */
     #derisking-section {
       position: relative;
-      background: #F4E9D5;
+      background: #fff;
       padding: clamp(100px, 14vw, 200px) clamp(20px, 3.5vw, 48px);
       overflow: hidden;
     }
@@ -700,13 +693,13 @@
       display: block;
       width: fit-content;
       margin: 0 auto;
-      background: #E0EC8A;
-      padding: 2px 10px;
     }
 
     .hl {
-      background: #E0EC8A;
-      padding: 0 4px;
+      display: inline-block;
+      border: 1px solid rgba(0,0,0,0.25);
+      border-radius: 6px;
+      padding: 1px 8px;
     }
 
     .derisking-body {
@@ -740,7 +733,7 @@
     }
 
     .success-text {
-      background: #fff;
+      background: #F5F5F7;
       padding: clamp(64px, 8vw, 100px) clamp(20px, 3.5vw, 48px);
       display: flex;
       flex-direction: column;
@@ -757,8 +750,6 @@
     .success-title span {
       display: block;
       width: fit-content;
-      background: #E0EC8A;
-      padding: 2px 10px;
     }
 
     .success-body {
@@ -772,10 +763,15 @@
     }
 
     .success-rive {
-      background: #E0EC8A;
+      background: #F5F5F7;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: clamp(24px, 3vw, 48px);
+    }
+
+    .tetrisco-wrap {
+      width: 100%;
     }
 
     #tetrisco-canvas {
@@ -805,7 +801,7 @@
 
     /* ── COLOPHON SECTION ── */
     #colophon-section {
-      background: #F4E9D5;
+      background: #fff;
       padding: clamp(60px, 8vw, 100px) clamp(20px, 3.5vw, 48px) clamp(80px, 10vw, 120px);
     }
 
@@ -845,11 +841,13 @@
     }
 
     /* ── Global link underline animation ── */
-    a {
+    a:not(#logo-circle):not(#footer-logo),
+    .contact-email-btn {
       position: relative;
     }
 
-    a::after {
+    a:not(#logo-circle):not(#footer-logo)::after,
+    .contact-email-btn::after {
       content: '';
       position: absolute;
       bottom: 0;
@@ -862,7 +860,8 @@
     }
 
     @media (hover: hover) {
-      a:hover::after {
+      a:not(#logo-circle):not(#footer-logo):hover::after,
+      .contact-email-btn:hover::after {
         width: 100%;
       }
     }
@@ -900,7 +899,7 @@
       <symbol id="icon-interactive" viewBox="0 0 77 77" style="fill-rule:evenodd;clip-rule:evenodd;">
         <g transform="matrix(1,0,0,1,-2149.604938,-1183.484688)">
           <g transform="matrix(1,0,0,1,-149,91.368069)">
-            <circle cx="2337.105" cy="1130.617" r="38.5" fill="rgb(224,236,138)"/>
+            <circle cx="2337.105" cy="1130.617" r="38.5" fill="#C5FF30"/>
           </g>
           <g transform="matrix(0.157025,0,0,0.157025,1855.447913,1025.917434)">
             <rect x="2089.842" y="1100.342" width="57.316" height="95.816" fill="rgb(23,63,54)"/>
@@ -934,7 +933,12 @@
   <div id="page-top">
 
   <header id="header">
-    <a href="/" id="logo">a–z</a>
+    <a href="/" id="logo-circle" aria-label="Home">
+      <svg viewBox="0 0 100 100" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+              font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#000">a</text>
+      </svg>
+    </a>
   </header>
 
   <div id="project-header">
@@ -1016,9 +1020,9 @@
         <div class="jiggle-body">
           <p>Maintaining tactile satisfaction comes down to context and material integrity.</p>
           <p>To find the sweet spot, I created two distinct sets of animation rules:</p>
-          <p><span class="hl"><strong>Material Integrity:</strong></span><br>
+          <p><span class="hl">Material Integrity</span><br>
           We maintained the core identity of the physical objects, ensuring structures kept their weight and friction.</p>
-          <p><span class="hl"><strong>Maximum Tactility:</strong></span><br>
+          <p><span class="hl">Maximum Tactility</span><br>
           UI elements squash, stretch, and pop back into place. Menus and pop-ups spring onto the screen with playful elasticity.</p>
         </div>
       </div>
@@ -1083,8 +1087,8 @@
       </div>
       <div class="derisking-body">
         <p>My approach focused on validating ideas early, reducing technical uncertainty, and keeping production moving in parallel.</p>
-        <p><span class="hl"><strong>Proxy-first workflow:</strong></span> I built a proxy pipeline to validate animation timing before final assets existed, cutting delivery time by 40%.</p>
-        <p><span class="hl"><strong>Prototype before it costs you:</strong></span> By prototyping in After Effects before engine implementation, we aligned stakeholders early and reduced technical rework by 80%.</p>
+        <p><span class="hl">Proxy-first workflow</span><br>I built a proxy pipeline to validate animation timing before final assets existed, cutting delivery time by 40%.</p>
+        <p><span class="hl">Prototype before it costs you</span><br>By prototyping in After Effects before engine implementation, we aligned stakeholders early and reduced technical rework by 80%.</p>
       </div>
     </div>
   </section>
@@ -1102,7 +1106,9 @@
       </div>
     </div>
     <div class="success-rive">
-      <canvas id="tetrisco-canvas"></canvas>
+      <div class="tetrisco-wrap">
+        <canvas id="tetrisco-canvas"></canvas>
+      </div>
     </div>
   </section>
 
@@ -1131,7 +1137,12 @@
       </p>
     </div>
     <div class="contact-right">
-      <a href="/" id="footer-logo">a–z</a>
+      <a href="/" id="footer-logo">
+        <svg viewBox="0 0 100 100" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+                font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#000">z</text>
+        </svg>
+      </a>
       <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials belong to their respective owners.</p>
     </div>
   </footer>
@@ -1783,7 +1794,7 @@ const emailBtn     = document.getElementById('email-btn');
   <script>
     (function () {
       const TOP    = '#AA95FC';
-      const BOTTOM = '#E0EC8A';
+      const BOTTOM = '#AA95FC';
       const THRESHOLD = 4;
 
       function update() {
