@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..800;1,9..40,300..800&display=swap" rel="stylesheet">
 
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="512x512" href="favicon.png">
@@ -28,111 +28,74 @@
     }
 
     body {
-      font-family: "Host Grotesk", sans-serif;
-      background: #F4E9D5;
+      font-family: "DM Sans", sans-serif;
+      background: #fff;
     }
 
-    /* ── HERO ── */
-    #hero {
-      position: relative;
-      width: 100%;
-      height: min(100vh, calc(100vw * 9 / 16));
-      overflow: hidden;
+    /* ── SITE HEADER ── */
+    #site-header {
+      display: flex;
+      align-items: center;
+      gap: clamp(20px, 3vw, 48px);
+      padding: clamp(24px, 3vw, 48px) clamp(24px, 3.5vw, 48px) clamp(16px, 2vw, 32px);
     }
 
-    #rive-canvas {
+    #logo-placeholder {
+      flex-shrink: 0;
+      width: clamp(64px, 9vw, 140px);
+      height: clamp(64px, 9vw, 140px);
+      border-radius: 50%;
+      background: #C5FF30;
       display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    #trail-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    #overlay {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-    }
-
-    #logo {
-      position: absolute;
-      top: clamp(20px, 3vw, 40px);
-      left: clamp(20px, 3.5vw, 48px);
-      font-size: clamp(48px, 6.5vw, 96px);
-      font-weight: 500;
-      line-height: 1;
-      color: #000;
+      overflow: hidden;
       text-decoration: none;
-      pointer-events: auto;
     }
 
     #headline {
-      position: absolute;
-      bottom: clamp(28px, 5vh, 72px);
-      left: clamp(20px, 3.5vw, 48px);
-      font-size: clamp(24px, 4vw, 120px);
-      display: flex;
-      flex-direction: column;
-      gap: 0.08em;
-      pointer-events: auto;
-      user-select: text;
-    }
-
-    .headline-line {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 0;
-    }
-
-    .headline-line span {
-      display: inline-block;
-      background: #E0EC8A;
-      padding: 0.07em 0.15em;
+      font-size: clamp(32px, 5.5vw, 88px);
       font-weight: 500;
-      line-height: 1;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
       color: #000;
-      border-radius: var(--r, 4px);
+      margin: 0;
     }
 
     /* ── WORK SECTION ── */
     #work {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(20px, 3vw, 48px);
+      gap: clamp(20px, 2.5vw, 40px);
     }
 
-    @media (max-width: 768px) {
-      #work {
-        grid-template-columns: 1fr;
-      }
+    .work-row {
+      display: flex;
+      gap: clamp(12px, 2vw, 32px);
+      align-items: flex-start;
     }
 
-    .work-item--featured {
-      grid-column: 1 / -1;
+    .work-item-wrap {
+      display: flex;
+      flex-direction: column;
     }
+
+    /* Row 1: narrow | wide — Row 2: wide | narrow */
+    .work-row:nth-child(odd)  .work-item-wrap:first-child { flex: 2; }
+    .work-row:nth-child(odd)  .work-item-wrap:last-child  { flex: 3; }
+    .work-row:nth-child(even) .work-item-wrap:first-child { flex: 3; }
+    .work-row:nth-child(even) .work-item-wrap:last-child  { flex: 2; }
 
     .work-item {
       position: relative;
       display: block;
       overflow: hidden;
       text-decoration: none;
-      color: #000;
       cursor: pointer;
       aspect-ratio: 16 / 9;
-      border-radius: var(--thumb-r, 0);
+      width: 100%;
+      border-radius: 20px;
     }
 
-    /* Video container */
     .work-media {
       position: absolute;
       inset: 0;
@@ -151,7 +114,7 @@
       display: block;
       border: none;
       pointer-events: none;
-      transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
+      transform: scale(1.04);
     }
 
     .work-media video::-webkit-media-controls,
@@ -162,104 +125,40 @@
       -webkit-appearance: none;
     }
 
-
-    /* Tag badge */
-    .work-tag {
+    /* Tag + title stacked inside image, bottom-left
+       iOS nested radius: outer=20px, inset=12px → inner=8px */
+    .work-overlay {
       position: absolute;
-      top: clamp(14px, 2vw, 24px);
-      left: clamp(14px, 2vw, 24px);
-      display: flex;
-      align-items: center;
-      gap: 0;
-      font-size: clamp(13px, 1.2vw, 17px);
-      font-weight: 500;
-      line-height: 1;
-      pointer-events: none;
-    }
-
-    .work-tag svg {
-      width: 1.7em;
-      height: 1.7em;
-      flex-shrink: 0;
-    }
-
-    .work-tag span {
-      height: 1.7em;
-      display: flex;
-      align-items: center;
-      padding: 0 9px;
-      color: #fff;
-    }
-
-    .work-tag--hot span         { background: rgb(249,66,58);  color: #3C1011; }
-    .work-tag--latest span      { background: rgb(255,192,63); color: #3C1011; }
-    .work-tag--rerun span       { background: rgb(9,87,195);   color: #7CE1D3; }
-    .work-tag--interactive span { background: rgb(224,236,138); color: #000; }
-
-    .work-tags {
-      position: absolute;
-      top: clamp(14px, 2vw, 24px);
-      left: clamp(14px, 2vw, 24px);
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }
-
-    .work-tags .work-tag {
-      position: static;
-    }
-
-    /* Title block */
-    .work-title {
-      position: absolute;
-      bottom: clamp(16px, 2.5vw, 32px);
-      left: clamp(14px, 2vw, 24px);
-      font-size: clamp(18px, 2.1vw, 34px);
-      font-weight: 400;
-      line-height: 1.2;
-      color: #000;
-      pointer-events: none;
+      bottom: 12px;
+      left: 12px;
+      right: 12px;
       display: flex;
       flex-direction: column;
-      gap: 0;
+      align-items: flex-start;
+      gap: 6px;
+      pointer-events: none;
     }
 
-    .work-title-line {
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }
-
-    .work-title-word {
-      display: inline-block;
-      background: #E0EC8A;
-      padding: 0.1em 0.18em;
-      line-height: 1;
+    .work-tag-overlay {
+      background: #fff;
+      border: 1px solid #000;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: clamp(11px, 0.85vw, 13px);
+      font-weight: 500;
       color: #000;
-      border-radius: var(--r, 4px);
+      line-height: 1.2;
     }
 
-    .work-title-arrow {
-      display: inline-flex;
-      align-items: center;
-      min-height: 1.2em;
-      transition: background 0.35s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    .work-title-arrow .arrow-icon {
-      margin-left: 0;
-    }
-
-    @media (hover: hover) {
-      .work-item:hover .work-title-arrow {
-        background: #fff;
-      }
-    }
-
-    .media-block {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
+    .work-title {
+      background: #fff;
+      border: 1px solid #000;
+      border-radius: 8px;
+      padding: clamp(7px, 0.8vw, 10px) clamp(10px, 1vw, 14px);
+      font-size: clamp(13px, 1.2vw, 18px);
+      font-weight: 600;
+      line-height: 1.3;
+      color: #000;
     }
 
     .arrow-icon {
@@ -267,87 +166,46 @@
       width: 0.85em;
       height: 0.45em;
       vertical-align: 0.12em;
-      margin-left: 0.25em;
+      margin-left: 0.4em;
       overflow: visible;
+    }
+
+    @media (max-width: 600px) {
+      #work {
+        padding: 16px;
+        gap: 16px;
+      }
+      .work-row {
+        flex-direction: column;
+        gap: 16px;
+      }
+      .work-row .work-item-wrap {
+        flex: none !important;
+        width: 100%;
+      }
     }
 
     /* ── ABOUT SECTION ── */
     #about {
-      position: relative;
-      overflow: hidden;
-      isolation: isolate;
-      background: #E0EC8A;
-      padding: clamp(60px, 10vw, 140px) clamp(20px, 3.5vw, 48px) clamp(20px, 3vw, 40px);
+      padding: clamp(40px, 6vw, 80px) clamp(20px, 3.5vw, 48px);
       display: flex;
       flex-direction: column;
-      gap: clamp(20px, 3vw, 40px);
+      gap: clamp(16px, 2vw, 28px);
+      max-width: min(720px, 100%);
     }
 
     .about-bio {
-      max-width: min(640px, 100%);
       font-size: clamp(16px, 1.6vw, 22px);
       font-weight: 400;
       line-height: 1.5;
       color: #000;
     }
 
-    .about-highlight {
-      display: block;
-      width: fit-content;
-      background: #F4E9D5;
-      padding: 2px 10px;
-      font-size: clamp(24px, 3.5vw, 48px);
-      font-weight: 500;
-      line-height: 1;
-      color: #000;
-      margin-top: clamp(12px, 2vw, 28px);
-    }
-
-    .done-it-wrapper {
-      width: 40%;
-    }
-
-    @media (max-width: 768px) {
-      .done-it-wrapper {
-        width: 100%;
-      }
-    }
-
-    .done-it-canvas-wrap {
-      position: relative;
-      display: block;
-      line-height: 0;
-    }
-
-    #done-it-canvas {
-      display: block;
-      width: 100%;
-      aspect-ratio: 1110 / 540;
-      cursor: pointer;
-    }
-
-    .done-it-interactive-tag {
-      position: absolute;
-      top: clamp(10px, 1.5vw, 16px);
-      left: clamp(10px, 1.5vw, 16px);
-      display: flex;
-      align-items: center;
-      pointer-events: none;
-      z-index: 2;
-    }
-
-    .done-it-interactive-tag svg {
-      width: clamp(16px, 1.75vw, 26px);
-      height: clamp(16px, 1.75vw, 26px);
-    }
 
     /* ── Footer / Contact ── */
     #contact {
-      position: relative;
-      overflow: hidden;
-      isolation: isolate;
-      background: #E0EC8A;
-      padding: clamp(20px, 3vw, 40px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
+      border-top: 1px solid rgba(0,0,0,0.12);
+      padding: clamp(32px, 5vw, 64px) clamp(20px, 3.5vw, 48px) clamp(48px, 7vw, 100px);
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
@@ -361,66 +219,25 @@
     .contact-tagline {
       font-size: clamp(28px, 4vw, 56px);
       font-weight: 500;
-      line-height: 1.15;
+      line-height: 1.3;
       color: #000;
       margin: 0;
     }
 
     .contact-linkedin {
-      display: inline-block;
-      background: #0957C3;
-      color: #fff;
-      padding: 0 10px 2px;
+      color: #000;
       text-decoration: none;
-      line-height: inherit;
-    }
-
-
-    .contact-email-wrap {
-      position: relative;
-      display: inline-block;
     }
 
     .contact-email-btn {
-      background: #FFC03F;
+      background: none;
       border: none;
-      padding: 0 10px 2px;
+      padding: 0;
       margin: 0;
       font: inherit;
       color: #000;
       cursor: pointer;
-      line-height: inherit;
-    }
-
-    .email-tooltip {
-      position: absolute;
-      top: calc(100% + 12px);
-      left: 0;
-      background: #000;
-      color: #FFC03F;
-      font-size: clamp(18px, 2vw, 28px);
-      font-weight: 500;
-      padding: 6px 14px;
-      border-radius: 0;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 10;
-    }
-
-    .email-tooltip::before {
-      content: '';
-      position: absolute;
-      bottom: 100%;
-      left: 10px;
-      border: 7px solid transparent;
-      border-bottom-color: #000;
-    }
-
-    .contact-email-wrap:hover .email-tooltip,
-    .contact-email-wrap.copied .email-tooltip {
-      opacity: 1;
+      overflow: visible;
     }
 
     .contact-right {
@@ -432,16 +249,18 @@
     }
 
     #footer-logo {
-      font-size: clamp(48px, 6vw, 88px);
-      font-weight: 500;
-      line-height: 1;
-      color: #000;
+      width: clamp(48px, 6vw, 88px);
+      height: clamp(48px, 6vw, 88px);
+      border-radius: 50%;
+      background: #C5FF30;
+      display: block;
+      overflow: hidden;
       text-decoration: none;
     }
 
     .contact-legal {
       font-size: clamp(10px, 0.9vw, 13px);
-      color: rgba(0,0,0,0.45);
+      color: rgba(0,0,0,0.4);
       text-align: right;
       line-height: 1.6;
       margin: 0;
@@ -462,11 +281,13 @@
     }
 
     /* ── Global link underline animation ── */
-    a:not(.work-item) {
+    a:not(.work-item):not(#logo-placeholder):not(#footer-logo),
+    .contact-email-btn {
       position: relative;
     }
 
-    a:not(.work-item)::after {
+    a:not(.work-item):not(#logo-placeholder):not(#footer-logo)::after,
+    .contact-email-btn::after {
       content: '';
       position: absolute;
       bottom: 0;
@@ -479,7 +300,8 @@
     }
 
     @media (hover: hover) {
-      a:not(.work-item):hover::after {
+      a:not(.work-item):not(#logo-placeholder):not(#footer-logo):hover::after,
+      .contact-email-btn:hover::after {
         width: 100%;
       }
     }
@@ -557,28 +379,15 @@
     </defs>
   </svg>
 
-  <section id="hero">
-    <canvas id="trail-canvas"></canvas>
-    <canvas id="rive-canvas"></canvas>
-
-    <div id="overlay">
-      <a href="/" id="logo">a–z</a>
-      <div id="headline">
-        <div class="headline-line">
-          <span style="--r:8px">Interactive</span>
-          <span style="--r:999px">Motion</span>
-          <span style="--r:20px">Designer</span>
-        </div>
-        <div class="headline-line">
-          <span style="--r:999px">for</span>
-          <span style="--r:4px">Games,</span>
-          <span style="--r:999px">Apps</span>
-          <span style="--r:999px; aspect-ratio:1/1; display:inline-flex; align-items:center; justify-content:center; padding:0.12em;">&amp;</span>
-          <span style="--r:14px">Web</span>
-        </div>
-      </div>
-    </div>
-  </section>
+  <header id="site-header">
+    <a href="/" id="logo-placeholder">
+      <svg viewBox="0 0 100 100" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+              font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#163F1A">a</text>
+      </svg>
+    </a>
+    <h1 id="headline">Interactive Motion Designer<br>for Games, Apps &amp; Web</h1>
+  </header>
 
   <section id="work"></section>
 
@@ -589,15 +398,6 @@
     <p class="about-bio">In recent years, focused on gaming, interactive
       motion design, and creative direction for
       mobile products and entertainment experiences.</p>
-    <span class="about-highlight">You name it, I've done it!</span>
-    <div class="done-it-wrapper">
-      <div class="done-it-canvas-wrap">
-        <canvas id="done-it-canvas"></canvas>
-        <div class="done-it-interactive-tag">
-          <svg aria-hidden="true"><use href="#icon-interactive"/></svg>
-        </div>
-      </div>
-    </div>
   </section>
 
   <footer id="contact">
@@ -606,49 +406,44 @@
         Get in touch<br>
         via <a class="contact-linkedin" href="https://www.linkedin.com/in/a-zdravkovic" target="_blank" rel="noopener">LinkedIn</a>
         or
-        <span class="contact-email-wrap" id="email-wrap">
-          <button class="contact-email-btn" id="email-btn">e-mail</button>
-          <span class="email-tooltip" id="email-tooltip">Copy e-mail</span>
-        </span>
+        <button class="contact-email-btn" id="email-btn">e-mail</button>
       </p>
     </div>
     <div class="contact-right">
-      <a href="/" id="footer-logo">a–z</a>
+      <a href="/" id="footer-logo">
+        <svg viewBox="0 0 100 100" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+                font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#163F1A">z</text>
+        </svg>
+      </a>
       <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials belong to their respective owners.</p>
     </div>
   </footer>
 
-  <script src="https://unpkg.com/@rive-app/canvas@latest/rive.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
   <script>
     // ── Projects config — add / remove / reorder here ──────────────────
     const projects = [
       {
         href:  'make-it-pop',
-
         title: ['Make It', 'Pop'],
-        tags:  [
-          { type: 'hot',         label: 'Hot',        icon: 'icon-hot' }
-        ],
+        tags:  [{ type: 'hot', label: 'Hot', icon: 'icon-hot' }],
         video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/v1779087634/MakeItPop_Pre2_kzdh8v.mp4'
       },
       {
         href:  'tetris-story2',
-
         title: ['Tetris® Story', 'Mobile Game'],
         tags:  [{ type: 'latest', label: 'Latest', icon: 'icon-latest' }],
         video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/TetrisStory_Pre_pbezjz.mp4'
       },
       {
         href:  'tetris-40th2',
-
         title: ['Tetris® 40th', 'Mobile Game'],
         tags:  [{ type: 'latest', label: 'Latest', icon: 'icon-latest' }],
         video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/Tetris40_Pre_clttxf.mp4'
       },
       {
         href:  'this-is-my-show',
-
         title: ['This Is', 'My Show'],
         tags:  [{ type: 'rerun', label: 'Rerun', icon: 'icon-rerun' }],
         video: 'https://res.cloudinary.com/dzar7cp0b/video/upload/TheShow_Pre_lmjx2h.mp4'
@@ -656,397 +451,93 @@
     ];
 
     (function renderWork() {
-      const section = document.getElementById('work');
-      const odd     = projects.length % 2 !== 0;
+      const section  = document.getElementById('work');
       const arrowSVG = '<svg class="arrow-icon" aria-hidden="true"><use href="#arr"/></svg>';
-      const wordRadii = ['8px', '999px', '4px', '20px', '999px', '14px'];
-      let rIdx = 0;
 
-      projects.forEach((p, i) => {
-        const featured = odd && i === projects.length - 1;
-        const a = document.createElement('a');
-        a.href      = p.href;
-        a.className = 'work-item' + (featured ? ' work-item--featured' : '');
-        if (p.radius) a.style.setProperty('--thumb-r', p.radius);
+      for (let i = 0; i < projects.length; i += 2) {
+        const row = document.createElement('div');
+        row.className = 'work-row';
 
-        const media = document.createElement('div');
-        media.className = 'work-media';
-        if (p.video) {
-          media.innerHTML =
-            `<video autoplay muted loop playsinline preload="auto" disablePictureInPicture>` +
-            `<source src="${p.video}" type="video/mp4"></video>`;
-        }
-        a.appendChild(media);
+        [projects[i], projects[i + 1]].forEach(p => {
+          if (!p) return;
 
-        const tagsEl = document.createElement('div');
-        tagsEl.className = 'work-tags';
-        p.tags.forEach(t => {
-          const tag = document.createElement('div');
-          tag.className = `work-tag work-tag--${t.type}`;
-          tag.innerHTML =
-            `<svg aria-hidden="true"><use href="#${t.icon}"/></svg><span>${t.label}</span>`;
-          tagsEl.appendChild(tag);
-        });
-        a.appendChild(tagsEl);
+          const wrap = document.createElement('div');
+          wrap.className = 'work-item-wrap';
 
-        const titleEl = document.createElement('div');
-        titleEl.className = 'work-title';
-        p.title.forEach((line, li) => {
-          const isLastLine = li === p.title.length - 1;
-          const lineEl = document.createElement('div');
-          lineEl.className = 'work-title-line';
-          line.split(' ').forEach((word) => {
-            const w = document.createElement('span');
-            w.className = 'work-title-word';
-            w.style.setProperty('--r', wordRadii[rIdx++ % wordRadii.length]);
-            w.textContent = word;
-            lineEl.appendChild(w);
-          });
-          if (isLastLine) {
-            const arrow = document.createElement('span');
-            arrow.className = 'work-title-word work-title-arrow';
-            arrow.style.setProperty('--r', wordRadii[rIdx++ % wordRadii.length]);
-            arrow.innerHTML = arrowSVG;
-            lineEl.appendChild(arrow);
+          // Thumbnail link
+          const a = document.createElement('a');
+          a.href      = p.href;
+          a.className = 'work-item';
+
+          const media = document.createElement('div');
+          media.className = 'work-media';
+          if (p.video) {
+            media.innerHTML =
+              `<video autoplay muted loop playsinline preload="auto" disablePictureInPicture>` +
+              `<source src="${p.video}" type="video/mp4"></video>`;
           }
-          titleEl.appendChild(lineEl);
-        });
-        a.appendChild(titleEl);
+          a.appendChild(media);
 
-        section.appendChild(a);
-      });
+          // Tag + title overlaid inside image
+          const overlay = document.createElement('div');
+          overlay.className = 'work-overlay';
+
+          if (p.tags && p.tags.length) {
+            const tag = document.createElement('div');
+            tag.className = 'work-tag-overlay';
+            tag.textContent = p.tags[0].label;
+            overlay.appendChild(tag);
+          }
+
+          const titleEl = document.createElement('div');
+          titleEl.className = 'work-title';
+          titleEl.textContent = p.title.join(' ');
+          overlay.appendChild(titleEl);
+
+          a.appendChild(overlay);
+          wrap.appendChild(a);
+          row.appendChild(wrap);
+        });
+
+        section.appendChild(row);
+      }
     })();
 
-    // Prevent browser from restoring scroll position on refresh
-    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-    window.scrollTo(0, 0);
-
-    function heroH() {
-      return Math.min(window.innerHeight, Math.round(window.innerWidth * 9 / 16));
-    }
-
-    const dpr = window.devicePixelRatio || 1;
-
-    const canvas = document.getElementById('rive-canvas');
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = heroH() * dpr;
-
-    const r = new rive.Rive({
-      src: 'web_head_full.riv',
-      canvas: canvas,
-      animations: 'Idle',
-      autoplay: true,
-      fit: rive.Fit.Cover,
-      alignment: rive.Alignment.Center,
-      onLoad: () => requestAnimationFrame(() => r.resizeDrawingSurfaceToCanvas()),
-      onLoadError: (e) => console.error('Rive error:', e)
-    });
-
-    const trailCanvas = document.getElementById('trail-canvas');
-    const tc = trailCanvas.getContext('2d');
-    trailCanvas.width = window.innerWidth * dpr;
-    trailCanvas.height = heroH() * dpr;
-    tc.scale(dpr, dpr);
-
-    // ── DoneItSlot Rive ──
-    // SLOT_TEXT: name of the text run — set this in the Rive editor (see below)
-    const SLOT_TEXT = 'slotText';
-
-    const slotTitles = [
-      'INTERACTIVE\nMOTION DESIGN',
-      'GRAPHIC DESIGN',
-      'ANIMATION',
-      'ANIMATION\nDIRECTION',
-      'ART DIRECTION',
-      'CREATIVE\nDIRECTION',
-      'ILLUSTRATION',
-      'CAMPAIGN\nDESIGN',
-      'ADVERTISING\nCREATIVE\nPRODUCTION',
-      'UI/UX MOTION\nDESIGN',
-      'WEB GRAPHICS\nDESIGN',
-      'SOCIAL MEDIA\nASSET DESIGN',
-      'VISUAL IDENTITY\nDEVELOPMENT',
-      'SCALABLE\nMOTION\nSYSTEMS',
-      'TEAM\nLEADERSHIP',
-      'NEW IP\nDEVELOPMENT',
-      'LIVE GAME\nCONTENT\nPRODUCTION',
-      'GAME JAM\nMENTORING',
-      'A/B TESTING\nCOLLABORATION',
-      'CREATIVE TEAM\nMANAGEMENT',
-      'BRANDING',
-    ];
-
-    const doneCanvas = document.getElementById('done-it-canvas');
-    let lastSlotIdx  = 0;
-    let isPulling    = false;
-    let idleAnimName = null;
-    let pullAnimName = null;
-    let slotVmInst   = null;   // ViewModel instance — available once you bind it in the Rive editor
-    let slotTextProp = null;   // vm.string('slotText')
-    let spinTrigger  = null;   // vm.trigger('trigSpin')
-
-    function sizeDoneCanvas() {
-      const w = doneCanvas.clientWidth || Math.round(window.innerWidth * 0.4);
-      doneCanvas.width  = w;
-      doneCanvas.height = Math.round(w * 540 / 1110);
-    }
-    sizeDoneCanvas();
-
-    function setSlotText(text) {
-      if (slotTextProp) {
-        slotTextProp.value = text;
-      } else {
-        try { doneRive.setTextRunValue(SLOT_TEXT, text); } catch(e) {}
-      }
-    }
-
-    const doneRive = new rive.Rive({
-      src: 'DoneItSlot.riv',
-      canvas: doneCanvas,
-      artboard: 'Slot',
-      stateMachines: 'SlotStateMachine',
-      autoplay: true,
-      fit: rive.Fit.Cover,
-      alignment: rive.Alignment.Center,
-      onLoad: () => {
-        sizeDoneCanvas();
-        requestAnimationFrame(() => doneRive.resizeDrawingSurfaceToCanvas());
-
-        const anims = doneRive.animationNames || [];
-        idleAnimName = anims.find(n => n.toLowerCase().includes('idle')) || anims[0];
-        pullAnimName = anims.find(n => n !== idleAnimName) || anims[1];
-
-        // ── ViewModel setup ──────────────────────────────────────────
-        try {
-          // Log all ViewModel/context-related methods on the Rive instance
-          const rProto = Object.getPrototypeOf(doneRive);
-          const vmMethods = Object.getOwnPropertyNames(rProto).filter(n =>
-            /viewmodel|context|databind|instance/i.test(n)
-          );
-          console.log('[DoneItSlot] Rive VM methods:', vmMethods);
-
-          slotVmInst = doneRive.viewModelInstance;
-          console.log('[DoneItSlot] viewModelInstance:', slotVmInst);
-
-          if (!slotVmInst) {
-            const vmDef = doneRive.viewModelByName ? doneRive.viewModelByName('SlotVm') : null;
-            if (vmDef) {
-              console.log('[DoneItSlot] instanceCount:', vmDef.instanceCount);
-
-              // Prefer a pre-existing instance (already wired to artboard)
-              if (vmDef.instanceCount > 0 && typeof vmDef.instanceByIndex === 'function') {
-                slotVmInst = vmDef.instanceByIndex(0);
-                console.log('[DoneItSlot] got instanceByIndex(0):', slotVmInst);
-              }
-              if (!slotVmInst && typeof vmDef.defaultInstance === 'function') {
-                slotVmInst = vmDef.defaultInstance();
-                console.log('[DoneItSlot] got defaultInstance:', slotVmInst);
-              }
-
-              // Bind to artboard — try every known method name
-              const bindFn = doneRive.setDataContextFromViewModelInstance
-                          || doneRive.bindViewModelInstance;
-              console.log('[DoneItSlot] bind fn:', typeof bindFn);
-              if (slotVmInst && typeof bindFn === 'function') {
-                bindFn.call(doneRive, slotVmInst);
-                console.log('[DoneItSlot] data context bound');
-              }
-            }
-          }
-
-          if (slotVmInst) {
-            slotTextProp = slotVmInst.string  ? slotVmInst.string('slotText')  : null;
-            spinTrigger  = slotVmInst.trigger ? slotVmInst.trigger('trigSpin') : null;
-            console.log('[DoneItSlot] ViewModel OK — textProp:', slotTextProp, '| trigger:', spinTrigger);
-          } else {
-            console.warn('[DoneItSlot] ViewModel null — text stays as baked default.');
-          }
-        } catch(e) {
-          console.warn('[DoneItSlot] ViewModel error:', e.message || e);
-        }
-
-        setSlotText(slotTitles[0]);
-      },
-      onLoadError: (e) => console.error('DoneItSlot Rive error:', e)
-    });
-
-    doneRive.on(rive.EventType.Stop, (event) => {
-      const stopped = event.data || [];
-      if (stopped.some(n => n === pullAnimName)) isPulling = false;
-    });
-
-    // SM doesn't reliably fire Stop — use StateChange as the primary reset
-    doneRive.on(rive.EventType.StateChange, (event) => {
-      const states = event.data || [];
-      if (states.some(s => /idle/i.test(s))) isPulling = false;
-    });
-
-    function changeSlotTitle() {
-      let idx;
-      do { idx = Math.floor(Math.random() * slotTitles.length); }
-      while (slotTitles.length > 1 && idx === lastSlotIdx);
-      lastSlotIdx = idx;
-      setSlotText(slotTitles[idx]);
-    }
-
-    function fireSlot() {
-      if (isPulling) return;
-      isPulling = true;
-      if (spinTrigger && typeof spinTrigger.trigger === 'function') {
-        spinTrigger.trigger();
-      } else if (pullAnimName) {
-        doneRive.play(pullAnimName);
-      }
-      setTimeout(changeSlotTitle, Math.round(8 * 1000 / 60));
-    }
-
-    doneCanvas.addEventListener('click', fireSlot);
-    doneCanvas.addEventListener('touchend', (e) => { e.preventDefault(); fireSlot(); }, { passive: false });
-
-    window.addEventListener('resize', () => {
-      r.resizeDrawingSurfaceToCanvas();
-      trailCanvas.width = window.innerWidth * dpr;
-      trailCanvas.height = heroH() * dpr;
-      tc.scale(dpr, dpr);
-      sizeDoneCanvas();
-      doneRive.resizeDrawingSurfaceToCanvas();
-    });
-
-    const squares = [];
-    let prevX = null, prevY = null;
-
-    function spawnSquare(x, y) {
-      const dx = prevX === null ? 999 : x - prevX;
-      const dy = prevY === null ? 999 : y - prevY;
-      if (dx * dx + dy * dy < 400) return;
-      prevX = x; prevY = y;
-      const vmin = Math.min(window.innerWidth, window.innerHeight);
-      const size = vmin * (0.015 + Math.random() * 0.08);
-      squares.push({
-        x: x - size / 2 + (Math.random() - 0.5) * 30,
-        y: y - size / 2 + (Math.random() - 0.5) * 30,
-        s: size,
-        born: performance.now(),
-        life: 2700 + Math.random() * 1800
-      });
-    }
-
-    function clientToCanvas(clientX, clientY) {
-      const rect = trailCanvas.getBoundingClientRect();
-      return [clientX - rect.left, clientY - rect.top];
-    }
-
-    window.addEventListener('mousemove', (e) => {
-      const [cx, cy] = clientToCanvas(e.clientX, e.clientY);
-      spawnSquare(cx, cy);
-      aboutTrail.spawn(e.clientX, e.clientY);
-      contactTrail.spawn(e.clientX, e.clientY);
-    });
-    window.addEventListener('touchmove', (e) => {
-      const t = e.touches[0];
-      const [cx, cy] = clientToCanvas(t.clientX, t.clientY);
-      spawnSquare(cx, cy);
-      aboutTrail.spawn(t.clientX, t.clientY);
-      contactTrail.spawn(t.clientX, t.clientY);
-    }, { passive: true });
-
-    // ── Lime section square trails ──
-    function makeLimeTrail(sectionEl) {
-      const canvas = document.createElement('canvas');
-      canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;';
-      sectionEl.appendChild(canvas);
-      const ctx = canvas.getContext('2d');
-      const lDpr = window.devicePixelRatio || 1;
-      const sqs = [];
-      let lpx = null, lpy = null;
-
-      function resize() {
-        canvas.width  = sectionEl.offsetWidth * lDpr;
-        canvas.height = sectionEl.offsetHeight * lDpr;
-        ctx.scale(lDpr, lDpr);
-      }
-      resize();
-      window.addEventListener('resize', resize);
-
-      return {
-        spawn(clientX, clientY) {
-          const rect = sectionEl.getBoundingClientRect();
-          const x = clientX - rect.left;
-          const y = clientY - rect.top;
-          const dx = lpx === null ? 999 : x - lpx;
-          const dy = lpy === null ? 999 : y - lpy;
-          if (dx * dx + dy * dy < 400) return;
-          lpx = x; lpy = y;
-          const vmin = Math.min(window.innerWidth, window.innerHeight);
-          const size = vmin * (0.015 + Math.random() * 0.08);
-          sqs.push({
-            x: x - size / 2 + (Math.random() - 0.5) * 30,
-            y: y - size / 2 + (Math.random() - 0.5) * 30,
-            s: size, born: performance.now(),
-            life: 2700 + Math.random() * 1800
-          });
-        },
-        tick(now) {
-          ctx.clearRect(0, 0, canvas.width / lDpr, canvas.height / lDpr);
-          for (let i = sqs.length - 1; i >= 0; i--) {
-            const sq = sqs[i];
-            const t = (now - sq.born) / sq.life;
-            if (t >= 1) { sqs.splice(i, 1); continue; }
-            const opacity = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
-            ctx.fillStyle = `rgba(255,255,255,${opacity})`;
-            ctx.fillRect(sq.x, sq.y, sq.s, sq.s);
-          }
-        }
-      };
-    }
-
-    const aboutTrail   = makeLimeTrail(document.getElementById('about'));
-    const contactTrail = makeLimeTrail(document.getElementById('contact'));
 
     // Lenis smooth scroll
     const lenis = new Lenis({
       duration: 1.4,
-      easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)), // easeOutExpo
+      easing: (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
 
     function tick(now) {
       lenis.raf(now);
-      tc.clearRect(0, 0, trailCanvas.width / dpr, trailCanvas.height / dpr);
-      for (let i = squares.length - 1; i >= 0; i--) {
-        const sq = squares[i];
-        const t = (now - sq.born) / sq.life;
-        if (t >= 1) { squares.splice(i, 1); continue; }
-        const opacity = t < 0.75 ? 1 : 1 - (t - 0.75) / 0.25;
-        tc.fillStyle = `rgba(255,255,255,${opacity})`;
-        tc.fillRect(sq.x, sq.y, sq.s, sq.s);
-      }
-      aboutTrail.tick(now);
-      contactTrail.tick(now);
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
 
     // ── Email copy-to-clipboard ──────────────────────────────────────
-    const emailBtn     = document.getElementById('email-btn');
-    const emailWrap    = document.getElementById('email-wrap');
-    const emailTooltip = document.getElementById('email-tooltip');
+    const emailBtn = document.getElementById('email-btn');
+    let copied = false;
+
+    emailBtn.addEventListener('mouseenter', () => {
+      if (!copied) emailBtn.textContent = 'copy e-mail';
+    });
+    emailBtn.addEventListener('mouseleave', () => {
+      if (!copied) emailBtn.textContent = 'e-mail';
+    });
 
     emailBtn.addEventListener('click', () => {
       navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
-        emailTooltip.textContent = 'Copied!';
-        emailWrap.classList.add('copied');
+        copied = true;
+        emailBtn.textContent = 'copied!';
         setTimeout(() => {
-          emailTooltip.textContent = 'Copy email';
-          emailWrap.classList.remove('copied');
+          copied = false;
+          emailBtn.textContent = 'e-mail';
         }, 2000);
       }).catch(() => {
-        emailTooltip.textContent = 'Copy failed';
-        emailWrap.classList.add('copied');
-        setTimeout(() => {
-          emailTooltip.textContent = 'Copy email';
-          emailWrap.classList.remove('copied');
-        }, 2000);
+        emailBtn.textContent = 'e-mail';
       });
     });
 

@@ -179,58 +179,19 @@
     }
 
     .contact-linkedin {
-      display: inline-block;
-      background: #0957C3;
-      color: #fff;
-      padding: 0 10px 2px;
+      color: #000;
       text-decoration: none;
-      line-height: inherit;
-    }
-
-    .contact-email-wrap {
-      position: relative;
-      display: inline-block;
     }
 
     .contact-email-btn {
-      background: #FFC03F;
+      background: none;
       border: none;
-      padding: 0 10px 2px;
+      padding: 0;
       margin: 0;
       font: inherit;
       color: #000;
       cursor: pointer;
-      line-height: inherit;
-    }
-
-    .email-tooltip {
-      position: absolute;
-      top: calc(100% + 12px);
-      left: 0;
-      background: #000;
-      color: #FFC03F;
-      font-size: clamp(18px, 2vw, 28px);
-      font-weight: 500;
-      padding: 6px 14px;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 10;
-    }
-
-    .email-tooltip::before {
-      content: '';
-      position: absolute;
-      bottom: 100%;
-      left: 10px;
-      border: 7px solid transparent;
-      border-bottom-color: #000;
-    }
-
-    .contact-email-wrap:hover .email-tooltip,
-    .contact-email-wrap.copied .email-tooltip {
-      opacity: 1;
+      overflow: visible;
     }
 
     .contact-right {
@@ -242,11 +203,14 @@
     }
 
     #footer-logo {
-      font-size: clamp(48px, 6vw, 88px);
-      font-weight: 500;
-      line-height: 1;
-      color: #000;
+      width: clamp(48px, 6vw, 88px);
+      height: clamp(48px, 6vw, 88px);
+      border-radius: 50%;
+      background: #C5FF30;
+      display: block;
+      overflow: hidden;
       text-decoration: none;
+      flex-shrink: 0;
     }
 
     .contact-legal {
@@ -1124,14 +1088,16 @@
         Get in touch<br>
         via <a class="contact-linkedin" href="https://www.linkedin.com/in/a-zdravkovic" target="_blank" rel="noopener">LinkedIn</a>
         or
-        <span class="contact-email-wrap" id="email-wrap">
-          <button class="contact-email-btn" id="email-btn">e-mail</button>
-          <span class="email-tooltip" id="email-tooltip">Copy e-mail</span>
-        </span>
+        <button class="contact-email-btn" id="email-btn">e-mail</button>
       </p>
     </div>
     <div class="contact-right">
-      <a href="/" id="footer-logo">a–z</a>
+      <a href="/" id="footer-logo">
+        <svg viewBox="0 0 100 100" width="100%" height="100%" overflow="visible" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <text x="50" y="50" text-anchor="middle" dominant-baseline="middle"
+                font-family="DM Sans, sans-serif" font-weight="500" font-size="58" fill="#163F1A">z</text>
+        </svg>
+      </a>
       <p class="contact-legal">© 2026 Aleksandar Zdravković. All rights reserved.<br>All trademarks and copyrighted materials belong to their respective owners.</p>
     </div>
   </footer>
@@ -1709,25 +1675,25 @@
       }, { threshold: 0.35 }).observe(document.getElementById('derisking-section'));
     })();
 
-const emailBtn     = document.getElementById('email-btn');
-    const emailWrap    = document.getElementById('email-wrap');
-    const emailTooltip = document.getElementById('email-tooltip');
+const emailBtn = document.getElementById('email-btn');
+    let copied = false;
 
+    emailBtn.addEventListener('mouseenter', () => {
+      if (!copied) emailBtn.textContent = 'copy e-mail';
+    });
+    emailBtn.addEventListener('mouseleave', () => {
+      if (!copied) emailBtn.textContent = 'e-mail';
+    });
     emailBtn.addEventListener('click', () => {
       navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
-        emailTooltip.textContent = 'Copied!';
-        emailWrap.classList.add('copied');
+        copied = true;
+        emailBtn.textContent = 'copied!';
         setTimeout(() => {
-          emailTooltip.textContent = 'Copy e-mail';
-          emailWrap.classList.remove('copied');
+          copied = false;
+          emailBtn.textContent = 'e-mail';
         }, 2000);
       }).catch(() => {
-        emailTooltip.textContent = 'Copy failed';
-        emailWrap.classList.add('copied');
-        setTimeout(() => {
-          emailTooltip.textContent = 'Copy e-mail';
-          emailWrap.classList.remove('copied');
-        }, 2000);
+        emailBtn.textContent = 'e-mail';
       });
     });
 
