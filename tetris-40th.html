@@ -71,6 +71,7 @@
 
     #tagline span {
       display: block;
+      font-style: italic;
       width: fit-content;
     }
 
@@ -191,7 +192,6 @@
       padding: 0;
       margin: 0;
       font: inherit;
-      font-style: italic;
       color: #fff;
       cursor: pointer;
       overflow: visible;
@@ -1123,14 +1123,15 @@
 
     const emailBtn = document.getElementById('email-btn');
     let emailCopied = false;
-    emailBtn.addEventListener('mouseenter', () => { if (!emailCopied) emailBtn.textContent = 'copy e-mail'; });
-    emailBtn.addEventListener('mouseleave', () => { if (!emailCopied) emailBtn.textContent = 'e-mail'; });
+    emailBtn.addEventListener('mouseenter', () => { if (!emailCopied) { emailBtn.textContent = 'copy e-mail'; emailBtn.style.fontStyle = 'italic'; } });
+    emailBtn.addEventListener('mouseleave', () => { if (!emailCopied) { emailBtn.textContent = 'e-mail'; emailBtn.style.fontStyle = ''; } });
     emailBtn.addEventListener('click', () => {
       navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
         emailCopied = true;
         emailBtn.textContent = 'copied!';
-        setTimeout(() => { emailCopied = false; emailBtn.textContent = 'e-mail'; }, 2000);
-      }).catch(() => { emailBtn.textContent = 'e-mail'; });
+        emailBtn.style.fontStyle = 'italic';
+        setTimeout(() => { emailCopied = false; emailBtn.textContent = 'e-mail'; emailBtn.style.fontStyle = ''; }, 2000);
+      }).catch(() => { emailBtn.textContent = 'e-mail'; emailBtn.style.fontStyle = ''; });
     });
 
     // ── PRIMEINTRO ──

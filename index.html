@@ -236,7 +236,6 @@
       padding: 0;
       margin: 0;
       font: inherit;
-      font-style: italic;
       color: #000;
       cursor: pointer;
       overflow: visible;
@@ -524,22 +523,25 @@
     let copied = false;
 
     emailBtn.addEventListener('mouseenter', () => {
-      if (!copied) emailBtn.textContent = 'copy e-mail';
+      if (!copied) { emailBtn.textContent = 'copy e-mail'; emailBtn.style.fontStyle = 'italic'; }
     });
     emailBtn.addEventListener('mouseleave', () => {
-      if (!copied) emailBtn.textContent = 'e-mail';
+      if (!copied) { emailBtn.textContent = 'e-mail'; emailBtn.style.fontStyle = ''; }
     });
 
     emailBtn.addEventListener('click', () => {
       navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
         copied = true;
         emailBtn.textContent = 'copied!';
+        emailBtn.style.fontStyle = 'italic';
         setTimeout(() => {
           copied = false;
           emailBtn.textContent = 'e-mail';
+          emailBtn.style.fontStyle = '';
         }, 2000);
       }).catch(() => {
         emailBtn.textContent = 'e-mail';
+        emailBtn.style.fontStyle = '';
       });
     });
 
