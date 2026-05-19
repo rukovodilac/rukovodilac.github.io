@@ -185,11 +185,6 @@
       text-decoration: none;
     }
 
-    .contact-email-wrap {
-      position: relative;
-      display: inline-block;
-    }
-
     .contact-email-btn {
       background: none;
       border: none;
@@ -199,36 +194,6 @@
       color: #fff;
       cursor: pointer;
       overflow: visible;
-    }
-
-    .email-tooltip {
-      position: absolute;
-      top: calc(100% + 12px);
-      left: 0;
-      background: #fff;
-      color: #000;
-      font-size: clamp(18px, 2vw, 28px);
-      font-weight: 500;
-      padding: 6px 14px;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 10;
-    }
-
-    .email-tooltip::before {
-      content: '';
-      position: absolute;
-      bottom: 100%;
-      left: 10px;
-      border: 7px solid transparent;
-      border-bottom-color: #fff;
-    }
-
-    .contact-email-wrap:hover .email-tooltip,
-    .contact-email-wrap.copied .email-tooltip {
-      opacity: 1;
     }
 
     .contact-right {
@@ -270,6 +235,8 @@
       .contact-legal {
         text-align: left;
       }
+      .credits-meta { flex-wrap: nowrap; gap: 16px; }
+      .credits-col  { flex: 1; min-width: 0; }
     }
 
     /* ── Global link underline animation ── */
@@ -1023,10 +990,7 @@
         Get in touch<br>
         via <a class="contact-linkedin" href="https://www.linkedin.com/in/a-zdravkovic" target="_blank" rel="noopener">LinkedIn</a>
         or
-        <span class="contact-email-wrap" id="email-wrap">
-          <button class="contact-email-btn" id="email-btn">e-mail</button>
-          <span class="email-tooltip" id="email-tooltip">Copy e-mail</span>
-        </span>
+        <button class="contact-email-btn" id="email-btn">e-mail</button>
       </p>
     </div>
     <div class="contact-right">
@@ -1155,26 +1119,16 @@
         .catch(function(e) { console.error('[ribbon fetch]', e); });
     })();
 
-    const emailBtn     = document.getElementById('email-btn');
-    const emailWrap    = document.getElementById('email-wrap');
-    const emailTooltip = document.getElementById('email-tooltip');
-
+    const emailBtn = document.getElementById('email-btn');
+    let emailCopied = false;
+    emailBtn.addEventListener('mouseenter', () => { if (!emailCopied) emailBtn.textContent = 'copy e-mail'; });
+    emailBtn.addEventListener('mouseleave', () => { if (!emailCopied) emailBtn.textContent = 'e-mail'; });
     emailBtn.addEventListener('click', () => {
       navigator.clipboard.writeText('dearmrzdravkovic@gmail.com').then(() => {
-        emailTooltip.textContent = 'Copied!';
-        emailWrap.classList.add('copied');
-        setTimeout(() => {
-          emailTooltip.textContent = 'Copy e-mail';
-          emailWrap.classList.remove('copied');
-        }, 2000);
-      }).catch(() => {
-        emailTooltip.textContent = 'Copy failed';
-        emailWrap.classList.add('copied');
-        setTimeout(() => {
-          emailTooltip.textContent = 'Copy e-mail';
-          emailWrap.classList.remove('copied');
-        }, 2000);
-      });
+        emailCopied = true;
+        emailBtn.textContent = 'copied!';
+        setTimeout(() => { emailCopied = false; emailBtn.textContent = 'e-mail'; }, 2000);
+      }).catch(() => { emailBtn.textContent = 'e-mail'; });
     });
 
     // ── PRIMEINTRO ──
