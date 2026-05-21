@@ -134,7 +134,7 @@
           const atlas = assets.get('Devil_Spine.atlas');
           const loader = new spine.AtlasAttachmentLoader(atlas);
           const binary = new spine.SkeletonBinary(loader);
-          binary.scale = 0.5;
+          binary.scale = 1.0;
 
           const data = binary.readSkeletonData(assets.get('Devil_Spine.skel'));
           if (index === 0) console.log('Animations:', data.animations.map(a => a.name));
