@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slot</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d0a14;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, sans-serif;
+    }
+
+    .machine {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .reels {
+      display: flex;
+      gap: 10px;
+    }
+
+    .reel-window {
+      width: 220px;
+      height: 220px;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1.5px solid rgba(255, 80, 30, 0.25);
+      box-shadow:
+        0 0 24px rgba(255, 50, 0, 0.18),
+        inset 0 0 30px rgba(0, 0, 0, 0.6);
+      background: #0a0008;
+    }
+
+    .reel-window canvas {
+      display: block;
+    }
+
+    .spin-btn {
+      background: linear-gradient(150deg, #cc2200, #ff4800);
+      color: #fff;
+      border: none;
+      padding: 14px 64px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      border-radius: 999px;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 0 32px rgba(255, 70, 0, 0.45);
+      transition: transform 0.1s, box-shadow 0.15s, opacity 0.2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .spin-btn:hover:not(:disabled) {
+      box-shadow: 0 0 52px rgba(255, 80, 0, 0.75);
+    }
+
+    .spin-btn:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+
+    .spin-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .loading-label {
+      color: rgba(255,255,255,0.35);
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      height: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .reel:not(:first-child) { display: none; }
+      .reel-window { width: 300px; height: 300px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="machine">
+    <div class="reels">
+      <div class="reel"><div class="reel-window"><canvas id="c0"></canvas></div></div>
+      <div class="reel"><div class="reel-window"><canvas id="c1"></canvas></div></div>
+      <div class="reel"><div class="reel-window"><canvas id="c2"></canvas></div></div>
+      <div class="reel"><div class="reel-window"><canvas id="c3"></canvas></div></div>
+    </div>
+    <div class="loading-label" id="status">Loading…</div>
+    <button class="spin-btn" id="spin-btn" disabled>SPIN</button>
+  </div>
+
+  <script src="https://unpkg.com/@esotericsoftware/spine-webgl@4.2.116/dist/iife/spine-webgl.js"></script>
+  <script>
+    const ASSET_BASE = '/DevilTest/';
+    const ANIM_IDLE = 'Idle';
+    const ANIM_WIN = 'Win';
+
+    const isMobile = () => window.innerWidth <= 768;
+    const reelSize = () => isMobile() ? 300 : 220;
+    const reelCount = () => isMobile() ? 1 : 4;
+
+    const reels = [];
+    let lastTime = 0;
+    let loopStarted = false;
+
+    function initReel(index) {
+      return new Promise((resolve, reject) => {
+        const size = reelSize();
+        const canvas = document.getElementById(`c${index}`);
+        canvas.width = size;
+        canvas.height = size;
+
+        const ctx = new spine.ManagedWebGLRenderingContext(canvas, { alpha: true });
+        const renderer = new spine.SceneRenderer(canvas, ctx);
+        const assets = new spine.AssetManager(ctx, ASSET_BASE);
+
+        assets.loadBinary('Devil_Spine.skel');
+        assets.loadTextureAtlas('Devil_Spine.atlas');
+
+        function tryInit() {
+          if (!assets.isLoadingComplete()) { requestAnimationFrame(tryInit); return; }
+          if (assets.hasErrors()) { reject(assets.getErrors()); return; }
+
+          const atlas = assets.get('Devil_Spine.atlas');
+          const loader = new spine.AtlasAttachmentLoader(atlas);
+          const binary = new spine.SkeletonBinary(loader);
+          binary.scale = 0.5;
+
+          const data = binary.readSkeletonData(assets.get('Devil_Spine.skel'));
+          if (index === 0) console.log('Animations:', data.animations.map(a => a.name));
+          const skeleton = new spine.Skeleton(data);
+          skeleton.setToSetupPose();
+          skeleton.updateWorldTransform(spine.Physics.update);
+
+          const animState = new spine.AnimationState(new spine.AnimationStateData(data));
+          animState.setAnimation(0, ANIM_IDLE, true);
+
+          const offset = new spine.Vector2(), sz = new spine.Vector2();
+          skeleton.getBounds(offset, sz, []);
+          renderer.camera.position.x = offset.x + sz.x / 2;
+          renderer.camera.position.y = offset.y + sz.y / 2;
+          renderer.camera.zoom = Math.max(sz.x / size, sz.y / size) * 1.08;
+          renderer.camera.update();
+
+          reels[index] = { canvas, ctx, renderer, skeleton, animState };
+          resolve();
+        }
+        requestAnimationFrame(tryInit);
+      });
+    }
+
+    function spinReel(index, delay) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          const { canvas, animState } = reels[index];
+          const size = reelSize();
+
+          // Exit downward
+          canvas.style.transition = `transform 0.22s ease-in`;
+          canvas.style.transform = `translateY(${size}px)`;
+
+          setTimeout(() => {
+            // Snap above, queue Win → Idle
+            canvas.style.transition = 'none';
+            canvas.style.transform = `translateY(-${size}px)`;
+            animState.setAnimation(0, ANIM_WIN, false);
+            animState.addAnimation(0, ANIM_IDLE, true, 0);
+
+            // Enter from above
+            requestAnimationFrame(() => requestAnimationFrame(() => {
+              canvas.style.transition = 'transform 0.32s ease-out';
+              canvas.style.transform = 'translateY(0)';
+              setTimeout(resolve, 320);
+            }));
+          }, 220);
+        }, delay);
+      });
+    }
+
+    let spinning = false;
+
+    document.getElementById('spin-btn').addEventListener('click', async () => {
+      if (spinning) return;
+      spinning = true;
+      document.getElementById('spin-btn').disabled = true;
+
+      const count = reelCount();
+      await Promise.all(
+        Array.from({ length: count }, (_, i) => spinReel(i, i * 160))
+      );
+
+      setTimeout(() => {
+        document.getElementById('spin-btn').disabled = false;
+        spinning = false;
+      }, 400);
+    });
+
+    function renderLoop(now) {
+      requestAnimationFrame(renderLoop);
+      const delta = Math.min((now - lastTime) / 1000, 0.1);
+      lastTime = now;
+
+      for (const reel of reels) {
+        if (!reel) continue;
+        const { ctx, renderer, skeleton, animState } = reel;
+        const gl = ctx.gl;
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        animState.update(delta);
+        animState.apply(skeleton);
+        skeleton.updateWorldTransform(spine.Physics.update);
+        renderer.begin();
+        renderer.drawSkeleton(skeleton, true);
+        renderer.end();
+      }
+    }
+
+    // Init only the visible reels
+    const count = reelCount();
+    const inits = Array.from({ length: count }, (_, i) => initReel(i));
+
+    Promise.all(inits).then(() => {
+      document.getElementById('status').textContent = '';
+      document.getElementById('spin-btn').disabled = false;
+      requestAnimationFrame(renderLoop);
+    }).catch(err => {
+      document.getElementById('status').textContent = 'Error loading assets';
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
