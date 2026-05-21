@@ -143,7 +143,7 @@
           skeleton.updateWorldTransform(spine.Physics.update);
 
           const animState = new spine.AnimationState(new spine.AnimationStateData(data));
-          animState.setAnimation(0, ANIM_IDLE, true);
+          animState.setAnimation(0, ANIM_IDLE, false);
 
           const offset = new spine.Vector2(), sz = new spine.Vector2();
           skeleton.getBounds(offset, sz, []);
@@ -173,13 +173,13 @@
             // Snap above, set Idle (visible as it enters)
             canvas.style.transition = 'none';
             canvas.style.transform = `translateY(-${size}px)`;
-            animState.setAnimation(0, ANIM_IDLE, true);
+            animState.setAnimation(0, ANIM_IDLE, false);
 
             // Enter with bounce
             requestAnimationFrame(() => requestAnimationFrame(() => {
-              canvas.style.transition = 'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)';
+              canvas.style.transition = 'transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1)';
               canvas.style.transform = 'translateY(0)';
-              setTimeout(resolve, 550);
+              setTimeout(resolve, 320);
             }));
           }, 200);
         }, delay);
