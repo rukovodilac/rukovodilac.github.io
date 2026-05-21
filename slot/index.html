@@ -166,23 +166,22 @@
           const size = reelSize();
 
           // Exit downward
-          canvas.style.transition = `transform 0.22s ease-in`;
+          canvas.style.transition = 'transform 0.2s ease-in';
           canvas.style.transform = `translateY(${size}px)`;
 
           setTimeout(() => {
-            // Snap above, queue Win → Idle
+            // Snap above, set Idle (visible as it enters)
             canvas.style.transition = 'none';
             canvas.style.transform = `translateY(-${size}px)`;
-            animState.setAnimation(0, ANIM_WIN, false);
-            animState.addAnimation(0, ANIM_IDLE, true, 0);
+            animState.setAnimation(0, ANIM_IDLE, true);
 
-            // Enter from above
+            // Enter with bounce
             requestAnimationFrame(() => requestAnimationFrame(() => {
-              canvas.style.transition = 'transform 0.32s ease-out';
+              canvas.style.transition = 'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)';
               canvas.style.transform = 'translateY(0)';
-              setTimeout(resolve, 320);
+              setTimeout(resolve, 550);
             }));
-          }, 220);
+          }, 200);
         }, delay);
       });
     }
@@ -195,14 +194,19 @@
       document.getElementById('spin-btn').disabled = true;
 
       const count = reelCount();
+
+      // Each reel lands on Idle with stagger + bounce
       await Promise.all(
-        Array.from({ length: count }, (_, i) => spinReel(i, i * 160))
+        Array.from({ length: count }, (_, i) => spinReel(i, i * 220))
       );
 
-      setTimeout(() => {
-        document.getElementById('spin-btn').disabled = false;
-        spinning = false;
-      }, 400);
+      // All landed — play Win on all in loop until next spin
+      for (let i = 0; i < count; i++) {
+        reels[i].animState.setAnimation(0, ANIM_WIN, true);
+      }
+
+      document.getElementById('spin-btn').disabled = false;
+      spinning = false;
     });
 
     function renderLoop(now) {
