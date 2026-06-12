@@ -239,6 +239,8 @@
       .credits-meta { flex-wrap: nowrap; gap: 16px; }
       .credits-col  { flex: 1; min-width: 0; }
       .credits-value br { display: none; }
+      #interp-canvas { height: 100vw; }
+      #bwcn-canvas   { height: 100vw; }
     }
 
     /* ── Global link underline animation ── */
@@ -1020,7 +1022,6 @@
         const cssH = p.offsetHeight || cssW;
         canvas.width  = cssW;
         canvas.height = cssH;
-        canvas.style.height = cssH + 'px';
       }
 
       function start() {
@@ -1229,7 +1230,6 @@
         const cssH = p.offsetHeight || cssW;
         canvas.width  = cssW;
         canvas.height = cssH;
-        canvas.style.height = cssH + 'px';
       }
 
       function start() {

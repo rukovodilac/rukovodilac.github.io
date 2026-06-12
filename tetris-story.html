@@ -453,6 +453,8 @@
       .credits-meta { flex-wrap: nowrap; gap: 16px; }
       .credits-col  { flex: 1; min-width: 0; }
       .credits-value br { display: none; }
+      #jiggle-canvas { height: 100vw; }
+      #deg45-canvas  { height: 100vw; }
     }
 
     /* ── DEG45 SECTION ── */
@@ -1253,7 +1255,6 @@
         const cssH = p.offsetHeight || cssW;
         canvas.width  = cssW;
         canvas.height = cssH;
-        canvas.style.height = cssH + 'px';
       }
 
       function start() {
@@ -1381,7 +1382,6 @@
         var cssW = canvas.parentElement.offsetWidth || window.innerWidth / 2;
         canvas.width  = cssW;
         canvas.height = cssW;
-        canvas.style.height = cssW + 'px';
       }
 
       function start() {
