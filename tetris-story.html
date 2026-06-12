@@ -1253,6 +1253,8 @@
         const cssH = p.offsetHeight || cssW;
         canvas.width  = cssW;
         canvas.height = cssH;
+        canvas.style.width  = cssW + 'px';
+        canvas.style.height = cssH + 'px';
       }
 
       function start() {
@@ -1380,6 +1382,8 @@
         var cssW = canvas.parentElement.offsetWidth || window.innerWidth / 2;
         canvas.width  = cssW;
         canvas.height = cssW;
+        canvas.style.width  = cssW + 'px';
+        canvas.style.height = cssW + 'px';
       }
 
       function start() {

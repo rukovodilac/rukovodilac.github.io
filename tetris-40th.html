@@ -1020,6 +1020,8 @@
         const cssH = p.offsetHeight || cssW;
         canvas.width  = cssW;
         canvas.height = cssH;
+        canvas.style.width  = cssW + 'px';
+        canvas.style.height = cssH + 'px';
       }
 
       function start() {
@@ -1228,6 +1230,8 @@
         const cssH = p.offsetHeight || cssW;
         canvas.width  = cssW;
         canvas.height = cssH;
+        canvas.style.width  = cssW + 'px';
+        canvas.style.height = cssH + 'px';
       }
 
       function start() {
