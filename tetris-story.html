@@ -387,8 +387,11 @@
 
     #jiggle-canvas {
       display: block;
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
       cursor: pointer;
       touch-action: pan-y;
     }
@@ -480,8 +483,11 @@
 
     #deg45-canvas {
       display: block;
-      width: 100%;
-      height: 100%;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
       touch-action: pan-y;
       cursor: pointer;
     }
@@ -1253,8 +1259,6 @@
         const cssH = p.offsetHeight || cssW;
         canvas.width  = cssW;
         canvas.height = cssH;
-        canvas.style.width  = cssW + 'px';
-        canvas.style.height = cssH + 'px';
       }
 
       function start() {
@@ -1382,8 +1386,6 @@
         var cssW = canvas.parentElement.offsetWidth || window.innerWidth / 2;
         canvas.width  = cssW;
         canvas.height = cssW;
-        canvas.style.width  = cssW + 'px';
-        canvas.style.height = cssW + 'px';
       }
 
       function start() {
